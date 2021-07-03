@@ -1,0 +1,23 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: Deploy
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Upload to S3 (mads-hartmann.com)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: aws s3 sync --region eu-central-1 _site/ s3://mads-hartmann.com/
+
+      - name: Invalidate cache (mads-hartmann.com)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: aws cloudfront create-invalidation --region us-east-1 --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths '/*'
