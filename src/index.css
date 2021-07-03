@@ -1,6 +1,9 @@
 body {
-  width: 500px;
+  max-width: 500px;
   margin: 0px auto;
+  padding: 20px;
+  font-family: "Muli", sans-serif;
+  font-size: 0.9rem;
 }
 
 header {
@@ -10,6 +13,7 @@ header {
 }
 
 header h1 {
+  text-align: center;
 }
 
 header p {
