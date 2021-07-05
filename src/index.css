@@ -12,7 +12,11 @@ header {
   align-items: center;
 }
 
-header h1 {
+h1 {
+  text-align: center;
+}
+
+h2 {
   text-align: center;
 }
 
