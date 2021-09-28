@@ -56,3 +56,10 @@ header p {
 .sites li {
   padding: 5px;
 }
+
+.technical-reviewer {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: center;
+}
