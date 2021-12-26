@@ -63,3 +63,16 @@ header p {
   list-style: none;
   text-align: center;
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #0d1117;
+    color: #c9d1d9;
+  }
+  a {
+    color: #58a6ff;
+  }
+  a:visited {
+    color: #58a6ff;
+  }
+}
