@@ -1,6 +1,8 @@
 import Head from "next/head";
 import { GetStaticProps } from "next";
 import { Client } from "@notionhq/client";
+import HowToItem from "@components/HowToItem";
+import { HowTo } from "@howto/howto"
 
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
@@ -11,47 +13,33 @@ export const getStaticProps: GetStaticProps = async (context) => {
     database_id: process.env.NOTION_HOW_TO_DATABASE_ID as string,
     sorts: [
       {
-        property: 'Created time',
-        direction: 'descending',
+        property: "Created time",
+        direction: "descending",
       },
     ],
   });
   const howtos = response.results.map((page) => {
-    const name = page.properties['Name'].title[0]['plain_text']
-    const tags = page.properties['Tags']['multi_select'].map((tag) => ({
+    const name = page.properties["Name"].title[0]["plain_text"];
+    const tags = page.properties["Tags"]["multi_select"].map((tag) => ({
       id: tag.id,
       name: tag.name,
       color: tag.color,
-    }))
+    }));
     return {
       name,
       tags,
       notion: {
         id: page.id,
-        url: page.url
-      }
-    }
-  })
+        url: page.url,
+      },
+    };
+  });
   return { props: { howtos } };
 };
 
-type Tag = {
-  id: string
-  name: string
-  color: string
-}
-
-type HowTo = {
-  name: string
-  tags: Tag[]
-  notion: {
-    url: string
-    id: string
-  }
-}
 
 type HomeProps = {
-  howtos: HowTo[]
+  howtos: HowTo[];
 };
 
 export default function Home(props: HomeProps) {
@@ -65,9 +53,7 @@ export default function Home(props: HomeProps) {
       <main>
         <ul>
           {props.howtos.map((howto) => {
-            return (
-              <li>{howto.name}</li>
-            )
+            return <HowToItem key={howto.notion.id} howto={howto} />;
           })}
         </ul>
       </main>

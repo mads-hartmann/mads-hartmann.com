@@ -26,6 +26,7 @@ touch .env
 Start the development server
 
 ```sh
+npm install
 npm run dev
 ```
 
