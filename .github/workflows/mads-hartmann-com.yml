@@ -1,4 +1,4 @@
-name: Deploy
+name: mads-hartmann.com
 on:
   push:
     branches:
@@ -14,7 +14,8 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: aws s3 sync --region eu-central-1 --acl public-read src/ s3://mads-hartmann.com/
+        run: |
+          aws s3 sync --region eu-central-1 --acl public-read sites/mads-hartmann.com/src/ s3://mads-hartmann.com/
 
       - name: Invalidate cache (mads-hartmann.com)
         env:

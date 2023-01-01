@@ -2,6 +2,4 @@
 
 # mads-hartmann.com
 
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/mads-hartmann/mads-hartmann.com)
-
-Tiny landing page for my *.mads-hartmann.com sites.
+**WIP: I'm slowly evolving this into a mono-repo containing all the code related to all my \*.mads-hartmann.com sites. Things will be quite messy and unfinished for a while.**

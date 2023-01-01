@@ -1,7 +1,0 @@
-tasks:
-  - command: python -m http.server --bind 0.0.0.0 --directory src 8080
-
-ports:
-  - port: 8080
-    onOpen: open-preview
-    visibility: public
