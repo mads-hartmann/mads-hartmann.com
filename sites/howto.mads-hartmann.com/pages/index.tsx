@@ -1,42 +1,17 @@
 import Head from "next/head";
 import { GetStaticProps } from "next";
-import { Client } from "@notionhq/client";
-import HowToItem from "@components/HowToItem";
-import { HowTo } from "@howto/howto"
-
-const notion = new Client({
-  auth: process.env.NOTION_TOKEN,
-});
+import { HowTo, HowToDB } from "@howto/howto";
+import css from "./index.module.scss";
+import HowToList from "@components/HowToList";
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const response = await notion.databases.query({
-    database_id: process.env.NOTION_HOW_TO_DATABASE_ID as string,
-    sorts: [
-      {
-        property: "Created time",
-        direction: "descending",
-      },
-    ],
-  });
-  const howtos = response.results.map((page) => {
-    const name = page.properties["Name"].title[0]["plain_text"];
-    const tags = page.properties["Tags"]["multi_select"].map((tag) => ({
-      id: tag.id,
-      name: tag.name,
-      color: tag.color,
-    }));
-    return {
-      name,
-      tags,
-      notion: {
-        id: page.id,
-        url: page.url,
-      },
-    };
-  });
+  const db = new HowToDB(
+    process.env.NOTION_TOKEN as string,
+    process.env.NOTION_HOW_TO_DATABASE_ID as string
+  );
+  const howtos = await db.list();
   return { props: { howtos } };
 };
-
 
 type HomeProps = {
   howtos: HowTo[];
@@ -50,12 +25,8 @@ export default function Home(props: HomeProps) {
         <meta name="description" content="Mads' How-To notes" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <main>
-        <ul>
-          {props.howtos.map((howto) => {
-            return <HowToItem key={howto.notion.id} howto={howto} />;
-          })}
-        </ul>
+      <main className={css.main}>
+        <HowToList howtos={props.howtos} />
       </main>
     </>
   );
