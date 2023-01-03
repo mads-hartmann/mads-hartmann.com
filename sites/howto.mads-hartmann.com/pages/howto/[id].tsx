@@ -1,9 +1,10 @@
 import { GetStaticProps, GetStaticPaths } from "next";
 import { HowTo, HowToDB } from "@howto/howto";
 import ReactMarkdown from "react-markdown";
+import { ParsedUrlQuery } from "querystring";
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const { id } = context.params;
+  const { id } = context.params as ParsedUrlQuery;
   const db = new HowToDB(
     process.env.HOWTO_NOTION_TOKEN as string,
     process.env.HOWTO_NOTION_DATABASE_ID as string

@@ -53,7 +53,7 @@ export class HowToDB {
 
   private parse(page: any): HowTo {
     const name = page.properties["Name"].title[0]["plain_text"];
-    const tags = page.properties["Tags"]["multi_select"].map((tag) => ({
+    const tags = page.properties["Tags"]["multi_select"].map((tag: any) => ({
       id: tag.id,
       name: tag.name,
       color: tag.color,
