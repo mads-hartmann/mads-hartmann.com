@@ -6,8 +6,8 @@ import HowToList from "@components/HowToList";
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const db = new HowToDB(
-    process.env.NOTION_TOKEN as string,
-    process.env.NOTION_HOW_TO_DATABASE_ID as string
+    process.env.HOWTO_NOTION_TOKEN as string,
+    process.env.HOWTO_NOTION_DATABASE_ID as string
   );
   const howtos = await db.list();
   return { props: { howtos } };

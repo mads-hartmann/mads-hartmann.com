@@ -16,14 +16,7 @@ To finish the prototype
 
 ### Development
 
-Put the relevant credentials in `.env` - they're stored in 1Password for now. See [Credentials](#credentials) below for information about how the credentials were created.
-
-```sh
-touch .env
-# Copy in the credentials from 1password.
-```
-
-Start the development server
+Ensure you have the appropriate environment variables set - they're stored in 1Password for now and have been added as Gitpod Variables so they're already present in workspaces I start. See [Credentials](#credentials) below for information about how the credentials were created.
 
 ```sh
 npm install
@@ -34,7 +27,8 @@ npm run dev
 
 Some notes on the credentials.
 
-- `NOTION_TOKEN` was created by creating a Notion integration. It has read-only access to the content in my workspace. See [My Integration](https://www.notion.so/my-integrations). You need to add the integration to the database page in Notion by clicking the "..." and then "Add connections" before it gets access to your database.
+- `HOWTO_NOTION_TOKEN` was created by creating a Notion integration. It has read-only access to the content in my workspace. See [My Integration](https://www.notion.so/my-integrations). You need to add the integration to the database page in Notion by clicking the "..." and then "Add connections" before it gets access to your database.
+- `HOWTO_NOTION__DATABASE_ID` the ID of the Notion database which contains the How-To documents. Can be found in the URL if you open the page for the database.
 
 ### References
 
