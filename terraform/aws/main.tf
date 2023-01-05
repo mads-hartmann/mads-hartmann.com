@@ -31,8 +31,9 @@ locals {
 }
 
 resource "aws_route53_record" "howto" {
-  zone_id = var.route53_zone_id
+  zone_id = local.route53_zone_id
   name    = "howto"
   type    = "CNAME"
+  ttl     = 300
   records = ["cname.vercel-dns.com."]
 }
