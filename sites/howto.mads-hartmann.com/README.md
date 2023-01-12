@@ -14,9 +14,13 @@ It uses [souvikinator/notion-to-md](https://github.com/souvikinator/notion-to-md
 
 To finish the prototype
 
-1. Host it somewhere. Probably easiest just to use Vercel to be honest.
+1. [x] Host it somewhere. Probably easiest just to use Vercel to be honest.
 2. Make it possible to click each How-To to render a page for it
 3. Possibly add a page for tags
+
+Optional
+
+- Play around with [Radix UI](https://www.radix-ui.com/) if I need nicer components
 
 ### Development
 

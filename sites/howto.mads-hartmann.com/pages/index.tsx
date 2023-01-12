@@ -59,7 +59,7 @@ export default function Home(props: HomeProps) {
         <div className={css.info}>
           <div>
             <h1>How to...</h1>
-            <p>This is my collection of {props.howtos.length} short how-to notes for how to accomplish common tasks. I only recently started collecting these so I don't have that many yet.</p>
+            <p>This is my collection of {props.howtos.length} short how-to notes for how to accomplish common tasks. I only recently started collecting these so I don&apos;t have that many yet.</p>
           </div>
           <input
             className={css.input}
