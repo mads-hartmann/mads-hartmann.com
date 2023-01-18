@@ -1,5 +1,6 @@
 name: mads-hartmann.com
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
