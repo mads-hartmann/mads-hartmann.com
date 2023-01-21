@@ -1,0 +1,34 @@
+title: Mads Hartmann
+description: Mads Hartmann's Blog
+url: https://blog.mads-hartmann.com
+author: Mads Hartmann
+
+highlighter: rouge
+
+collections:
+  book_reviews:
+    output: true
+
+kramdown:
+  input: GFM
+  auto_ids: true
+  syntax_highlighter: rouge
+
+disqus:
+  shortname: madshartmann
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-feed
+
+# Atom feed
+feed:
+  posts_limit: 100
+
+# Serving
+detach: false
+port: 4000
+host: 0.0.0.0
+baseurl: "" # does not include hostname
+show_dir_listing: false

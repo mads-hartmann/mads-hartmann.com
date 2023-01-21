@@ -1,0 +1,20 @@
+---
+layout: default
+---
+
+<div class="appetizer">
+  {{ page.excerpt }}
+</div>
+
+<div class="title">
+  <h1>{{ page.title }}</h1>
+  <section class="meta">
+    by <a href="/">Mads Hartmann</a> - {{ page.date | date_to_string }}
+  </section>
+</div>
+
+<div class="post">
+{{ page.content | remove: page.excerpt }}
+</div>
+
+{% include disqus_comments.html %}

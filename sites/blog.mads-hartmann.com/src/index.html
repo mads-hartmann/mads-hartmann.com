@@ -1,0 +1,52 @@
+---
+layout: default
+title: Mads Hartmann
+disable_scroll_indicator: true
+---
+
+<div id="home">
+
+  <div class="featured posts">
+    <h2 id="highlights">✨ Highlights ✨</h2>
+    <ul>
+      <li>
+        <a href="/series/observability/index.html">Series on Observability</a>
+        <span class="date">2019 - 2020</span>
+      </li>
+      <li>
+        <a href="/2018/09/29/enough-awk-to-get-by.html">Enough AWK to get by</a>
+        <span class="date">29 Sep 2018</span>
+      </li>
+      <li>
+        <a href="/2016/08/20/make.html">Make</a>
+        <span class="date">20 Aug 2016</span>
+      </li>
+      <li>
+        <a href="/ocaml/2015/01/05/gadt-ocaml.html">Detecting use-cases for GADTs in OCaml</a>
+        <span class="date">05 Jan 2015</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="posts">
+  {% for post in site.posts %}
+    {% assign currentdate = post.date | date: "%Y" %}
+    {% if currentdate != date %}
+      {% unless forloop.first %}
+      </ul>
+      {% endunless %}
+      <h2 id="y{{post.date | date: "%Y"}}">{{ currentdate }}</h2>
+      <ul>
+    {% assign date = currentdate %}
+    {% endif %}
+        <li>
+          <a href="{{ post.url }}">{{ post.title }}</a>
+          <span class="date">{{ post.date | date_to_string }}</span>
+        </li>
+    {% if forloop.last %}
+      </ul>
+    {% endif %}
+  {% endfor %}
+  </div>
+
+</div>

@@ -1,0 +1,21 @@
+@media print {
+  body {
+    font-size: 0.7rem;
+    line-height: 1rem;
+  }
+
+  h2 {
+    font-size: 1rem;
+    margin-top: 1em;
+  }
+
+  .container {
+    width: 90%;
+  }
+  .menu {
+    display: none;
+  }
+  .footer {
+    display: none;
+  }
+}

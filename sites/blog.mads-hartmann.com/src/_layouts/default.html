@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width" name="viewport">
+
+    <link rel="alternate" type="application/rss+xml" href="{{ site.url }}/feed.xml" title="{{ site.title }}">
+
+    <link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="/images/favicon.ico" rel="icon" type="image/x-icon">
+
+    <link href="/css/index.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Muli:200,200i,400,400i,700,700i" rel="stylesheet">
+
+    {% unless page.disable_scroll_indicator %}
+    <script defer src="/js/scroll-indicator.js" type="text/javascript"></script>
+    {% endunless %}
+
+    {% comment %} The seo plugin takes care of generating title tags etc. {% endcomment %}
+    {% seo %}
+</head>
+
+<body>
+    <div class="container {{page.colors | default: 'default' }} {{page.class}}">
+
+        {% unless page.disable_scroll_indicator %}
+        <div class="scroll-indicator-container">
+            <div class="scroll-indicator-progress"></div>
+        </div>
+        {% endunless %}
+
+        <div class="menu">
+            <a href="/">
+                <img alt="Portrait photo of Mads Hartmann" height="45" src="/images/profile.png" width="45" />
+                Mads Hartmann
+            </a>
+            <ul>
+                <li><a href="/">Posts 📝</a></li>
+                <li><a href="/about/index.html">About 👋</a></li>
+            </ul>
+        </div>
+
+        <div class="site">
+            {{ content }}
+        </div>
+
+        <div class="footer">
+            <div class="contact">
+                <p>
+                    Mads Hartmann<br />
+                    SRE at 
+                    <a href="https://gitpod.com" rel="noreferrer" target="_blank">Gitpod</a><br />
+                    hello@mads-hartmann.com
+                </p>
+            </div>
+            <div class="contact">
+                <p>
+                    <a href="https://github.com/mads-hartmann">Github</a><br />
+                    <a href="https://twitter.com/mads_hartmann">Twitter</a><br />
+                    <a href="https://www.linkedin.com/in/mads-hartmann">LinkedIn</a><br />
+                </p>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,31 @@
+name: Build & deploy blog.mads-hartmann.com
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and deploy
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@master
+      - uses: cachix/install-nix-action@v15
+        with:
+          nix_path: nixpkgs=channel:release-22.05
+      - name: Setup bundler environment
+        working-directory: sites/blog.mads-hartmann.com
+        run: nix-shell --run 'bundle install'
+      - name: Build
+        working-directory: sites/blog.mads-hartmann.com
+        run: nix-shell --run 'bundle exec jekyll build --source src'
+      - name: Upload to S3 and invalidate cache
+        if: github.ref == 'refs/heads/main'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BLOG_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BLOG_AWS_SECRET_ACCESS_KEY }}
+        working-directory: sites/blog.mads-hartmann.com
+        run: |
+          aws s3 sync --region us-east-1 _site/ s3://${{ secrets.BLOG_BUCKET_NAME }}/
+          aws cloudfront create-invalidation --region us-east-1 --distribution-id ${{ secrets.BLOG_CLOUDFRONT_DISTRIBUTION_ID }} --paths '/*'

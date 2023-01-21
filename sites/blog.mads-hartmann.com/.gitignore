@@ -1,0 +1,13 @@
+.DS_Store
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+.vscode
+
+_site
+
+# bundler related things
+vendor/
+
+# Dagger
+cue.mod
