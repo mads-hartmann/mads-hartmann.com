@@ -1,0 +1,31 @@
+name: Build & deploy computer.mads-hartmann.com
+on: push
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.1.2"
+
+      - name: Install bundler and gems
+        run: |
+          gem install bundler -v 2.3.15
+          bundle install
+
+      - name: Build site
+        working-directory: sites/computer.mads-hartmann.com
+        run: bundle exec jekyll build --source src
+
+      - name: Upload to S3 and Invalidate cache
+        if: github.ref == 'refs/heads/main'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.COMPUTER_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.COMPUTER_AWS_SECRET_ACCESS_KEY }}
+        working-directory: sites/computer.mads-hartmann.com
+        run: |
+          aws s3 sync --region us-east-1 _site/ s3://computer.mads-hartmann.com/
+          aws cloudfront create-invalidation --region us-east-1 --distribution-id ${{ secrets.COMPUTER_CLOUDFRONT_DISTRIBUTION_ID }} --paths '/*'

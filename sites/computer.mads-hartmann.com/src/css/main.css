@@ -1,0 +1,73 @@
+body {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  grid-template-rows: auto;
+  grid-template-areas: "nav main";
+  font-family: "Muli", sans-serif;
+  padding: 0;
+  margin: 0;
+}
+
+main {
+  grid-area: main;
+  padding: 2em;
+  margin: 0;
+  max-width: 800px;
+}
+
+nav {
+  background: #f9f9f9;
+  border-right: 1px solid #ccc;
+
+  grid-area: nav;
+  padding: 2em;
+  justify-self: left;
+
+  overflow-y: scroll;
+
+  /* Make the navigation sticky */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+}
+
+nav ul:first-child {
+  padding: 0;
+}
+
+h1 {
+  font-style: monospace;
+}
+
+a {
+  color: inherit;
+}
+
+pre {
+  overflow-x: auto;
+  background: #f1f1f1;
+  padding: 1em 20px;
+  margin: 0;
+}
+
+@media only screen and (max-width: 768px) {
+  body {
+    display: block;
+    padding: 2em;
+  }
+  nav {
+    position: relative;
+    height: auto;
+    border: 1px solid #ccc;
+  }
+  main {
+    max-width: 100%;
+    padding: 0;
+  }
+}

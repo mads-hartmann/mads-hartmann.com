@@ -1,0 +1,9 @@
+inputs:
+  nixpkgs:
+    url: github:NixOS/nixpkgs/nixpkgs-unstable
+  computer:
+    url: github:mads-hartmann/computer.mads-hartmann.com
+    flake: false
+imports:
+  - computer/devenvs/kubernetes
+  - computer/devenvs/scripting
