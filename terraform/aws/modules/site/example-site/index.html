@@ -1,0 +1,25 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Static site</title>
+    <meta name="description" content="Example static site">
+    <meta name="author" content="Mads Hartmann">
+</head>
+
+<body>
+    <h1>Example static site hosted in S3 and served by CloudFront!</h1>
+    <h2>Example of a 200 response</h2>
+    <pre>curl https://example.mads-hartmann.com</pre>
+
+    <h2>Example of a 404 response</h2>
+    <pre>curl https://example.mads-hartmann.com/no-file</pre>
+
+    <h2>Example of a 403 response</h2>
+    <p>One of the AWS managed firewall rules disallow empty user-agents:</p>
+    <pre>curl --user-agent '' https://example.mads-hartmann.com</pre>
+</body>
+
+</html>
