@@ -1,10 +1,9 @@
-name: Build & deploy blog.mads-hartmann.com
+name: blog.mads-hartmann.com
 on:
   workflow_dispatch:
   push:
     branches:
       - main
-
 jobs:
   build:
     name: Build and deploy

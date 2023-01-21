@@ -1,5 +1,9 @@
-name: Build & deploy computer.mads-hartmann.com
-on: push
+name: computer.mads-hartmann.com
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 jobs:
   build:
     name: Build
