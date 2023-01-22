@@ -1,8 +1,9 @@
 # blog.mads-hartmann.com
 
+Uses devenv. Uses [bundix](https://github.com/nix-community/bundix) so that Nix can manage the gems (TOOD: The purpose is to allow me use the nix cache so that I don't have to compile gems)
+
 ```
 cd sites/blog.mads-hartmann.com
-nix-shell
-bundle install
-bundle exec jekyll serve --watch --drafts --source src
+devenv shell
+devenv up
 ```
