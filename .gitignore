@@ -1,1 +1,5 @@
 .terraform
+
+# Devenv
+.devenv*
+devenv.local.nix
