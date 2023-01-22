@@ -12,5 +12,5 @@ Manual for now:
 # nix profile install nixpkgs#cachix
 
 cachix use devenv
-nix profile install github:cachix/devenv/v0.5
+yes | nix profile install github:cachix/devenv/v0.5
 ```
