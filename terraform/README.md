@@ -1,8 +1,8 @@
 # AWS
 
 ```sh
-nix-shell
-terraform validate
+devenv shell
+# cd to appropriate dir
 terraform init
 terraform plan
 terraform appy
@@ -16,7 +16,7 @@ terraform appy
 ## Reading outputs
 
 ```
-nix-shell
+devenv shell
 terraform output
 # If you need access to sensitive output
 terraform output -json
