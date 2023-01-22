@@ -7,3 +7,13 @@ cd sites/blog.mads-hartmann.com
 devenv shell
 devenv up
 ```
+
+## Updating gems
+
+Update the version in `Gemfile` and run the following:
+
+```sh
+devenv shell
+bundle lock # to update Gemfile.lock
+bundix      # to update gemset.nix
+```
