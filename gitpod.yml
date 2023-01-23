@@ -1,0 +1,6 @@
+tasks:
+  - before: |
+      # Nix and Cachix are part of the default Gitpod image
+      # so I don't need to install those
+      cachix use devenv
+      yes | nix profile install github:cachix/devenv/v0.5
