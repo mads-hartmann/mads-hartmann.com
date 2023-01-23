@@ -7,8 +7,6 @@ gem "jekyll-seo-tag", "~> 2.8.0"
 gem 'jekyll-sitemap', "~> 1.4.0"
 gem 'jekyll-feed', "~> 0.17.0"
 
-gem "webrick", "~> 1.7.0"
-
 # Jekyll 4.3.0 switched to using jekyll-sass-converter 3.0
 # however I get "Error occurred during parsing (Google::Protobuf::ParseError)" when I try to
 # build my site with that version, so I'm fixing the version to 2.x here
