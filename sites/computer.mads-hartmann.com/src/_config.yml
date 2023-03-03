@@ -7,7 +7,6 @@ permalink: pretty
 
 plugins:
   - jekyll-toc
-  - jekyll-seo-tag
 
 defaults:
   -
