@@ -9,21 +9,17 @@
         <link href="/css/main.css" rel="stylesheet"/>
         <link href="/css/pygments-theme.css" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css?family=Muli:200,200i,400,400i,700,700i" rel="stylesheet"/>
-
-        {%- comment -%}
-            The seo plugin takes care of generating title tags etc.
-        {%- endcomment -%}
-        {% seo %}
     </head>
 
     <body>
-        <nav>
-            {{ content | toc_only }}
-        </nav>
+        
         <main aria-label="Content" class="page-content">
             {% if page.title %}
                 <h1>{{ page.title }}</h1>
             {% endif %}
+            <nav>
+                {{ content | toc_only }}
+            </nav>
             {{ content | inject_anchors }}
         </main>
     </body>
