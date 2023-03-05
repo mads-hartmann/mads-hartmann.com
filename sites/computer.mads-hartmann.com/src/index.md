@@ -89,7 +89,29 @@ nix profile install github:cachix/devenv/v0.6
 
 ### VSCode
 
-I keep my local configuration very minimal.
+I try to keep my local configuration minimal.
+
+Installed extensions snap-shotted on the 5th of March 2023 
+
+```sh
+$ code --list-extensions
+bbenoist.Nix
+brody715.vscode-cuelang
+dbaeumer.vscode-eslint
+eamodio.gitlens
+EditorConfig.EditorConfig
+esbenp.prettier-vscode
+gitpod.gitpod-desktop
+hashicorp.terraform
+liviuschera.noctis
+ms-vscode-remote.remote-ssh
+ms-vscode-remote.remote-ssh-edit
+ms-vscode.remote-explorer
+nickgo.cuelang
+PKief.material-icon-theme
+SimonSiefke.prettier-vscode
+streetsidesoftware.code-spell-checker
+```
 
 <details>
   <summary>settings.json</summary>
