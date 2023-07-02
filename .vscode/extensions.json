@@ -1,5 +1,3 @@
 {
-    "recommendations": [
-        "hashicorp.terraform"
-    ]
+  "recommendations": ["hashicorp.terraform"]
 }
