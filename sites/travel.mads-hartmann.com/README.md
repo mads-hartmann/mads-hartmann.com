@@ -1,6 +1,8 @@
 # travel.mads-hartmann.com
 
+TBD - Trying to find a nice way to journal trips.
+
 ```sh
-devenv up
-devenv shell
+nix-shell
+hugo serve
 ```

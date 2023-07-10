@@ -1,0 +1,18 @@
+[submodule "sites/travel.mads-hartmann.com/web/themes/gpx-shortcode"]
+	path = sites/travel.mads-hartmann.com/web/themes/gpx-shortcode
+	url = git@github.com:martinschneider/hugo-gpx-shortcode.git
+[submodule "sites/travel.mads-hartmann.com/web/themes/nostyleplease"]
+	path = sites/travel.mads-hartmann.com/web/themes/nostyleplease
+	url = https://github.com/Masellum/hugo-theme-nostyleplease
+[submodule "sites/travel.mads-hartmann.com/web/themes/hugo-shortcode-gallery"]
+	path = sites/travel.mads-hartmann.com/web/themes/hugo-shortcode-gallery
+	url = https://github.com/mfg92/hugo-shortcode-gallery.git
+[submodule "sites/travel.mads-hartmann.com/themes/hugo-shortcode-gallery"]
+	path = sites/travel.mads-hartmann.com/themes/hugo-shortcode-gallery
+	url = https://github.com/mfg92/hugo-shortcode-gallery.git
+[submodule "sites/travel.mads-hartmann.com/themes/nostyleplease"]
+	path = sites/travel.mads-hartmann.com/themes/nostyleplease
+	url = https://github.com/Masellum/hugo-theme-nostyleplease
+[submodule "sites/travel.mads-hartmann.com/themes/gpx-shortcode"]
+	path = sites/travel.mads-hartmann.com/themes/gpx-shortcode
+	url = git@github.com:martinschneider/hugo-gpx-shortcode.git
