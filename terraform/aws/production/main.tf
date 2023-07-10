@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "3.22.0"
+      version = "5.7.0"
     }
   }
 
@@ -96,6 +96,18 @@ module "links-mads-hartmann-com" {
 module "blog-mads-hartmann-com" {
   source              = "../modules/site"
   domain              = "blog.mads-hartmann.com"
+  acm_certificate_arn = local.acm_certificate_arn
+  route53_zone_id     = local.route53_zone_id
+  enable_waf          = false
+
+  providers = {
+    aws = aws.us-east-1
+  }
+}
+
+module "travel-mads-hartmann-com" {
+  source              = "../modules/site"
+  domain              = "travel.mads-hartmann.com"
   acm_certificate_arn = local.acm_certificate_arn
   route53_zone_id     = local.route53_zone_id
   enable_waf          = false
