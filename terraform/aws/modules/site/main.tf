@@ -329,7 +329,7 @@ resource "aws_lambda_function" "origin_request" {
   # It seems that CloudFront needs the lambda to be versioned.
   publish = true
 
-  runtime = "nodejs12.x"
+  runtime = "nodejs18.x"
 
   tags = local.tags
 }
@@ -348,7 +348,7 @@ resource "aws_lambda_function" "origin_response" {
   # It seems that CloudFront needs the lambda to be versioned.
   publish = true
 
-  runtime = "nodejs12.x"
+  runtime = "nodejs18.x"
 
   tags = local.tags
 }
