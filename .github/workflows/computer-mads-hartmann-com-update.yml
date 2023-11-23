@@ -1,4 +1,4 @@
-name: Run Node Script Every Hour
+name: computer.mads-hartmann.com - update
 
 on:
   workflow_dispatch:

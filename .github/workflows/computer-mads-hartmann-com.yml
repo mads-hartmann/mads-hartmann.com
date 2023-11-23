@@ -1,4 +1,4 @@
-name: computer.mads-hartmann.com
+name: computer.mads-hartmann.com - ci/cd
 on:
   workflow_dispatch:
   push:
