@@ -1,0 +1,25 @@
+name: Run Node Script Every Hour
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    
+    # - name: Install dependencies
+    #   run: npm ci
+      
+    - name: Run script
+      run: node sites/computer.mads-hartmann.com/scripts/fetch-from-notion.js
