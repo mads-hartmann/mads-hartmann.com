@@ -11,13 +11,19 @@ toc: true
 ## Applications
 
 
+### 1Password
+
+
+I use [1Password](https://1password.com/) for all my personal passwords, credit cards, credentials, and so on. I Install it using the App Store.
+
+
 ### Raycast
 
 
 I use the following **Raycast Extensions** from the [Raycast Store](https://www.raycast.com/store). They’re sorted alphabetically
 
-- **Apple Reminders**
-Mostly to quickly add reminders.
+- [**Apple Reminders**](https://www.raycast.com/raycast/apple-reminders)
+I use the “My Reminders” command get a quick overview or modify the individual reminders and “Create Reminder” to quickly adding new reminders.
 - **Navigation
 This is one of the native extensions that ship with Raycast. I primarily use the “**Search Menu Items” command. It’s the best. Allows you to use Raycast to search through the menu items of whatever application you have focused at the time.
 - [**Screenshot**](https://www.raycast.com/Aayush9029/screenshot)
@@ -190,6 +196,6 @@ streetsidesoftware.code-spell-checker
 The current version is v3
 
 - v3 - The biggest difference between v2 and v3 is that this is now authored in Notion and then exported as markdown. This should hopefully mean that I find it easier to update along the way.
-- v2 - the major change from [v1](https://computer.mads-hartmann.com/v1) is that I now do 99% of my development in [Cloud Development Environments (CDE)](https://www.gitpod.io/cde) which means that I install _very_ few tools locally.
-- v1 - the original [computer.mads-hartmann.com](http://computer.mads-hartmann.com/)
+- [v2](https://computer.mads-hartmann.com/v2) - the major change from [v1](https://computer.mads-hartmann.com/v1) is that I now do 99% of my development in [Cloud Development Environments (CDE)](https://www.gitpod.io/cde) which means that I install _very_ few tools locally.
+- [v1](https://computer.mads-hartmann.com/v1) - the original [computer.mads-hartmann.com](http://computer.mads-hartmann.com/)
 
