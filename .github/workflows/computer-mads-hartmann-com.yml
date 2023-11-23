@@ -2,8 +2,9 @@ name: computer.mads-hartmann.com - ci/cd
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    paths:
+      - "sites/computer.mads-hartmann.com/**"
+
 jobs:
   build:
     name: Build

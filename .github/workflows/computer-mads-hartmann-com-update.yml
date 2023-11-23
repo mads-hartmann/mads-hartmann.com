@@ -17,15 +17,13 @@ jobs:
         with:
           node-version: 18
       - name: Install dependencies
-        run: |
-          cd sites/computer.mads-hartmann.com/scripts/fetch-from-notion
-          npm ci
+        working-directory: sites/computer.mads-hartmann.com/scripts/fetch-from-notion
+        run: npm ci
       - name: Run script
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: |
-          cd sites/computer.mads-hartmann.com/scripts/fetch-from-notion
-          node index.js > ../../src/index.md
+        working-directory: sites/computer.mads-hartmann.com/scripts/fetch-from-notion
+        run: node index.js > ../../src/index.md
       - name: Commit changes
         run: |
           git config --global user.name 'Mads Hartmann (GitHub Actions)'
