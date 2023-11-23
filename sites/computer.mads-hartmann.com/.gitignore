@@ -12,3 +12,5 @@ vendor/
 
 # Devenv related files
 .devenv*
+
+node_modules

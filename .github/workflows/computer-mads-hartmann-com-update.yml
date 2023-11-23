@@ -14,7 +14,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      # - name: Install dependencies
-      #   run: npm ci
+      - name: Install dependencies
+        run: |
+          cd sites/computer.mads-hartmann.com/scripts/fetch-from-notion
+          npm ci
       - name: Run script
-        run: node sites/computer.mads-hartmann.com/scripts/fetch-from-notion.js
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          cd sites/computer.mads-hartmann.com/scripts/fetch-from-notion
+          node index.js > ../../src/index.md
+      - name: Commit changes
+        run: |
+          git config --global user.name 'Mads Hartmann (GitHub Actions)'
+          git config --global user.email 'mads-hartmann@users.noreply.github.com'
+          git commit -am "Updated from Notion"
+          git push
