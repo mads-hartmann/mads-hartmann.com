@@ -26,6 +26,10 @@ jobs:
         run: node index.js > ../../src/index.md
       - name: Commit changes
         run: |
+          if [[ -z $(git status -s) ]]; then
+            echo "No changes to commit"
+            exit 0
+          fi
           git config --global user.name 'Mads Hartmann (GitHub Actions)'
           git config --global user.email 'mads-hartmann@users.noreply.github.com'
           git commit -am "Updated from Notion"
