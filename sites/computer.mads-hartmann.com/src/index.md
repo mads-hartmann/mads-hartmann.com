@@ -25,10 +25,18 @@ I use [1Password](https://1password.com/) for all my personal passwords, credit 
 
 I use the following **Raycast Extensions** from the [Raycast Store](https://www.raycast.com/store). They’re sorted alphabetically
 
+
+Built-in extensions
+
+- **Window Management**
+I use this a ton for very basic window management. “Center” is mapped to ⌘⌥C, “Left Half” to ⌘⌥←, “Right Half” to ⌘⌥←, and Maximize ⌘⌥↵.
+- **Navigation**
+I primarily use the “Search Menu Items” command. It’s the best. Allows you to use Raycast to search through the menu items of whatever application you have focused at the time.
+
+From the [Raycast Store](https://www.raycast.com/store)
+
 - [Apple Reminders](https://www.raycast.com/raycast/apple-reminders)
 I use the “My Reminders” command get a quick overview or modify the individual reminders and “Create Reminder” to quickly adding new reminders.
-- Navigation
-**This is one of the native extensions that ship with Raycast. I primarily use the “**Search Menu Items” command. It’s the best. Allows you to use Raycast to search through the menu items of whatever application you have focused at the time.
 - [**Screenshot**](https://www.raycast.com/Aayush9029/screenshot)
 Really useful for taking screenshots directly to the Clipboard. That way I don’t litter my Desktop with screenshots.
 - [Color Picker](https://www.raycast.com/thomas/color-picker)
