@@ -1,5 +1,6 @@
 import { Client } from "@notionhq/client";
 import { NotionToMarkdown } from "notion-to-md";
+import { marked } from "marked";
 
 const header = `
 ---
@@ -27,8 +28,9 @@ async function main() {
 
   const mdBlocks = await n2m.pageToMarkdown("9c3cf9a818da426f9be44d838395396c");
   const mdString = n2m.toMarkdownString(mdBlocks);
+  const html = await marked.parse(mdString.parent);
   console.log(header);
-  console.log(mdString.parent);
+  console.log(html);
 }
 
 await main();
