@@ -1,8 +1,28 @@
+:root {
+  --background-color: #fff;
+  --code-background-color: #f1f1f1;
+  --text-color: #000;
+  --table-bg: #F7F6F3;
+  --table-border-color: #E9E9E7;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #191919;
+    --code-background-color: #202020;
+    --text-color: rgba(255, 255, 255, 0.81);
+    --table-bg: #202020;
+    --table-border-color: #2F2F2F;
+  }
+}
+
 body {
   display: block;
   font-family: "Muli", sans-serif;
   padding: 2em;
   margin: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 main {
@@ -20,7 +40,7 @@ main {
 }
 
 nav {
-  background: #f9f9f9;
+  background: var(--code-background-color);
   border: 1px solid #ccc;
   padding: 2em;
   box-sizing: border-box;
@@ -45,8 +65,33 @@ a {
 
 pre {
   overflow-x: auto;
-  background: #f1f1f1;
+  background: var(--code-background-color);
   padding: 1em 20px;
   margin: 0;
 }
 
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid var(--table-border-color);
+  padding: 0.5rem;
+}
+
+th {
+  background-color: var(--table-bg);
+  text-align: left;
+}
+
+td:first-child {
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+
+td:last-child {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
