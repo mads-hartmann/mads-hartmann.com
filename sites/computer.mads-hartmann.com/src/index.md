@@ -17,7 +17,7 @@ Hej 👋 welcome to computer.mads-hartmann.com. I use this little site to jot d
 ### VSCode
 
 
-Key-bindings
+This is the list **keyboard shortcuts** I generally use. I try to stick to the defaults where possible and only use custom shortcuts when needed.
 
 
 | Keys                  | Command Title                                           | Condition            | Default |
