@@ -17,6 +17,91 @@ Hej 👋 welcome to computer.mads-hartmann.com. I use this little site to jot d
 ### VSCode
 
 
+Key-bindings
+
+
+| Keys              | Command Title                                           | Condition            | Default |
+| ----------------- | ------------------------------------------------------- | -------------------- | ------- |
+| Coding            |                                                         |                      |         |
+| ^-.               | Quick Fix…                                              |                      | no      |
+| Window Management |                                                         |                      |         |
+| ⌘0                | Focus Sidebar                                           |                      |         |
+| ⌘K ↓              | Move editor group down (same for the other directions)  |                      |         |
+| ⌘K ⌘↓             | Focus Editor Group Down (same for the other directions) |                      |         |
+| ^⇧⌥⌘7             | View: Split Editor                                      |                      |         |
+| ⌘<                | Terminal: Focus Terminal                                | when !terminal focus | no      |
+| ⌘<                | View: Focus Active Editor Group                         | when terminal focus  | no      |
+
+
+Extensions
+
+
+```bash
+code --list-extensions
+```
+
+
+```text
+# Installed extensions snap-shotted on the 5th of March 2023
+bbenoist.Nix
+brody715.vscode-cuelang
+dbaeumer.vscode-eslint
+eamodio.gitlens
+EditorConfig.EditorConfig
+esbenp.prettier-vscode
+gitpod.gitpod-desktop
+hashicorp.terraform
+liviuschera.noctis
+ms-vscode-remote.remote-ssh
+ms-vscode-remote.remote-ssh-edit
+ms-vscode.remote-explorer
+nickgo.cuelang
+PKief.material-icon-theme
+SimonSiefke.prettier-vscode
+streetsidesoftware.code-spell-checker
+```
+
+
+Settings
+
+<details>
+<summary>settings.json</summary>
+
+```text
+{
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.formatOnSave": true,
+  "workbench.activityBar.visible": true,
+  "workbench.colorTheme": "Noctis Minimus",
+  "workbench.startupEditor": "none",
+  "window.restoreWindows": "none",
+  "window.commandCenter": true,
+  "workbench.iconTheme": "material-icon-theme",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
+```
+
+
+</details>
+
+
 ### 1Password
 
 
@@ -39,7 +124,7 @@ I use the following extensions from the [Raycast Store](https://www.raycast.com/
 
 - [Apple Reminders](https://www.raycast.com/raycast/apple-reminders)
 I use the “My Reminders” command get a quick overview or modify the individual reminders and “Create Reminder” to quickly adding new reminders.
-- [**Screenshot**](https://www.raycast.com/Aayush9029/screenshot)
+- [Screenshot](https://www.raycast.com/Aayush9029/screenshot)
 Really useful for taking screenshots directly to the Clipboard. That way I don’t litter my Desktop with screenshots.
 - [Color Picker](https://www.raycast.com/thomas/color-picker)
 Quickest and simplest way to grab the hex code of a pixel on your screen.
@@ -132,77 +217,6 @@ I use [devenv](https://devenv.sh/) where I can:
 ```bash
 nix profile install github:cachix/devenv/v0.6
 ```
-
-
-### VSCode
-
-
-I try to keep my local configuration minimal.
-
-
-Installed extensions snap-shotted on the 5th of March 2023
-
-
-```bash
-code --list-extensions
-```
-
-
-```text
-bbenoist.Nix
-brody715.vscode-cuelang
-dbaeumer.vscode-eslint
-eamodio.gitlens
-EditorConfig.EditorConfig
-esbenp.prettier-vscode
-gitpod.gitpod-desktop
-hashicorp.terraform
-liviuschera.noctis
-ms-vscode-remote.remote-ssh
-ms-vscode-remote.remote-ssh-edit
-ms-vscode.remote-explorer
-nickgo.cuelang
-PKief.material-icon-theme
-SimonSiefke.prettier-vscode
-streetsidesoftware.code-spell-checker
-```
-
-<details>
-<summary>settings.json</summary>
-
-```text
-{
-  "editor.multiCursorModifier": "ctrlCmd",
-  "editor.formatOnSave": true,
-  "workbench.activityBar.visible": true,
-  "workbench.colorTheme": "Noctis Minimus",
-  "workbench.startupEditor": "none",
-  "window.restoreWindows": "none",
-  "window.commandCenter": true,
-  "workbench.iconTheme": "material-icon-theme",
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[css]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[scss]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
-}
-```
-
-
-</details>
 
 
 ## Changelog
