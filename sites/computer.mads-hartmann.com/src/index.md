@@ -20,17 +20,65 @@ Hej 👋 welcome to computer.mads-hartmann.com. I use this little site to jot d
 Key-bindings
 
 
-| Keys              | Command Title                                           | Condition            | Default |
-| ----------------- | ------------------------------------------------------- | -------------------- | ------- |
-| Coding            |                                                         |                      |         |
-| ^-.               | Quick Fix…                                              |                      | no      |
-| Window Management |                                                         |                      |         |
-| ⌘0                | Focus Sidebar                                           |                      |         |
-| ⌘K ↓              | Move editor group down (same for the other directions)  |                      |         |
-| ⌘K ⌘↓             | Focus Editor Group Down (same for the other directions) |                      |         |
-| ^⇧⌥⌘7             | View: Split Editor                                      |                      |         |
-| ⌘<                | Terminal: Focus Terminal                                | when !terminal focus | no      |
-| ⌘<                | View: Focus Active Editor Group                         | when terminal focus  | no      |
+| Keys                  | Command Title                                           | Condition            | Default |
+| --------------------- | ------------------------------------------------------- | -------------------- | ------- |
+| **Coding**            |                                                         |                      |         |
+| ^-.                   | Quick Fix…                                              |                      | no      |
+| **Window Management** |                                                         |                      |         |
+| ⌘0                    | Focus Sidebar                                           |                      |         |
+| ⌘K ↓                  | Move editor group down (same for the other directions)  |                      |         |
+| ⌘K ⌘↓                 | Focus Editor Group Down (same for the other directions) |                      |         |
+| ^⇧⌥⌘7                 | View: Split Editor                                      |                      |         |
+| ⌘<                    | Terminal: Focus Terminal                                | when !terminal focus | no      |
+| ⌘<                    | View: Focus Active Editor Group                         | when terminal focus  | no      |
+
+<details>
+<summary>keybindings.json</summary>
+
+```json
+[
+    // Switch focus between terminal and editors
+    {
+        "key": "cmd+[Backquote]",
+        "command": "terminal.focus",
+        "when": "!terminalFocus"
+    },
+    {
+        "key": "cmd+[Backquote]",
+        "command": "workbench.action.focusActiveEditorGroup",
+        "when": "terminalFocus"
+    },
+    // the default is mapped to ⌘+. but I use that for Raycast.
+    {
+        "key": "ctrl+.",
+        "command": "editor.action.quickFix"
+    },
+    // ⌘+<number> has become the default way to navigate to tabs in macOS
+    {
+        "key": "cmd+1",
+        "command": "workbench.action.openEditorAtIndex1"
+    },
+    {
+        "key": "cmd+2",
+        "command": "workbench.action.openEditorAtIndex2"
+    },
+    {
+        "key": "cmd+3",
+        "command": "workbench.action.openEditorAtIndex3"
+    },
+    {
+        "key": "cmd+4",
+        "command": "workbench.action.openEditorAtIndex4"
+    },
+    {
+        "key": "cmd+5",
+        "command": "workbench.action.openEditorAtIndex5"
+    }
+]
+```
+
+
+</details>
 
 
 Extensions
