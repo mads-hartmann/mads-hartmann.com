@@ -14,6 +14,9 @@ Hej 👋 welcome to computer.mads-hartmann.com. I use this little site to jot d
 ## Applications
 
 
+### VSCode
+
+
 ### 1Password
 
 
