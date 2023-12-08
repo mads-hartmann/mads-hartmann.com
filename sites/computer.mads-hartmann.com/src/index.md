@@ -27,10 +27,34 @@ toc: true
 <td></td>
 </tr>
 <tr>
-<td>^-.</td>
+<td>^.</td>
 <td>Quick Fix…</td>
 <td></td>
 <td>no</td>
+</tr>
+<tr>
+<td>^-</td>
+<td>Go Back</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>F2</td>
+<td>Rename Symbol</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>F12</td>
+<td>Go to Definition</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr>
 <td><strong>Window Management</strong></td>
