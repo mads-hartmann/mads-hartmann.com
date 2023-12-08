@@ -51,12 +51,6 @@ toc: true
 <td></td>
 </tr>
 <tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
 <td><strong>Terminal</strong></td>
 <td></td>
 <td></td>
@@ -67,12 +61,6 @@ toc: true
 <td>Terminal: Create New Terminal</td>
 <td>terminalFocus</td>
 <td>no</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
 </tr>
 <tr>
 <td><strong>Window Management</strong></td>
@@ -107,13 +95,13 @@ toc: true
 <tr>
 <td>⌘&lt;</td>
 <td>Terminal: Focus Terminal</td>
-<td>when !terminal focus</td>
+<td>!terminalFocus</td>
 <td>no</td>
 </tr>
 <tr>
 <td>⌘&lt;</td>
 <td>View: Focus Active Editor Group</td>
-<td>when terminal focus</td>
+<td>terminalFocus</td>
 <td>no</td>
 </tr>
 </tbody></table>
