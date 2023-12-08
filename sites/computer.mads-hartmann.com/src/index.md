@@ -57,6 +57,24 @@ toc: true
 <td></td>
 </tr>
 <tr>
+<td><strong>Terminal</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>⌘N</td>
+<td>Terminal: Create New Terminal</td>
+<td>terminalFocus</td>
+<td>no</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
 <td><strong>Window Management</strong></td>
 <td></td>
 <td></td>
