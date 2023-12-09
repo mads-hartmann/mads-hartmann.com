@@ -233,6 +233,8 @@ Much nicer than the Spotify App. I have enabled “Close window on action”.</l
 <li><a href="https://www.raycast.com/rishabswift/word-search">Word Search</a>
 I primarily use this for the “Spell a Word” command which allows me to attempt to spell a word and then pick the correct spelling. It’s convient when I know I want to write a word that I can never spell correctly in the first attempt.</li>
 </ul>
+<h3>Gitpod</h3>
+<p>I do 99% of my development using <a href="https://www.gitpod.io/">Gitpod</a>. I use the <a href="https://www.gitpod.io/docs/configure/user-settings/dotfiles">Dotfiles feeature</a> to load my Gitpod specific dotfiles from  <a href="https://github.com/mads-hartmann/gitpod-dotfiles">mads-hartmann/gitpod-dotfiles</a></p>
 <h2>Setting Up a New Mac</h2>
 <h3>Setting up Nix</h3>
 <p>To install Nix I do need some basic development tools installed like <code>git</code>, <code>curl</code> and so on:</p>
