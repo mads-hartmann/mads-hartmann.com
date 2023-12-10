@@ -43,6 +43,14 @@ main {
   }
 }
 
+#logo {
+  font-size: 100px;
+  display: flex;
+  justify-content: center;
+  height: 100px;
+  align-items: center;
+}
+
 nav {
   background: var(--code-background-color);
   border: 1px solid #ccc;
