@@ -22,7 +22,7 @@ jobs:
 
       - name: Build site
         working-directory: sites/computer.mads-hartmann.com
-        run: node build.js
+        run: node scripts/build.js
 
       - name: Upload to S3 and Invalidate cache
         if: github.ref == 'refs/heads/main'
