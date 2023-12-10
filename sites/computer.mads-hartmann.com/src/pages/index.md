@@ -1,6 +1,5 @@
 ---
 title: ~ v3
-toc: true
 ---
 
 <!--

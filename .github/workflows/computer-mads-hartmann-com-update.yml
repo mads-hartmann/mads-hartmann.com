@@ -13,17 +13,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_PAT }}
+
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+
       - name: Install dependencies
-        working-directory: sites/computer.mads-hartmann.com/scripts/fetch-from-notion
+        working-directory: sites/computer.mads-hartmann.com
         run: npm ci
+
       - name: Run script
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        working-directory: sites/computer.mads-hartmann.com/scripts/fetch-from-notion
-        run: node index.js > ../../src/index.md
+        working-directory: sites/computer.mads-hartmann.com
+        run: node scripts/update-from-notion.js > src/pages/index.md
+
       - name: Commit changes
         run: |
           if [[ -z $(git status -s) ]]; then

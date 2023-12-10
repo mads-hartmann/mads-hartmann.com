@@ -1,16 +1,23 @@
 # computer.mads-hartmann.com
 
-## Starting
+Building the site
 
 ```sh
 cd sites/computer.mads-hartmann.com
 nix-shell
-node build.js
+node scripts/build.js
 ```
 
-Previewing:
+Previewing it
 
 ```sh
 nix-shell
-node serve.js
+node scripts/serve.js
+```
+
+Updating from Notion
+
+```sh
+nix-shell
+node scripts/update-from-notion.js
 ```

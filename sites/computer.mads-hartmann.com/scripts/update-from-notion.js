@@ -5,7 +5,6 @@ import { marked } from "marked";
 const header = `
 ---
 title: ~ v3
-toc: true
 ---
 
 <!--
