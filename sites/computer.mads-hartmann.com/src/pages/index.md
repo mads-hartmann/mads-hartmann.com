@@ -103,6 +103,24 @@ title: ~ v3
 <td>terminalFocus</td>
 <td>no</td>
 </tr>
+<tr>
+<td>^⇥</td>
+<td>View: Open Next Editor in Group</td>
+<td></td>
+<td>no - this matches the macOS default better</td>
+</tr>
+<tr>
+<td>^⇧⇥</td>
+<td>View: Move Editor into Previous Group</td>
+<td></td>
+<td>no - this matches the macOS default better</td>
+</tr>
+<tr>
+<td>⌘<number></td>
+<td>Open Editor at Index</td>
+<td></td>
+<td>no - this matches the macOS default better</td>
+</tr>
 </tbody></table>
 <details>
 <summary>keybindings.json</summary>
@@ -252,7 +270,6 @@ I primarily use this for the “Spell a Word” command which allows me to attem
 <p>Create a basic profile for ZSH (<code>touch ~/.zshrc</code>) and add the following</p>
 <pre><code class="language-bash">alias tailscale=&quot;/Applications/Tailscale.app/Contents/MacOS/Tailscale&quot;
 
-# Produced by starship init zsh
 source &lt;(/Users/mads/.nix-profile/bin/starship init zsh --print-full-init)
 
 autoload -Uz compinit &amp;&amp; compinit
