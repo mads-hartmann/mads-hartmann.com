@@ -1,0 +1,19 @@
+{
+  "name": "computer.mads-hartmann.com",
+  "version": "1.0.0",
+  "description": "computer.mads-hartmann.com",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
+    "gray-matter": "^4.0.3",
+    "marked": "^11.0.1"
+  }
+}
