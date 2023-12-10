@@ -1,14 +1,16 @@
 {
   "name": "computer.mads-hartmann.com",
   "version": "1.0.0",
-  "description": "## Starting",
+  "description": "computer.mads-hartmann.com",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "ejs": "^3.1.9"
+    "ejs": "^3.1.9",
+    "marked": "^11.0.1"
   }
 }
