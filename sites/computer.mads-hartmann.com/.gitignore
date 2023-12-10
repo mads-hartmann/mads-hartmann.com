@@ -1,16 +1,4 @@
 .DS_Store
-.sass-cache
-.jekyll-cache
-.jekyll-metadata
 .vscode
-
 _site
-
-# bundler related things
-.bundle/
-vendor/
-
-# Devenv related files
-.devenv*
-
 node_modules
