@@ -10,21 +10,19 @@ jobs:
     name: Build
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v4
         with:
-          ruby-version: "3.1.2"
+          node-version: 18
 
-      - name: Install bundler and gems
+      - name: Install dependencies
         working-directory: sites/computer.mads-hartmann.com
-        run: |
-          gem install bundler -v 2.3.15
-          bundle install
+        run: npm ci
 
       - name: Build site
         working-directory: sites/computer.mads-hartmann.com
-        run: bundle exec jekyll build --source src
+        run: node build.js
 
       - name: Upload to S3 and Invalidate cache
         if: github.ref == 'refs/heads/main'
