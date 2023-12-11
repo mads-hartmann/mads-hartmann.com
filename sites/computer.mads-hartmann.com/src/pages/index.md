@@ -59,7 +59,25 @@ title: ~ v3
 <td>⌘N</td>
 <td>Terminal: Create New Terminal</td>
 <td>terminalFocus</td>
-<td>no</td>
+<td>no - matches the macOS default better</td>
+</tr>
+<tr>
+<td>⌘W</td>
+<td>Terminal: Kill the Active Terminal Instance</td>
+<td>terminalFocus</td>
+<td>no - matches the macOS default better</td>
+</tr>
+<tr>
+<td>^X 2</td>
+<td>Terminal: Split Terminal</td>
+<td>terminalFocus</td>
+<td>no - matches Emacs’ defaults</td>
+</tr>
+<tr>
+<td>^X 3</td>
+<td>Terminal: Split Terminal</td>
+<td>terminalFocus</td>
+<td>no - matches Emacs’ defaults</td>
 </tr>
 <tr>
 <td><strong>Window Management</strong></td>
@@ -87,27 +105,39 @@ title: ~ v3
 </tr>
 <tr>
 <td>^X 2</td>
-<td>View: Split Editor Right</td>
-<td></td>
-<td>no - matches Emacs’ defaults</td>
-</tr>
-<tr>
-<td>^X 3</td>
 <td>View: Split Editor Down</td>
 <td></td>
 <td>no - matches Emacs’ defaults</td>
 </tr>
 <tr>
+<td>^X 3</td>
+<td>View: Split Editor Right</td>
+<td></td>
+<td>no - matches Emacs’ defaults</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
 <td>⌘&lt;</td>
 <td>Terminal: Focus Terminal</td>
 <td>!terminalFocus</td>
-<td>no</td>
+<td>no - makes it easy to jump to the terminal</td>
 </tr>
 <tr>
 <td>⌘&lt;</td>
 <td>View: Focus Active Editor Group</td>
 <td>terminalFocus</td>
-<td>no</td>
+<td>no - makes it easy to jump back to the editors from the terminal</td>
 </tr>
 <tr>
 <td>^⇥</td>
@@ -177,6 +207,9 @@ title: ~ v3
 <p>Extensions</p>
 <pre><code class="language-bash">code --list-extensions
 </code></pre>
+<details>
+<summary>List of extensions</summary>
+
 <pre><code class="language-text"># Installed extensions snap-shotted on the 5th of March 2023
 bbenoist.Nix
 brody715.vscode-cuelang
@@ -195,6 +228,9 @@ PKief.material-icon-theme
 SimonSiefke.prettier-vscode
 streetsidesoftware.code-spell-checker
 </code></pre>
+</details>
+
+
 <p>Settings</p>
 <details>
 <summary>settings.json</summary>
@@ -300,4 +336,6 @@ ssh-add -l
 <li><a href="https://computer.mads-hartmann.com/v2">v2</a> - the major change from <a href="https://computer.mads-hartmann.com/v1">v1</a> is that I now do 99% of my development in <a href="https://www.gitpod.io/cde">Cloud Development Environments (CDE)</a> which means that I install <em>very</em> few tools locally.</li>
 <li><a href="https://computer.mads-hartmann.com/v1">v1</a> - the original <a href="http://computer.mads-hartmann.com/">computer.mads-hartmann.com</a></li>
 </ul>
+<hr>
+<p><a href="/9c3cf9a818da426f9be44d838395396c"><em>Edit</em></a></p>
 
