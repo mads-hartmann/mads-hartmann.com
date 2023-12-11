@@ -16,7 +16,7 @@ title: ~ v3
 <th>Keys</th>
 <th>Command Title</th>
 <th>Condition</th>
-<th>Default</th>
+<th>Default - Reason</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -86,10 +86,16 @@ title: ~ v3
 <td></td>
 </tr>
 <tr>
-<td>^⇧⌥⌘7</td>
-<td>View: Split Editor</td>
+<td>^X 2</td>
+<td>View: Split Editor Right</td>
 <td></td>
+<td>no - matches Emacs’ defaults</td>
+</tr>
+<tr>
+<td>^X 3</td>
+<td>View: Split Editor Down</td>
 <td></td>
+<td>no - matches Emacs’ defaults</td>
 </tr>
 <tr>
 <td>⌘&lt;</td>
@@ -107,19 +113,19 @@ title: ~ v3
 <td>^⇥</td>
 <td>View: Open Next Editor in Group</td>
 <td></td>
-<td>no - this matches the macOS default better</td>
+<td>no - matches the macOS default better</td>
 </tr>
 <tr>
 <td>^⇧⇥</td>
 <td>View: Move Editor into Previous Group</td>
 <td></td>
-<td>no - this matches the macOS default better</td>
+<td>no - matches the macOS default better</td>
 </tr>
 <tr>
 <td>⌘<number></td>
 <td>Open Editor at Index</td>
 <td></td>
-<td>no - this matches the macOS default better</td>
+<td>no - matches the macOS default better</td>
 </tr>
 </tbody></table>
 <details>
