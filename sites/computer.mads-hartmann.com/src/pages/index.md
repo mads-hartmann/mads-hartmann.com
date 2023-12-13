@@ -10,6 +10,7 @@ title: ~ v3
 <h2>Applications</h2>
 <h3>VSCode</h3>
 <p>This is the list <strong>keyboard shortcuts</strong> I generally use. I try to stick to the defaults where possible and only use custom shortcuts when needed.</p>
+<p>My shortcuts are heavily influenced by my Emacs days.</p>
 <table>
 <thead>
 <tr>
@@ -102,6 +103,18 @@ title: ~ v3
 <td>Focus Editor Group Down (same for the other directions)</td>
 <td></td>
 <td></td>
+</tr>
+<tr>
+<td>^X B</td>
+<td>View: Quick Open Previous Recently Used Editor</td>
+<td></td>
+<td>no - matches Emacs’ defaults</td>
+</tr>
+<tr>
+<td>^X O</td>
+<td>View: Focus Next Editor Group</td>
+<td></td>
+<td>no - matches Emacs’ defaults</td>
 </tr>
 <tr>
 <td>^X 2</td>
