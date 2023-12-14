@@ -31,7 +31,7 @@ title: ~ v3
 <td>^.</td>
 <td>Quick Fix…</td>
 <td></td>
-<td>no</td>
+<td>no - the default is ⌘. but I used that for Raycast</td>
 </tr>
 <tr>
 <td>^-</td>
@@ -94,16 +94,22 @@ title: ~ v3
 <td></td>
 </tr>
 <tr>
-<td>⌘K ↓</td>
-<td>Move editor group down - <em>same for the other directions</em></td>
+<td>⌘1</td>
+<td>Open Editor at Index 1 - <em>same for the 2 - 9</em></td>
 <td></td>
-<td></td>
+<td>no - matches the macOS default better</td>
 </tr>
 <tr>
-<td>⌘K ⌘↓</td>
-<td>Focus Editor Group Down - <em>same for the other directions</em></td>
+<td>^⇥</td>
+<td>View: Open Next Editor in Group</td>
 <td></td>
+<td>no - matches the macOS default better</td>
+</tr>
+<tr>
+<td>^⇧⇥</td>
+<td>View: Move Editor into Previous Group</td>
 <td></td>
+<td>no - matches the macOS default better</td>
 </tr>
 <tr>
 <td>^X B</td>
@@ -116,6 +122,12 @@ title: ~ v3
 <td>View: Focus Next Editor Group</td>
 <td></td>
 <td>no - matches Emacs’ defaults</td>
+</tr>
+<tr>
+<td>^X →↓←↑</td>
+<td>Focus Editor Group Right</td>
+<td>Down</td>
+<td>Left</td>
 </tr>
 <tr>
 <td>^X 0</td>
@@ -159,56 +171,54 @@ title: ~ v3
 <td>terminalFocus</td>
 <td>no - makes it easy to jump back to the editors from the terminal</td>
 </tr>
-<tr>
-<td>^⇥</td>
-<td>View: Open Next Editor in Group</td>
-<td></td>
-<td>no - matches the macOS default better</td>
-</tr>
-<tr>
-<td>^⇧⇥</td>
-<td>View: Move Editor into Previous Group</td>
-<td></td>
-<td>no - matches the macOS default better</td>
-</tr>
-<tr>
-<td>⌘1</td>
-<td>Open Editor at Index 1 - <em>same for the 2 - 9</em></td>
-<td></td>
-<td>no - matches the macOS default better</td>
-</tr>
 </tbody></table>
 <details>
 <summary>keybindings.json</summary>
 
 <pre><code class="language-json">[
-    // Switch focus between terminal and editors
+    ////////////////////////
+    // Coding
+    ////////////////////////
+    // the default is mapped to ⌘+. but I use that for Raycast.
     {
-        &quot;key&quot;: &quot;cmd+[Backquote]&quot;,
-        &quot;command&quot;: &quot;terminal.focus&quot;,
-        &quot;when&quot;: &quot;!terminalFocus&quot;
+        &quot;key&quot;: &quot;ctrl+.&quot;,
+        &quot;command&quot;: &quot;editor.action.quickFix&quot;
+    },
+    ////////////////////////
+    // Terminal 
+    ////////////////////////
+    {
+        &quot;key&quot;: &quot;cmd+n&quot;,
+        &quot;command&quot;: &quot;workbench.action.terminal.new&quot;,
+        &quot;when&quot;: &quot;terminalFocus&quot;
+    },
+    // This enables closing terminal tabs when using the build-in terminal in the panel. 
+    // The !terminalEditorFocus ensure that it doesn&#39;t interfere with the default system 
+    // binding for closing terminals that are shown in editor groups.
+    {
+        &quot;key&quot;: &quot;cmd+w&quot;,
+        &quot;command&quot;: &quot;workbench.action.terminal.kill&quot;,
+        &quot;when&quot;: &quot;terminalFocus &amp;&amp; !terminalEditorFocus&quot;
     },
     {
         &quot;key&quot;: &quot;cmd+[Backquote]&quot;,
         &quot;command&quot;: &quot;workbench.action.focusActiveEditorGroup&quot;,
         &quot;when&quot;: &quot;terminalFocus&quot;
     },
-    // Terminal 
     {
-        &quot;key&quot;: &quot;cmd+n&quot;,
-        &quot;command&quot;: &quot;workbench.action.terminal.new&quot;,
+        &quot;key&quot;: &quot;ctrl+x 3&quot;,
+        &quot;command&quot;: &quot;workbench.action.terminal.split&quot;,
         &quot;when&quot;: &quot;terminalFocus&quot;
     },
     {
-        &quot;key&quot;: &quot;cmd+w&quot;,
-        &quot;command&quot;: &quot;workbench.action.terminal.kill&quot;,
+        &quot;key&quot;: &quot;ctrl+x 2&quot;,
+        &quot;command&quot;: &quot;workbench.action.terminal.split&quot;,
         &quot;when&quot;: &quot;terminalFocus&quot;
     },
-    // the default is mapped to ⌘+. but I use that for Raycast.
-    {
-        &quot;key&quot;: &quot;ctrl+.&quot;,
-        &quot;command&quot;: &quot;editor.action.quickFix&quot;
-    },
+    ////////////////////////
+    // Window Management 
+    ////////////////////////
+
     // ⌘+&lt;number&gt; has become the default way to navigate to tabs in macOS
     {
         &quot;key&quot;: &quot;cmd+1&quot;,
@@ -230,6 +240,7 @@ title: ~ v3
         &quot;key&quot;: &quot;cmd+5&quot;,
         &quot;command&quot;: &quot;workbench.action.openEditorAtIndex5&quot;
     },
+    // Matches macOS default better
     {
         &quot;key&quot;: &quot;ctrl+tab&quot;,
         &quot;command&quot;: &quot;workbench.action.nextEditorInGroup&quot;
@@ -238,6 +249,13 @@ title: ~ v3
         &quot;key&quot;: &quot;ctrl+shift+tab&quot;,
         &quot;command&quot;: &quot;workbench.action.previousEditorInGroup&quot;
     },
+    // Focus the terminal - there&#39;s a similar binding for when the terminal is in focus above
+    {
+        &quot;key&quot;: &quot;cmd+[Backquote]&quot;,
+        &quot;command&quot;: &quot;terminal.focus&quot;,
+        &quot;when&quot;: &quot;!terminalFocus&quot;
+    },
+    // Emacs-like ways of managing editor groups (frames in Emacs-speak)
     {
         &quot;key&quot;: &quot;ctrl+x 2&quot;,
         &quot;command&quot;: &quot;workbench.action.splitEditorDown&quot;,
@@ -247,16 +265,6 @@ title: ~ v3
         &quot;key&quot;: &quot;ctrl+x 3&quot;,
         &quot;command&quot;: &quot;workbench.action.splitEditorRight&quot;,
         &quot;when&quot;: &quot;!terminalFocus&quot;
-    },
-    {
-        &quot;key&quot;: &quot;ctrl+x 3&quot;,
-        &quot;command&quot;: &quot;workbench.action.terminal.split&quot;,
-        &quot;when&quot;: &quot;terminalFocus&quot;
-    },
-    {
-        &quot;key&quot;: &quot;ctrl+x 2&quot;,
-        &quot;command&quot;: &quot;workbench.action.terminal.split&quot;,
-        &quot;when&quot;: &quot;terminalFocus&quot;
     },
     {
         &quot;key&quot;: &quot;ctrl+x b&quot;,
@@ -277,7 +285,23 @@ title: ~ v3
     {
         &quot;key&quot;: &quot;ctrl+x k&quot;,
         &quot;command&quot;: &quot;workbench.action.closeActiveEditor&quot;
-    }
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x left&quot;,
+        &quot;command&quot;: &quot;workbench.action.focusLeftGroup&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x right&quot;,
+        &quot;command&quot;: &quot;workbench.action.focusRightGroup&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x up&quot;,
+        &quot;command&quot;: &quot;workbench.action.focusAboveGroup&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x down&quot;,
+        &quot;command&quot;: &quot;workbench.action.focusBelowGroup&quot;
+    },
 ]
 </code></pre>
 </details>
@@ -352,7 +376,7 @@ streetsidesoftware.code-spell-checker
 <p>I use the following <strong>built-in extensions</strong></p>
 <ul>
 <li><strong>Search Emoji &amp; Symbols</strong><br>I use this <strong>all the time</strong>. I have this mapped to ^⌘Space so that it overwrites the default Emoji picker in macOS</li>
-<li><strong>Navigation</strong><br>I primarily use the “Search Menu Items” command. It’s the best. Allows you to use Raycast to search through the menu items of whatever application you have focused at the time.</li>
+<li><strong>Navigation</strong><br>I primarily use the “Search Menu Items” command. It’s the best. Allows you to use Raycast to search through the menu items of whatever application you have focused at the time. I have it bound to “⌘.”</li>
 <li><strong>Window Management</strong><br>I use this a ton for very basic window management. “Center” is mapped to ⌘⌥C, “Left Half” to ⌘⌥←, “Right Half” to ⌘⌥←, and Maximize ⌘⌥↵.</li>
 </ul>
 <p>I use the following extensions from the <a href="https://www.raycast.com/store">Raycast Store</a>:</p>
