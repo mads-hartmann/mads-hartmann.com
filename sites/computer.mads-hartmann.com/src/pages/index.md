@@ -156,9 +156,7 @@ title: ~ v3
 </tr>
 </thead>
 <tbody><tr>
-<td><strong>Coding</strong></td>
-<td></td>
-<td></td>
+<td colspan="4"><strong>Coding</strong></td>
 </tr>
 <tr>
 <td>^.</td>
@@ -181,9 +179,7 @@ title: ~ v3
 <td></td>
 </tr>
 <tr>
-<td><strong>Terminal</strong></td>
-<td></td>
-<td></td>
+<td colspan="4"><strong>Terminal</strong></td>
 </tr>
 <tr>
 <td>⌘N</td>
@@ -206,9 +202,7 @@ title: ~ v3
 <td>no - matches Emacs’ defaults</td>
 </tr>
 <tr>
-<td><strong>Window Management</strong></td>
-<td></td>
-<td></td>
+<td colspan="4"><strong>Window Management</strong></td>
 </tr>
 <tr>
 <td>⌘0</td>
@@ -253,17 +247,17 @@ title: ~ v3
 <tr>
 <td>^X →</td>
 <td>View: Focus Editor Group Right</td>
-<td></td>
+<td>no - a mixture of the VSCode and Emacs.</td>
 </tr>
 <tr>
 <td>^X ↓</td>
 <td>View: Focus Editor Group Down</td>
-<td></td>
+<td>no - a mixture of the VSCode and Emacs.</td>
 </tr>
 <tr>
 <td>^X ←</td>
 <td>View: Focus Editor Group Left</td>
-<td></td>
+<td>no - a mixture of the VSCode and Emacs.</td>
 </tr>
 <tr>
 <td>^X 0</td>

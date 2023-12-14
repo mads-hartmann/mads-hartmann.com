@@ -29,7 +29,14 @@ async function main() {
   const mdString = n2m.toMarkdownString(mdBlocks);
   const html = await marked.parse(mdString.parent);
   console.log(header);
-  console.log(html);
+  console.log(colspan(html));
+}
+
+// Hack to add colspan to table
+function colspan(html) {
+  return html
+    .replaceAll("<td><strong>", `<td colspan="4"><strong>`)
+    .replaceAll(`</td>\n<td></td>\n<td></td>`, "</td>");
 }
 
 await main();
