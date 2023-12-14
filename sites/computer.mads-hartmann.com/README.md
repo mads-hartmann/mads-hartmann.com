@@ -5,6 +5,7 @@ Building the site
 ```sh
 cd sites/computer.mads-hartmann.com
 nix-shell
+npm i
 node scripts/build.js
 ```
 
@@ -19,5 +20,6 @@ Updating from Notion
 
 ```sh
 nix-shell
+export NOTION_TOKEN=""
 node scripts/update-from-notion.js
 ```

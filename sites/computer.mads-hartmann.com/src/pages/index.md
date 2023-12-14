@@ -8,6 +8,8 @@ title: ~ v3
 -->
 <p>Hej 👋 welcome to computer.mads-hartmann.com. I use this little site to jot down notes about my computer. How it’s configured, what applications I use, and how I use them. It contains a little guide for bootstrapping new computers but mostly this is for documenting how I use my computer; documenting things helps me think.</p>
 <h2>Applications</h2>
+<h3>Gitpod</h3>
+<p>I do 99% of my development using <a href="https://www.gitpod.io/">Gitpod</a>. I use the <a href="https://www.gitpod.io/docs/configure/user-settings/dotfiles">Dotfiles feeature</a> to load my Gitpod specific dotfiles from  <a href="https://github.com/mads-hartmann/gitpod-dotfiles">mads-hartmann/gitpod-dotfiles</a></p>
 <h3>VSCode</h3>
 <p>This is the list of <strong>keyboard shortcuts</strong> I generally use. It’s a bit of a weird mixture of using the VSCode default for most things while also accepting that I have a lot of Emacs muscle memory that I might as well put to good use.</p>
 <table>
@@ -170,8 +172,8 @@ title: ~ v3
 <td>no - matches the macOS default better</td>
 </tr>
 <tr>
-<td>⌘<number></td>
-<td>Open Editor at Index</td>
+<td>⌘1</td>
+<td>Open Editor at Index 1 - <em>same for the 2 - 9</em></td>
 <td></td>
 <td>no - matches the macOS default better</td>
 </tr>
@@ -349,28 +351,18 @@ streetsidesoftware.code-spell-checker
 <h3>Raycast</h3>
 <p>I use the following <strong>built-in extensions</strong></p>
 <ul>
-<li><strong>Search Emoji &amp; Symbols</strong>
-I use this <strong>all the time</strong>. I have this mapped to ^⌘Space so that it overwrites the default Emoji picker in macOS</li>
-<li><strong>Navigation</strong>
-I primarily use the “Search Menu Items” command. It’s the best. Allows you to use Raycast to search through the menu items of whatever application you have focused at the time.</li>
-<li><strong>Window Management</strong>
-I use this a ton for very basic window management. “Center” is mapped to ⌘⌥C, “Left Half” to ⌘⌥←, “Right Half” to ⌘⌥←, and Maximize ⌘⌥↵.</li>
+<li><strong>Search Emoji &amp; Symbols</strong><br>I use this <strong>all the time</strong>. I have this mapped to ^⌘Space so that it overwrites the default Emoji picker in macOS</li>
+<li><strong>Navigation</strong><br>I primarily use the “Search Menu Items” command. It’s the best. Allows you to use Raycast to search through the menu items of whatever application you have focused at the time.</li>
+<li><strong>Window Management</strong><br>I use this a ton for very basic window management. “Center” is mapped to ⌘⌥C, “Left Half” to ⌘⌥←, “Right Half” to ⌘⌥←, and Maximize ⌘⌥↵.</li>
 </ul>
 <p>I use the following extensions from the <a href="https://www.raycast.com/store">Raycast Store</a>:</p>
 <ul>
-<li><a href="https://www.raycast.com/raycast/apple-reminders">Apple Reminders</a>
-I use the “My Reminders” command get a quick overview or modify the individual reminders and “Create Reminder” to quickly adding new reminders.</li>
-<li><a href="https://www.raycast.com/Aayush9029/screenshot">Screenshot</a>
-Really useful for taking screenshots directly to the Clipboard. That way I don’t litter my Desktop with screenshots.</li>
-<li><a href="https://www.raycast.com/thomas/color-picker">Color Picker</a>
-Quickest and simplest way to grab the hex code of a pixel on your screen.</li>
-<li><a href="https://www.raycast.com/mattisssa/spotify-player">Spotify Player</a>
-Much nicer than the Spotify App. I have enabled “Close window on action”.</li>
-<li><a href="https://www.raycast.com/rishabswift/word-search">Word Search</a>
-I primarily use this for the “Spell a Word” command which allows me to attempt to spell a word and then pick the correct spelling. It’s convient when I know I want to write a word that I can never spell correctly in the first attempt.</li>
+<li><a href="https://www.raycast.com/raycast/apple-reminders"><strong>Apple Reminders</strong></a><br>I use the “My Reminders” command get a quick overview or modify the individual reminders and “Create Reminder” to quickly adding new reminders.</li>
+<li><a href="https://www.raycast.com/Aayush9029/screenshot"><strong>Screenshot</strong></a><br>Really useful for taking screenshots directly to the Clipboard. That way I don’t litter my Desktop with screenshots.</li>
+<li><a href="https://www.raycast.com/thomas/color-picker"><strong>Color Picker</strong></a><br>Quickest and simplest way to grab the hex code of a pixel on your screen.</li>
+<li><a href="https://www.raycast.com/mattisssa/spotify-player"><strong>Spotify Player</strong></a><br>Much nicer than the Spotify App. I have enabled “Close window on action”.</li>
+<li><a href="https://www.raycast.com/rishabswift/word-search"><strong>Word Search</strong></a><br>I primarily use this for the “Spell a Word” command which allows me to attempt to spell a word and then pick the correct spelling. It’s convient when I know I want to write a word that I can never spell correctly in the first attempt.</li>
 </ul>
-<h3>Gitpod</h3>
-<p>I do 99% of my development using <a href="https://www.gitpod.io/">Gitpod</a>. I use the <a href="https://www.gitpod.io/docs/configure/user-settings/dotfiles">Dotfiles feeature</a> to load my Gitpod specific dotfiles from  <a href="https://github.com/mads-hartmann/gitpod-dotfiles">mads-hartmann/gitpod-dotfiles</a></p>
 <h2>Setting Up a New Mac</h2>
 <h3>Setting up Nix</h3>
 <p>To install Nix I do need some basic development tools installed like <code>git</code>, <code>curl</code> and so on:</p>
