@@ -146,7 +146,7 @@ title: ~ v3
 </details>
 
 
-<p>This is the list of <strong>keyboard shortcuts</strong> I generally use. It’s a bit of a weird mixture of using the VSCode default for most things while also accepting that I have a lot of Emacs muscle memory that I might as well put to good use.</p>
+<p>This is the list of keyboard shortcuts I generally use. It’s a bit of a weird mixture of trying to use the VSCode defaults while also accepting that I have a lot of Emacs muscle memory that I might as well put to good use.</p>
 <table>
 <thead>
 <tr>
@@ -166,17 +166,17 @@ title: ~ v3
 <tr>
 <td>^-</td>
 <td>Go Back</td>
-<td></td>
+<td>yes</td>
 </tr>
 <tr>
 <td>F2</td>
 <td>Rename Symbol</td>
-<td></td>
+<td>yes</td>
 </tr>
 <tr>
 <td>F12</td>
 <td>Go to Definition</td>
-<td></td>
+<td>yes</td>
 </tr>
 <tr>
 <td colspan="4"><strong>Terminal</strong></td>
@@ -207,17 +207,12 @@ title: ~ v3
 <tr>
 <td>⌘0</td>
 <td>Focus Sidebar</td>
-<td></td>
+<td>yes</td>
 </tr>
 <tr>
 <td>⌘1</td>
-<td>Open Editor at Index 1</td>
-<td></td>
-</tr>
-<tr>
-<td><em>same for the 2 - 9</em></td>
+<td>Open Editor at Index 1 - 9</td>
 <td>no - matches the macOS default better</td>
-<td></td>
 </tr>
 <tr>
 <td>^⇥</td>
