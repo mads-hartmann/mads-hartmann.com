@@ -9,8 +9,7 @@ title: ~ v3
 <p>Hej 👋 welcome to computer.mads-hartmann.com. I use this little site to jot down notes about my computer. How it’s configured, what applications I use, and how I use them. It contains a little guide for bootstrapping new computers but mostly this is for documenting how I use my computer; documenting things helps me think.</p>
 <h2>Applications</h2>
 <h3>VSCode</h3>
-<p>This is the list <strong>keyboard shortcuts</strong> I generally use. I try to stick to the defaults where possible and only use custom shortcuts when needed.</p>
-<p>My shortcuts are heavily influenced by my Emacs days.</p>
+<p>This is the list of <strong>keyboard shortcuts</strong> I generally use. It’s a bit of a weird mixture of using the VSCode default for most things while also accepting that I have a lot of Emacs muscle memory that I might as well put to good use.</p>
 <table>
 <thead>
 <tr>
@@ -94,13 +93,13 @@ title: ~ v3
 </tr>
 <tr>
 <td>⌘K ↓</td>
-<td>Move editor group down (same for the other directions)</td>
+<td>Move editor group down - <em>same for the other directions</em></td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>⌘K ⌘↓</td>
-<td>Focus Editor Group Down (same for the other directions)</td>
+<td>Focus Editor Group Down - <em>same for the other directions</em></td>
 <td></td>
 <td></td>
 </tr>
@@ -117,6 +116,18 @@ title: ~ v3
 <td>no - matches Emacs’ defaults</td>
 </tr>
 <tr>
+<td>^X 0</td>
+<td>View: Close All Editors in Group</td>
+<td></td>
+<td>no - matches Emacs’ defaults</td>
+</tr>
+<tr>
+<td>^X 1</td>
+<td>View: Close Editors in Other Groups</td>
+<td></td>
+<td>no - matches Emacs’ defaults</td>
+</tr>
+<tr>
 <td>^X 2</td>
 <td>View: Split Editor Down</td>
 <td></td>
@@ -129,16 +140,10 @@ title: ~ v3
 <td>no - matches Emacs’ defaults</td>
 </tr>
 <tr>
+<td>^X K</td>
+<td>View: Close Editor</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>no - matches Emacs’ defaults</td>
 </tr>
 <tr>
 <td>⌘&lt;</td>
@@ -186,6 +191,17 @@ title: ~ v3
         &quot;command&quot;: &quot;workbench.action.focusActiveEditorGroup&quot;,
         &quot;when&quot;: &quot;terminalFocus&quot;
     },
+    // Terminal 
+    {
+        &quot;key&quot;: &quot;cmd+n&quot;,
+        &quot;command&quot;: &quot;workbench.action.terminal.new&quot;,
+        &quot;when&quot;: &quot;terminalFocus&quot;
+    },
+    {
+        &quot;key&quot;: &quot;cmd+w&quot;,
+        &quot;command&quot;: &quot;workbench.action.terminal.kill&quot;,
+        &quot;when&quot;: &quot;terminalFocus&quot;
+    },
     // the default is mapped to ⌘+. but I use that for Raycast.
     {
         &quot;key&quot;: &quot;ctrl+.&quot;,
@@ -211,6 +227,54 @@ title: ~ v3
     {
         &quot;key&quot;: &quot;cmd+5&quot;,
         &quot;command&quot;: &quot;workbench.action.openEditorAtIndex5&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+tab&quot;,
+        &quot;command&quot;: &quot;workbench.action.nextEditorInGroup&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+shift+tab&quot;,
+        &quot;command&quot;: &quot;workbench.action.previousEditorInGroup&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x 2&quot;,
+        &quot;command&quot;: &quot;workbench.action.splitEditorDown&quot;,
+        &quot;when&quot;: &quot;!terminalFocus&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x 3&quot;,
+        &quot;command&quot;: &quot;workbench.action.splitEditorRight&quot;,
+        &quot;when&quot;: &quot;!terminalFocus&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x 3&quot;,
+        &quot;command&quot;: &quot;workbench.action.terminal.split&quot;,
+        &quot;when&quot;: &quot;terminalFocus&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x 2&quot;,
+        &quot;command&quot;: &quot;workbench.action.terminal.split&quot;,
+        &quot;when&quot;: &quot;terminalFocus&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x b&quot;,
+        &quot;command&quot;: &quot;workbench.action.quickOpenPreviousRecentlyUsedEditor&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x o&quot;,
+        &quot;command&quot;: &quot;workbench.action.focusNextGroup&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x 0&quot;,
+        &quot;command&quot;: &quot;workbench.action.closeEditorsInGroup&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x 1&quot;,
+        &quot;command&quot;: &quot;workbench.action.closeEditorsInOtherGroups&quot;
+    },
+    {
+        &quot;key&quot;: &quot;ctrl+x k&quot;,
+        &quot;command&quot;: &quot;workbench.action.closeActiveEditor&quot;
     }
 ]
 </code></pre>
@@ -337,10 +401,6 @@ autoload -Uz compinit &amp;&amp; compinit
 <p>To verify it works run the following</p>
 <pre><code class="language-bash">export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 ssh-add -l
-</code></pre>
-<h3>devenv</h3>
-<p>I use <a href="https://devenv.sh/">devenv</a> where I can:</p>
-<pre><code class="language-bash">nix profile install github:cachix/devenv/v0.6
 </code></pre>
 <h2>Changelog</h2>
 <p>The current version is v3</p>
