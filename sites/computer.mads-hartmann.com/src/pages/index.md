@@ -183,6 +183,21 @@ title: ~ v3
 <td>yes</td>
 </tr>
 <tr>
+<td>⌥⌘K</td>
+<td>Bookmarks: Toggle</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>⌥⌘L</td>
+<td>Bookmarks: Jump to Next</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>⌥⌘J</td>
+<td>Bookmarks: Jump to Previous</td>
+<td>yes</td>
+</tr>
+<tr>
 <td colspan="4"><strong>Terminal</strong></td>
 </tr>
 <tr>
