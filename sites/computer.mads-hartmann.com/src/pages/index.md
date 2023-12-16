@@ -10,6 +10,10 @@ title: ~ v3
 <h2>Gitpod</h2>
 <p>I do 99% of my development using <a href="https://www.gitpod.io/">Gitpod</a>. I use the <a href="https://www.gitpod.io/docs/configure/user-settings/dotfiles">Dotfiles feeature</a> to load my Gitpod specific dotfiles from  <a href="https://github.com/mads-hartmann/gitpod-dotfiles">mads-hartmann/gitpod-dotfiles</a></p>
 <h2>VSCode</h2>
+<h3>Extensions</h3>
+<ul>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=alefragnani.Bookmarks"><strong>Bookmarks</strong></a><br>Really useful way to navigate code.</li>
+</ul>
 <h3>Keybindings</h3>
 <details>
 <summary>keybindings.json</summary>
