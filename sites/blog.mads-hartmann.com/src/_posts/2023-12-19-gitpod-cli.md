@@ -52,7 +52,7 @@ function gppr {
 
 ![new](/images/gitpod-cli/gpo.png)
 
-Short for Gitpod Open. This lists all Gitpod workspaces and provides a quick way to open filter and open a specific one. I mostly use this if I stopped a workspace before heading out for launch and I want to start that same workspace rather than create a new one.
+Short for Gitpod Open. This lists all Gitpod workspaces and provides a quick way to filter and open a specific one. I mostly use this if I stopped a workspace before heading out for launch and I want to start that same workspace rather than create a new one.
 
 ```zsh
 function gpo {
