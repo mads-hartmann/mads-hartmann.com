@@ -11,8 +11,12 @@ title: ~ v3
 <p>I do 99% of my development using <a href="https://www.gitpod.io/">Gitpod</a>. I use the <a href="https://www.gitpod.io/docs/configure/user-settings/dotfiles">Dotfiles feeature</a> to load my Gitpod specific dotfiles from  <a href="https://github.com/mads-hartmann/gitpod-dotfiles">mads-hartmann/gitpod-dotfiles</a></p>
 <h2>VSCode</h2>
 <h3>Extensions</h3>
+<p>This list is not comprehensive at the moment. The extensions are alphabetically sorted.</p>
 <ul>
 <li><a href="https://marketplace.visualstudio.com/items?itemName=alefragnani.Bookmarks"><strong>Bookmarks</strong></a><br>Really useful way to navigate code.</li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=GitHub.copilot"><strong>GitHub Copilot</strong></a><br>I mostly used this for “advanced code-completion”. I rarely use it for prompting or anything else, really. Maybe in 2024 that will change.</li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=GitHub.github-vscode-theme"><strong>GitHub Theme</strong></a><br>The GitHub Light and GitHub Dark are my favourite themes at the moment</li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme"><strong>Material Icon Theme</strong></a><br>This has been my go-to icon theme for quite a while.</li>
 </ul>
 <h3>Keybindings</h3>
 <details>
@@ -309,34 +313,6 @@ title: ~ v3
 <td>no - makes it easy to jump back to the editors from the terminal</td>
 </tr>
 </tbody></table>
-<h3>Extensions</h3>
-<details>
-<summary>List of extensions</summary>
-
-<pre><code class="language-text">#
-# Generated using code --list-extensions
-# Installed extensions snap-shotted on the 5th of March 2023
-#
-bbenoist.Nix
-brody715.vscode-cuelang
-dbaeumer.vscode-eslint
-eamodio.gitlens
-EditorConfig.EditorConfig
-esbenp.prettier-vscode
-gitpod.gitpod-desktop
-hashicorp.terraform
-liviuschera.noctis
-ms-vscode-remote.remote-ssh
-ms-vscode-remote.remote-ssh-edit
-ms-vscode.remote-explorer
-nickgo.cuelang
-PKief.material-icon-theme
-SimonSiefke.prettier-vscode
-streetsidesoftware.code-spell-checker
-</code></pre>
-</details>
-
-
 <h3>Settings</h3>
 <details>
 <summary>settings.json</summary>
@@ -391,6 +367,7 @@ streetsidesoftware.code-spell-checker
 <h2>1Password</h2>
 <p>I use <a href="https://1password.com/">1Password</a> for all my personal passwords, credit cards, credentials, and so on. I Install it using the App Store.</p>
 <h2>Setting Up a New Mac</h2>
+<p><em>This was from the last time I configured a Mac from scratch. If I were to do it today I don’t think I’d use Nix as the “global” package manager but just rely on Homebrew instead; I haven’t really seen any benefit from using Nix for system-wide packages.</em></p>
 <h3>Setting up Nix</h3>
 <p>To install Nix I do need some basic development tools installed like <code>git</code>, <code>curl</code> and so on:</p>
 <pre><code class="language-bash">xcode-select --install
