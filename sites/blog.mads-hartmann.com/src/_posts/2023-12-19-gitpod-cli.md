@@ -13,9 +13,9 @@ Here are some of my favorite little scripts form my `~/.zshrc`
 
 ## new
 
-This allows me to type `new` in my terminal to get an interactive picker with my most commonly used repositories. The real list is longer but I've redacted a few private repositories 😉
-
 ![new](/images/gitpod-cli/new.png)
+
+This allows me to type `new` in my terminal to get an interactive picker with my most commonly used repositories. The real list is longer but I've redacted a few private repositories 😉
 
 ```zsh
 function new {
@@ -36,9 +36,9 @@ function new {
 
 ## gppr
 
-Short for Gitpod PR. This uses `gh` to list all my open PRs and then opens a Gitpod workspace from that context. I use this **all** the time as I usually create DRAFT PRs really early and use them to keep track of the work I have in flight.
-
 ![new](/images/gitpod-cli/gppr.png)
+
+Short for Gitpod PR. This uses `gh` to list all my open PRs and then opens a Gitpod workspace from that context. I use this **all** the time as I usually create DRAFT PRs really early and use them to keep track of the work I have in flight.
 
 ```zsh
 function gppr {
@@ -50,9 +50,9 @@ function gppr {
 
 ## gpo
 
-Short for Gitpod Open. This lists all Gitpod workspaces and provides a quick way to open filter and open a specific one. I mostly use this if I stopped a workspace before heading out for launch and I want to start that same workspace rather than create a new one.
-
 ![new](/images/gitpod-cli/gpo.png)
+
+Short for Gitpod Open. This lists all Gitpod workspaces and provides a quick way to open filter and open a specific one. I mostly use this if I stopped a workspace before heading out for launch and I want to start that same workspace rather than create a new one.
 
 ```zsh
 function gpo {
@@ -65,9 +65,9 @@ function gpo {
 
 ## gpgc
 
-Short for Gitpod Garbage Collect. This is a quick way to clean up in my list of workspaces. For this I use the fzf feature of hitting `tab` to select multiple entries.
-
 ![new](/images/gitpod-cli/gpgc.png)
+
+Short for Gitpod Garbage Collect. This is a quick way to clean up in my list of workspaces. For this I use the fzf feature of hitting `tab` to select multiple entries.
 
 ```zsh
 function gpgc {
