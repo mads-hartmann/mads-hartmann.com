@@ -8,7 +8,7 @@ title: ~ v3
 -->
 <p>Hej 👋 welcome to computer.mads-hartmann.com. I use this little site to jot down notes about my computer. How it’s configured, what applications I use, and how I use them. It contains a little guide for bootstrapping new computers but mostly this is for documenting how I use my computer; documenting things helps me think.</p>
 <h2>Gitpod</h2>
-<p>I do 99% of my development using <a href="https://www.gitpod.io/">Gitpod</a>. I use the <a href="https://www.gitpod.io/docs/configure/user-settings/dotfiles">Dotfiles feeature</a> to load my Gitpod specific dotfiles from  <a href="https://github.com/mads-hartmann/gitpod-dotfiles">mads-hartmann/gitpod-dotfiles</a></p>
+<p>I do 99% of my development using <a href="https://www.gitpod.io/">Gitpod</a>. I use the <a href="https://www.gitpod.io/docs/configure/user-settings/dotfiles">Dotfiles feeature</a> to load my Gitpod specific dotfiles from  <a href="https://github.com/mads-hartmann/gitpod-dotfiles">mads-hartmann/gitpod-dotfiles</a>.</p>
 <h2>VSCode</h2>
 <h3>Extensions</h3>
 <p>This list is not comprehensive at the moment. The extensions are alphabetically sorted.</p>
