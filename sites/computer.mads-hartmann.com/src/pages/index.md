@@ -366,6 +366,8 @@ title: ~ v3
 </ul>
 <h2>1Password</h2>
 <p>I use <a href="https://1password.com/">1Password</a> for all my personal passwords, credit cards, credentials, and so on. I Install it using the App Store.</p>
+<h2>Notion</h2>
+<p>I use <a href="https://www.notion.so/">Notion</a> for quite a few different things. This site is <a href="https://github.com/mads-hartmann/mads-hartmann.com/tree/main/sites/computer.mads-hartmann.com">generated from a Notion document</a>. I use it as a simple database system for books, articles, records, how-to’s, projects, and so on. I use it as an easy way to write interconnected notes when learning new topics.</p>
 <h2>Setting Up a New Mac</h2>
 <p><em>This was from the last time I configured a Mac from scratch. If I were to do it today I don’t think I’d use Nix as the “global” package manager but just rely on Homebrew instead; I haven’t really seen any benefit from using Nix for system-wide packages.</em></p>
 <h3>Setting up Nix</h3>
@@ -401,9 +403,9 @@ ssh-add -l
 <h2>Changelog</h2>
 <p>The current version is v3</p>
 <ul>
-<li>v3 - The biggest difference between v2 and v3 is that this is now authored in Notion and then exported as markdown. This should hopefully mean that I find it easier to update along the way.</li>
-<li><a href="https://computer.mads-hartmann.com/v2">v2</a> - the major change from <a href="https://computer.mads-hartmann.com/v1">v1</a> is that I now do 99% of my development in <a href="https://www.gitpod.io/cde">Cloud Development Environments (CDE)</a> which means that I install <em>very</em> few tools locally.</li>
-<li><a href="https://computer.mads-hartmann.com/v1">v1</a> - the original <a href="http://computer.mads-hartmann.com/">computer.mads-hartmann.com</a></li>
+<li><strong>v3</strong> - In this version I’ve extended the document to also include macOS application, SaaS services, and so on; everything that I do on my computer. I also switched to using Notion for writing the document and then have a <a href="https://github.com/mads-hartmann/mads-hartmann.com/tree/main/sites/computer.mads-hartmann.com">bit of code</a> that produces a static site for it.</li>
+<li><a href="https://computer.mads-hartmann.com/v2"><strong>v2</strong></a> - the major change from <a href="https://computer.mads-hartmann.com/v1">v1</a> is that I now do 99% of my development in <a href="https://www.gitpod.io/cde">Cloud Development Environments (CDE)</a> which means that I install <em>very</em> few tools locally.</li>
+<li><a href="https://computer.mads-hartmann.com/v1"><strong>v1</strong></a> - the original <a href="http://computer.mads-hartmann.com/">computer.mads-hartmann.com</a></li>
 </ul>
 <hr>
 <p><a href="/9c3cf9a818da426f9be44d838395396c"><em>Edit</em></a></p>
