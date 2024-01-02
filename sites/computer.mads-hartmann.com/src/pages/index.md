@@ -368,6 +368,7 @@ title: ~ v3
 <p>I use <a href="https://1password.com/">1Password</a> for all my personal passwords, credit cards, credentials, and so on. I Install it using the App Store.</p>
 <h2>Notion</h2>
 <p>I use <a href="https://www.notion.so/">Notion</a> for quite a few different things. This site is <a href="https://github.com/mads-hartmann/mads-hartmann.com/tree/main/sites/computer.mads-hartmann.com">generated from a Notion document</a>. I use it as a simple database system for books, articles, records, how-to’s, projects, and so on. I use it as an easy way to write interconnected notes when learning new topics.</p>
+<p>I use the <a href="https://www.notion.so/desktop">Notion Desktop App</a> as I find it marginally quicker than opening a tab in Safari.</p>
 <h2>Setting Up a New Mac</h2>
 <p><em>This was from the last time I configured a Mac from scratch. If I were to do it today I don’t think I’d use Nix as the “global” package manager but just rely on Homebrew instead; I haven’t really seen any benefit from using Nix for system-wide packages.</em></p>
 <h3>Setting up Nix</h3>
