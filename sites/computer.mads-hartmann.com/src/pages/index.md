@@ -350,12 +350,15 @@ title: ~ v3
 
 
 <h2>Raycast</h2>
+<p>I adore Raycast. I pay for the <a href="https://www.raycast.com/pro">Pro plan</a> which, amongst other things, gives me access to ChatGPT through Raycast. I use the AI Chat as my primary interface to ChatGPT.</p>
+<h3>Built-in Extensions</h3>
 <p>I use the following <strong>built-in extensions</strong></p>
 <ul>
 <li><strong>Search Emoji &amp; Symbols</strong><br>I use this <strong>all the time</strong>. I have this mapped to ^⌘Space so that it overwrites the default Emoji picker in macOS</li>
 <li><strong>Navigation</strong><br>I primarily use the “Search Menu Items” command. It’s the best. Allows you to use Raycast to search through the menu items of whatever application you have focused at the time. I have it bound to “⌘.”</li>
 <li><strong>Window Management</strong><br>I use this a ton for very basic window management. “Center” is mapped to ⌘⌥C, “Left Half” to ⌘⌥←, “Right Half” to ⌘⌥←, and Maximize ⌘⌥↵.</li>
 </ul>
+<h3>Raycast Store Extensions</h3>
 <p>I use the following extensions from the <a href="https://www.raycast.com/store">Raycast Store</a>:</p>
 <ul>
 <li><a href="https://www.raycast.com/raycast/apple-reminders"><strong>Apple Reminders</strong></a><br>I use the “My Reminders” command get a quick overview or modify the individual reminders and “Create Reminder” to quickly adding new reminders.</li>
