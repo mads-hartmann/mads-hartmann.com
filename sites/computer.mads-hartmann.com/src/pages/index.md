@@ -167,6 +167,16 @@ title: ~ v3
 <td colspan="4"><strong>Coding</strong></td>
 </tr>
 <tr>
+<td>^<Space></td>
+<td>Trigger Suggest</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>⌘⇧<space></td>
+<td>Trigger Parameter Hints</td>
+<td>yes</td>
+</tr>
+<tr>
 <td>^.</td>
 <td>Quick Fix…</td>
 <td>no - the default is ⌘. but I used that for Raycast</td>
@@ -199,6 +209,11 @@ title: ~ v3
 <tr>
 <td>⌥⌘J</td>
 <td>Bookmarks: Jump to Previous</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>⌘K ⌘I</td>
+<td>Show or Focus Hover</td>
 <td>yes</td>
 </tr>
 <tr>
