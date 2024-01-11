@@ -253,6 +253,11 @@ title: ~ v3
 <td>no - matches the macOS default better</td>
 </tr>
 <tr>
+<td>⌘⌥T</td>
+<td>View: Close Other Editors n Group</td>
+<td>yes</td>
+</tr>
+<tr>
 <td>^⇥</td>
 <td>View: Open Next Editor in Group</td>
 <td>no - matches the macOS default better</td>
