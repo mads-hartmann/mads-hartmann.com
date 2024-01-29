@@ -13,7 +13,7 @@ Here are some of my favorite little scripts form my `~/.zshrc`
 
 ## new
 
-![new](/images/gitpod-cli/new.png)
+<img src="/images/gitpod-cli/new.png" width="100%" />
 
 This allows me to type `new` in my terminal to get an interactive picker with my most commonly used repositories. The real list is longer but I've redacted a few private repositories 😉
 
@@ -36,7 +36,7 @@ function new {
 
 ## gppr
 
-![new](/images/gitpod-cli/gppr.png)
+<img src="/images/gitpod-cli/gppr.png" width="100%" />
 
 Short for Gitpod PR. This uses `gh` to list all my open PRs and then opens a Gitpod workspace from that context. I use this **all** the time as I usually create DRAFT PRs really early and use them to keep track of the work I have in flight.
 
@@ -50,7 +50,7 @@ function gppr {
 
 ## gpo
 
-![new](/images/gitpod-cli/gpo.png)
+<img src="/images/gitpod-cli/gpo.png" width="100%" />
 
 Short for Gitpod Open. This lists all Gitpod workspaces and provides a quick way to filter and open a specific one. I mostly use this if I stopped a workspace before heading out for launch and I want to start that same workspace rather than create a new one.
 
@@ -65,7 +65,7 @@ function gpo {
 
 ## gpgc
 
-![new](/images/gitpod-cli/gpgc.png)
+<img src="/images/gitpod-cli/gpgc.png" width="100%" />
 
 Short for Gitpod Garbage Collect. This is a quick way to clean up in my list of workspaces. For this I use the fzf feature of hitting `tab` to select multiple entries.
 
