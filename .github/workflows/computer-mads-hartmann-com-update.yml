@@ -1,4 +1,4 @@
-name: computer.mads-hartmann.com - update
+name: computer - update
 
 on:
   workflow_dispatch:
