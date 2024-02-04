@@ -17,6 +17,10 @@ title: ~ v3
 <li><a href="https://marketplace.visualstudio.com/items?itemName=GitHub.copilot"><strong>GitHub Copilot</strong></a><br>I mostly used this for “advanced code-completion”. I rarely use it for prompting or anything else, really. Maybe in 2024 that will change.</li>
 <li><a href="https://marketplace.visualstudio.com/items?itemName=GitHub.github-vscode-theme"><strong>GitHub Theme</strong></a><br>The GitHub Light and GitHub Dark are my favourite themes at the moment</li>
 <li><a href="https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme"><strong>Material Icon Theme</strong></a><br>This has been my go-to icon theme for quite a while.</li>
+<li>Rainbow Indent
+Can sometime be quite nice - haven’t fully decided if I love it or not. For now I’m using it</li>
+<li>Center Editor Window
+This is just to be able to map ^l to re-center the editor window around the current line. I used this all the time when I used Emacs so it’s nice to be able to use it again.</li>
 </ul>
 <h3>Keybindings</h3>
 <details>
