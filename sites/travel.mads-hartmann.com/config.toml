@@ -1,8 +1,0 @@
-baseURL = 'https://travel.mads-hartmann.com/'
-languageCode = 'en-us'
-title = 'Travel - Mads Hartmann'
-
-# https://github.com/Masellum/hugo-theme-nostyleplease
-# https://github.com/martinschneider/hugo-gpx-shortcode
-# https://github.com/mfg92/hugo-shortcode-gallery
-theme = ["nostyleplease", "gpx-shortcode", "hugo-shortcode-gallery"]
