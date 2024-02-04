@@ -1,0 +1,16 @@
+{
+	"name": "blog.mads-hartmann.com",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": "../../sites/blog.mads-hartmann.com"
+	},
+	"workspaceMount": "source=${localWorkspaceFolder}/sites/blog.mads-hartmann.com,target=/workspace,type=bind",
+	"workspaceFolder": "/workspace",
+	"postStartCommand": "bundle exec jekyll serve --watch --drafts --source src",
+	"portsAttributes": {
+		"4000": {
+			"label": "Jekyll",
+			"onAutoForward": "notify"
+		}
+	}
+}

@@ -1,0 +1,4 @@
+{
+	"name": "mads-hartmann.com",
+    "image": "mcr.microsoft.com/devcontainers/base:alpine"
+}
