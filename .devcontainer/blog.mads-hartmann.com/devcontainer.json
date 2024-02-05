@@ -1,12 +1,8 @@
 {
 	"name": "blog.mads-hartmann.com",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"context": "../../sites/blog.mads-hartmann.com"
-	},
-	"workspaceMount": "source=${localWorkspaceFolder}/sites/blog.mads-hartmann.com,target=/workspace,type=bind",
-	"workspaceFolder": "/workspace",
-	"postStartCommand": "bundle exec jekyll serve --watch --drafts --source src",
+	"image": "mcr.microsoft.com/devcontainers/ruby:3.1",
+	"updateContentCommand": "cd sites/blog.mads-hartmann.com && bundle install",
+	"postStartCommand": "cd sites/blog.mads-hartmann.com && bundle exec jekyll serve --watch --drafts --source src",
 	"portsAttributes": {
 		"4000": {
 			"label": "Jekyll",
