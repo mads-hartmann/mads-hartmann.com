@@ -1,0 +1,12 @@
+{
+	"name": "computer.mads-hartmann.com",
+	"image": "mcr.microsoft.com/vscode/devcontainers/javascript-node:16",
+	"updateContentCommand": "cd sites/computer.mads-hartmann.com && npm install",
+	"postStartCommand": "cd sites/computer.mads-hartmann.com && node scripts/serve.js",
+	"portsAttributes": {
+		"3000": {
+			"label": "Site",
+			"onAutoForward": "notify"
+		}
+	}
+}
