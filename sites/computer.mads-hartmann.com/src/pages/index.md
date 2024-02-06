@@ -391,6 +391,11 @@ This is just to be able to map ^l to re-center the editor window around the curr
 <li><a href="https://www.raycast.com/mattisssa/spotify-player"><strong>Spotify Player</strong></a><br>Much nicer than the Spotify App. I have enabled “Close window on action”.</li>
 <li><a href="https://www.raycast.com/rishabswift/word-search"><strong>Word Search</strong></a><br>I primarily use this for the “Spell a Word” command which allows me to attempt to spell a word and then pick the correct spelling. It’s convient when I know I want to write a word that I can never spell correctly in the first attempt.</li>
 </ul>
+<h2>[Experimental] Arc</h2>
+<p>6th of February 2024: I’m trying out using Arc as my default browser for a bit. Some quick notes</p>
+<ul>
+<li>I disabled the default keybinding of ⌘+S to show/hide the sidebar. Turns out I still hit ⌘+S quite a lot when using Notion which meant I ended up toggling the sidebar all the time. Instead I just use the mouse or ⌘+L + “sidebar”</li>
+</ul>
 <h2>1Password</h2>
 <p>I use <a href="https://1password.com/">1Password</a> for all my personal passwords, credit cards, credentials, and so on. I Install it using the App Store.</p>
 <h2>Notion</h2>
