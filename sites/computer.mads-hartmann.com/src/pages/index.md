@@ -390,6 +390,8 @@ This is just to be able to map ^l to re-center the editor window around the curr
 <li><a href="https://www.raycast.com/thomas/color-picker"><strong>Color Picker</strong></a><br>Quickest and simplest way to grab the hex code of a pixel on your screen.</li>
 <li><a href="https://www.raycast.com/mattisssa/spotify-player"><strong>Spotify Player</strong></a><br>Much nicer than the Spotify App. I have enabled “Close window on action”.</li>
 <li><a href="https://www.raycast.com/rishabswift/word-search"><strong>Word Search</strong></a><br>I primarily use this for the “Spell a Word” command which allows me to attempt to spell a word and then pick the correct spelling. It’s convient when I know I want to write a word that I can never spell correctly in the first attempt.</li>
+<li><a href="https://www.raycast.com/garrett/ray-so">ray.so</a>
+Really easy way to create beautiful screenshots of code snippets.</li>
 </ul>
 <h2>[Experimental] Arc</h2>
 <p>6th of February 2024: I’m trying out using Arc as my default browser for a bit. Some quick notes</p>
