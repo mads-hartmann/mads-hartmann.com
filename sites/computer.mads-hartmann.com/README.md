@@ -20,6 +20,7 @@ Updating from Notion
 
 ```sh
 nix-shell
+# Find this in 1Password
 export NOTION_TOKEN=""
 node scripts/update-from-notion.js
 ```
