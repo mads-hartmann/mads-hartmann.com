@@ -444,7 +444,7 @@ ssh-add -l
 </ul>
 <h2 id="heading-logbook">Logbook</h2>
 <h3 id="heading-week-8-2024">Week 8, 2024</h3>
-<p>I’m giving <a href="https://kapeli.com/dash">Dash</a> a try to see if having the official docs available for the tools I use means I’ll reach for them more often rather than just run ChatGPT or Google every time I need to look something up. I picked Dash because there’s a <a href="https://www.raycast.com/RSO/dash">Raycast Extension</a> for it.</p>
+<p>I’m giving <a href="https://kapeli.com/dash">Dash</a> a try to see if having the official docs available for the tools I use means I’ll reach for them more often rather than ChatGPT/Google. I picked Dash because there’s a <a href="https://www.raycast.com/RSO/dash">Raycast Extension</a> for it.</p>
 <hr>
 <p><a href="/9c3cf9a818da426f9be44d838395396c"><em>Edit</em></a></p>
 
