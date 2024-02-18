@@ -442,6 +442,9 @@ ssh-add -l
 <li><a href="https://computer.mads-hartmann.com/v2"><strong>v2</strong></a> - the major change from <a href="https://computer.mads-hartmann.com/v1">v1</a> is that I now do 99% of my development in <a href="https://www.gitpod.io/cde">Cloud Development Environments (CDE)</a> which means that I install <em>very</em> few tools locally.</li>
 <li><a href="https://computer.mads-hartmann.com/v1"><strong>v1</strong></a> - the original <a href="http://computer.mads-hartmann.com/">computer.mads-hartmann.com</a></li>
 </ul>
+<h2>Logbook</h2>
+<h3>Week 8, 2024</h3>
+<p>I’m giving <a href="https://kapeli.com/dash">Dash</a> a try to see if having the official docs available for the tools I use means I’ll reach for them more often rather than just run ChatGPT or Google every time I need to look something up. I picked Dash because there’s a <a href="https://www.raycast.com/RSO/dash">Raycast Extension</a> for it.</p>
 <hr>
 <p><a href="/9c3cf9a818da426f9be44d838395396c"><em>Edit</em></a></p>
 
