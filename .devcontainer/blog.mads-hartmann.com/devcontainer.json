@@ -1,12 +1,11 @@
 {
-	"name": "blog.mads-hartmann.com",
-	"image": "mcr.microsoft.com/devcontainers/ruby:3.1",
-	"updateContentCommand": "cd sites/blog.mads-hartmann.com && bundle install",
-	"postStartCommand": "cd sites/blog.mads-hartmann.com && bundle exec jekyll serve --watch --drafts --source src",
-	"portsAttributes": {
-		"4000": {
-			"label": "Jekyll",
-			"onAutoForward": "notify"
-		}
-	}
+  "name": "blog.mads-hartmann.com",
+  "image": "mcr.microsoft.com/devcontainers/ruby:3.1",
+  "updateContentCommand": "cd sites/blog.mads-hartmann.com && bundle install",
+  "portsAttributes": {
+    "4000": {
+      "label": "Jekyll",
+      "onAutoForward": "notify"
+    }
+  }
 }
