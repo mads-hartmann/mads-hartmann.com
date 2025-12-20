@@ -95,3 +95,7 @@ Effects can replace them. Lwt/Async use monads (`>>=`, `let*`) to chain async op
 ### How are OCaml's effect compared to Monad Transformers and Tagless Final?
 
 TODO
+
+### What are the performance benefits and drawbacks of implementing them as "resumable exceptions"?
+
+TODO
