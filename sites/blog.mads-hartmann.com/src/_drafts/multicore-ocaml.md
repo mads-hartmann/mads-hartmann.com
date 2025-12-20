@@ -62,6 +62,10 @@ Effects let you suspend a computation, do something else, then resume it - witho
 
 TODO
 
+### What are the primary APIs?
+
+TODO
+
 ### How do they relate to exceptions?
 
 TODO
