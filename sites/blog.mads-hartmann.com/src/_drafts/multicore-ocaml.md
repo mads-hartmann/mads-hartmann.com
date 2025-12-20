@@ -58,6 +58,18 @@ TODO
 
 Effects let you suspend a computation, do something else, then resume it - without callbacks or monads. Useful for async I/O, generators, exceptions, and building custom schedulers. You define an effect, perform it, and a handler decides what happens. Think of them as resumable exceptions.
 
+### What are the core concepts for Effects?
+
+TODO
+
+### How do they relate to exceptions?
+
+TODO
+
+### What are the performance characteristics?
+
+TODO
+
 ### How do I write code using effects?
 
 ```ocaml
@@ -96,6 +108,6 @@ Effects can replace them. Lwt/Async use monads (`>>=`, `let*`) to chain async op
 
 TODO
 
-### What are the performance benefits and drawbacks of implementing them as "resumable exceptions"?
+## Resources
 
-TODO
+- https://ocaml.org/manual/5.4/effects.html
