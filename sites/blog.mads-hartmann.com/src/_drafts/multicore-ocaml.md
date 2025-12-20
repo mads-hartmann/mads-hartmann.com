@@ -16,7 +16,15 @@ Libraries like Lwt and Async provided *concurrency* (not parallelism) on a singl
 
 For CPU-bound parallelism, multiple processes was the only option
 
-## What new primitives, if any, were introduced to OCaml to support multi-core support
+### How does Lwt and Async achieve this?
+
+TODO
+
+### What's the main differences between Lwt and Async?
+
+TODO
+
+## What new primitives, if any, were introduced to OCaml to support multicore support
 
 Two main additions:
 
@@ -32,7 +40,7 @@ Domains are OCaml's unit of parallelism. Each domain has its own minor heap and 
 
 ### What is the relationship between domains and OS threads?
 
-One-to-one. Each domain is backed by exactly one OS thread for its lifetime. The domain owns that thread—you can't detach or reassign it. This keeps the model simple and predictable: domain count ≈ core count.
+One-to-one. Each domain is backed by exactly one OS thread for its lifetime. The domain owns that thread - you can't detach or reassign it. This keeps the model simple and predictable: domain count ≈ core count.
 
 ### How does OCaml's multicore model differ from other languages' approaches (e.g., Go, Node)?
 
@@ -48,7 +56,7 @@ TODO
 
 ### What are effects and why should I use them?
 
-Effects let you suspend a computation, do something else, then resume it—without callbacks or monads. Useful for async I/O, generators, exceptions, and building custom schedulers. You define an effect, perform it, and a handler decides what happens. Think of them as resumable exceptions.
+Effects let you suspend a computation, do something else, then resume it - without callbacks or monads. Useful for async I/O, generators, exceptions, and building custom schedulers. You define an effect, perform it, and a handler decides what happens. Think of them as resumable exceptions.
 
 ### How do I write code using effects?
 
@@ -82,7 +90,7 @@ If no handler catches an effect, OCaml raises `Effect.Unhandled` at runtime—th
 
 ### What does effects relate to Lwt and Async?
 
-Effects can replace them. Lwt/Async use monads (`>>=`, `let*`) to chain async operations—your code must be written in a specific style. Effects let you write direct-style code (normal function calls) that can still suspend and resume. Libraries like `eio` use effects under the hood to provide Lwt-like functionality without the monadic syntax.
+Effects can replace them. Lwt/Async use monads (`>>=`, `let*`) to chain async operations - your code must be written in a specific style. Effects let you write direct-style code (normal function calls) that can still suspend and resume. Libraries like `eio` use effects under the hood to provide Lwt-like functionality without the monadic syntax.
 
 ### What is eio
 
