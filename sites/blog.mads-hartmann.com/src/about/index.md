@@ -12,7 +12,7 @@ I'm **Mads Hartmann**, an experienced software engineer and tech lead with a foc
 
 <ul class="experience">
     <li class="experience__company">
-        <h3 class="experience__company_name">Gitpod</h3>
+        <h3 class="experience__company_name">Ona</h3>
         <span class="experience__duration">Current</span>
         <span class="experience__description">
             <p></p>
