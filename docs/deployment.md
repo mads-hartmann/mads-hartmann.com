@@ -5,7 +5,7 @@
 | Root | State key | Responsibility |
 | --- | --- | --- |
 | Manual kernel | `kernel/terraform.tfstate` | Backend storage, OIDC, IAM roles/policies, GitHub controls |
-| Shared | `stacks/shared.tfstate` | Existing Route 53 zone, existing ACM certificate, validation records |
+| Shared | `stacks/shared.tfstate` | Route 53 zone, protected legacy certificate, new DNS certificate and validation CNAME |
 | Homepage | `stacks/homepage.tfstate` | Homepage S3/CloudFront, apex and www DNS, URL redirects |
 | Blog | `stacks/blog.tfstate` | Existing blog S3/CloudFront/DNS, generated posts and assets |
 | Uses | `stacks/uses.tfstate` | Uses S3/CloudFront/DNS, generated HTML |
@@ -74,6 +74,15 @@ can include HTML; it is not an untrusted-input renderer. The blog keeps Jekyll,
 posts, book reviews, drafts, media, feed and existing permalink behavior.
 
 ## Updating the kernel
+
+Shared CI can request only DNS-validated certificates for `mads-hartmann.com` and
+`*.mads-hartmann.com` in `us-east-1`, with the shared-stack/project tags. Its ACM
+tag permissions cover the existing certificate and shared-tagged certificates;
+creation also needs permission to add the initial shared/project tags. ACM
+certificate deletion is intentionally excluded. The shared output waits for DNS
+validation before downstream stacks can switch their CloudFront viewer certificate.
+Keep the validation CNAME for automatic renewal and the legacy certificate until
+every distribution using it has migrated or been retired.
 
 ```sh
 terraform -chdir=terraform/kernel init -backend-config=backend.hcl

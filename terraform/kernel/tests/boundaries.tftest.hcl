@@ -26,4 +26,8 @@ run "kernel_boundaries" {
     condition     = github_repository_environment_deployment_policy.master.branch_pattern == "master" && github_actions_variable.deployment["TERRAFORM_DEPLOY_ENABLED"].value == "false"
     error_message = "Deployment must be restricted to master and disabled until adoption."
   }
+  assert {
+    condition     = jsondecode(aws_iam_role_policy.shared_apply.policy).Statement[3].Action == "acm:RequestCertificate" && jsondecode(aws_iam_role_policy.shared_apply.policy).Statement[3].Condition.StringEquals["acm:ValidationMethod"] == "DNS" && jsondecode(aws_iam_role_policy.shared_apply.policy).Statement[3].Condition.StringEquals["aws:RequestTag/Stack"] == "shared" && jsondecode(aws_iam_role_policy.shared_apply.policy).Statement[3].Condition["ForAllValues:StringEquals"]["acm:DomainNames"] == ["mads-hartmann.com", "*.mads-hartmann.com"]
+    error_message = "Shared CI may request only DNS-validated certificates for this domain."
+  }
 }

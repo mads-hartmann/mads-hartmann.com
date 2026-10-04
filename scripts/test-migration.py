@@ -64,6 +64,10 @@ if sys.argv[-2:] == ['state','pull']:
 
 class InventoryTests(unittest.TestCase):
     def test_inventory_hides_secrets_and_maps_real_addresses(self):
+        self.check_inventory('DNS')
+    def test_email_certificate_needs_no_validation_record_import(self):
+        self.check_inventory('EMAIL')
+    def check_inventory(self, method):
         spec=importlib.util.spec_from_file_location('inventory',ROOT/'scripts/inventory.py')
         inventory=importlib.util.module_from_spec(spec);spec.loader.exec_module(inventory)
         with tempfile.TemporaryDirectory() as directory:
@@ -88,7 +92,11 @@ class InventoryTests(unittest.TestCase):
                 if args[:2]==('s3api','get-object'):Path(args[-1]).write_text(json.dumps(old));return {}
                 if args[:2]==('cloudfront','list-distributions'):return {'DistributionList':{}}
                 if args[:2]==('route53','list-resource-record-sets'):return {'ResourceRecordSets':[]}
-                if args[:2]==('acm','describe-certificate'):return {'Certificate':{'DomainName':'*.mads-hartmann.com','SubjectAlternativeNames':['*.mads-hartmann.com','mads-hartmann.com'],'DomainValidationOptions':[{'DomainName':'*.mads-hartmann.com','ResourceRecord':{'Name':'_proof.mads-hartmann.com.','Type':'CNAME','Value':'_proof.acm-validations.aws.'}}]}}
+                if args[:2]==('acm','describe-certificate'):
+                    options=[dict(DomainName=name,ValidationMethod=method) for name in ['*.mads-hartmann.com','mads-hartmann.com']]
+                    if method=='DNS':
+                        for option in options:option['ResourceRecord']={'Name':'_proof.mads-hartmann.com.','Type':'CNAME','Value':'_proof.acm-validations.aws.'}
+                    return {'Certificate':{'DomainName':'*.mads-hartmann.com','SubjectAlternativeNames':['*.mads-hartmann.com','mads-hartmann.com'],'DomainValidationOptions':options}}
                 if args[:2]==('s3api','get-bucket-location') and '--bucket' in args and args[args.index('--bucket')+1]=='blog.mads-hartmann.com':return {'LocationConstraint':None}
                 if kwargs.get('optional'):return None
                 raise AssertionError(args)
@@ -102,7 +110,10 @@ class InventoryTests(unittest.TestCase):
             manifests=''.join(path.read_text() for path in inventory.OUT.glob('*imports.json'))
             self.assertNotIn('MUST_NOT_APPEAR',manifests)
             self.assertIn('module.site.aws_s3_bucket.bucket',manifests)
-            self.assertIn('aws_route53_record.validation[\\"mads-hartmann.com\\"]',manifests)
+            shared=json.loads((inventory.OUT/'shared-imports.json').read_text())
+            self.assertEqual(sum(item['address'].startswith('aws_route53_record.validation[') for item in shared),1 if method=='DNS' else 0)
+            values=json.loads((inventory.OUT/'shared.tfvars.json').read_text())
+            self.assertEqual(values['legacy_certificate_validation_method'],method)
             self.assertEqual(inventory.OUT.stat().st_mode & 0o777,0o700)
 
 if __name__=='__main__':unittest.main()

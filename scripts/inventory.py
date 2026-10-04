@@ -63,7 +63,8 @@ def main():
             add('shared', f'aws_route53_record.validation[{json.dumps(option["DomainName"].removeprefix("*."))}]', f'{ZONE}_{record["Name"]}_{record["Type"]}')
     save('shared.tfvars.json', {
         'certificate_domain': certificate['DomainName'],
-        'certificate_alternative_names': [name for name in certificate['SubjectAlternativeNames'] if name != certificate['DomainName']]
+        'certificate_alternative_names': [name for name in certificate['SubjectAlternativeNames'] if name != certificate['DomainName']],
+        'legacy_certificate_validation_method': certificate['DomainValidationOptions'][0]['ValidationMethod']
     })
     preserved = {'aws_s3_bucket.bucket', 'aws_s3_bucket_public_access_block.public_access_block', 'aws_s3_bucket_policy.policy', 'aws_cloudfront_distribution.distribution', 'aws_route53_record.records'}
     blog_values = {'bucket_name': 'blog.mads-hartmann.com', 'region': 'us-east-1'}

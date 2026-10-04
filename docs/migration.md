@@ -29,7 +29,7 @@ or an unexpected www CNAME. Review all manifests against the actual AWS console.
 Archive deployed content for travel/library/links/example/computer and howto before
 retiring them; some deployed content has no source in these repositories.
 
-Review the bucket regions, ACM DomainName/SAN ordering, www TTL, OAI and any existing
+Review the bucket regions, ACM DomainName/SAN ordering and validation method, www TTL, OAI and any existing
 homepage distribution. Copy the non-secret discovered values into the corresponding
 `production.auto.tfvars` (or an additional committed `production.auto.tfvars.json`),
 keeping account/region settings. Match `kernel.site_buckets` if bucket names differ.
@@ -73,16 +73,32 @@ python3 scripts/adopt.py shared --var-file .migration/shared.tfvars.json
 python3 scripts/adopt.py shared --var-file .migration/shared.tfvars.json --execute
 terraform -chdir=terraform/stacks/shared plan -out=shared.tfplan
 terraform -chdir=terraform/stacks/shared apply shared.tfplan
+export TF_VAR_certificate_arn="$(terraform -chdir=terraform/stacks/shared output -raw certificate_arn)"
 python3 scripts/adopt.py blog --var-file .migration/blog.tfvars.json
 python3 scripts/adopt.py blog --var-file .migration/blog.tfvars.json --execute
 python3 scripts/adopt.py blog --release-legacy
 python3 scripts/adopt.py blog --release-legacy --execute
 ```
 
-The existing zone and certificate are imported, with one owner for duplicate
-apex/wildcard validation records. A certificate replacement is blocked. Use the
-reviewed certificate values in the committed config before planning. Other DNS
-records, including mail, stay outside these resource declarations and are preserved.
+The inventory confirmed an issued email-validated wildcard/apex certificate used
+by seven distributions. Import it at `aws_acm_certificate.primary` with its existing
+domain/SAN ordering and `legacy_certificate_validation_method=EMAIL`; do not change
+its validation method. Its replacement/deletion is blocked by `prevent_destroy`.
+The committed production values match this inventory. An inventory generated before
+the validation-method field was added still works with the default `EMAIL` value.
+
+The shared plan should create `aws_acm_certificate.dns`, one Route 53 validation
+CNAME shared by apex/wildcard, and a validation waiter. **Stop if it replaces or
+destroys the imported certificate.** Review the plan before applying. Validation
+can take several minutes; site stacks receive only the issued DNS certificate's
+ARN. Export the new ARN as shown above before planning/applying any site. When
+resuming in another shell, repeat that export and the zone-ID export from step 1.
+The old certificate remains available through `legacy_certificate_arn` for recovery.
+Other DNS records, including mail, are preserved.
+
+Terraform owns the validation CNAME so ACM can renew the DNS certificate
+automatically while it is in use. Keep that CNAME after issuance. See
+[AWS DNS validation](https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html).
 
 Blog import moves the bucket, access block, bucket policy, CloudFront distribution,
 and A/AAAA records to `stacks/blog.tfstate`. The release step verifies each new ID,
@@ -199,6 +215,11 @@ an earlier human-managed cleanup apply, with the reviewed remaining state retain
 
 Delete retired DNS not present in those states, including any howto records from
 Vercel, after checking the DNS snapshot. Keep mail/NS/SOA/ACM validation records.
+After all retained distributions use the new DNS certificate and retired
+distributions are deleted, confirm the old certificate's ACM `InUseBy` is empty.
+Retire it in a separate reviewed cleanup PR/manual apply that removes its
+`prevent_destroy` protection and resource. Do not delete it during the cutover;
+the current PR deliberately preserves it.
 Revoke any older homepage deployment identity found outside the legacy states and
 remove obsolete repository AWS/Notion secrets. Remove Vercel projects only after
 AWS DNS and content have been verified. Add a deprecation README to the v2 repo

@@ -98,7 +98,14 @@ resource "aws_iam_role_policy" "shared_apply" {
   policy = jsonencode({ Version = "2012-10-17", Statement = [
     { Effect = "Allow", Action = ["route53:UpdateHostedZoneComment", "route53:ChangeTagsForResource"], Resource = "arn:aws:route53:::hostedzone/${var.zone_id}" },
     { Effect = "Allow", Action = "route53:ChangeResourceRecordSets", Resource = "arn:aws:route53:::hostedzone/${var.zone_id}", Condition = { "ForAllValues:StringEquals" = { "route53:ChangeResourceRecordSetsRecordTypes" = ["CNAME"] }, "ForAllValues:StringLike" = { "route53:ChangeResourceRecordSetsNormalizedRecordNames" = ["_*.mads-hartmann.com"] } } },
-    { Effect = "Allow", Action = ["acm:AddTagsToCertificate", "acm:RemoveTagsFromCertificate"], Resource = var.certificate_arn }
+    { Effect = "Allow", Action = ["acm:AddTagsToCertificate", "acm:RemoveTagsFromCertificate"], Resource = var.certificate_arn },
+    { Effect = "Allow", Action = "acm:RequestCertificate", Resource = "*", Condition = {
+      StringEquals                = { "acm:ValidationMethod" = "DNS", "aws:RequestTag/Stack" = "shared", "aws:RequestTag/Project" = "mads-hartmann.com", "aws:RequestedRegion" = "us-east-1" }
+      "ForAllValues:StringEquals" = { "acm:DomainNames" = ["mads-hartmann.com", "*.mads-hartmann.com"] }
+    } },
+    # RequestCertificate also authorizes AddTagsToCertificate for its initial tags.
+    { Effect = "Allow", Action = "acm:AddTagsToCertificate", Resource = "arn:aws:acm:us-east-1:${var.account_id}:certificate/*", Condition = { StringEquals = { "aws:RequestTag/Stack" = "shared", "aws:RequestTag/Project" = "mads-hartmann.com" } } },
+    { Effect = "Allow", Action = ["acm:AddTagsToCertificate", "acm:RemoveTagsFromCertificate"], Resource = "arn:aws:acm:us-east-1:${var.account_id}:certificate/*", Condition = { StringEquals = { "aws:ResourceTag/Stack" = "shared", "aws:ResourceTag/Project" = "mads-hartmann.com" } } }
   ] })
 }
 resource "github_branch_default" "master" {
