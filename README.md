@@ -31,10 +31,9 @@ The four independent roots under `terraform/stacks` are `shared`, `homepage`,
 applies the site roots. Content is uploaded by Terraform, followed by CloudFront
 invalidation and HTTP checks. No AWS access keys or Vercel deployment are needed.
 
-**The initial merge does not deploy while the GitHub deployment variable is false.**
-The sites have been adopted and DNS has moved to AWS. Production kernel config now
-sets `deploy_enabled=true`; its next reviewed manual apply enables Actions and
-future manual applies preserve that setting. The migration runbook explicitly
-overrides it to false during bootstrap. Follow [the migration runbook](docs/migration.md)
-for the first OIDC deployment. See [deployment details](docs/deployment.md) for daily use.
+All three sites are live on AWS, and GitHub Actions deployments are enabled.
+Production kernel config sets `deploy_enabled=true`, so future manual applies
+preserve that setting. See the [Sites workflow](https://github.com/mads-hartmann/mads-hartmann.com/actions/workflows/sites.yml)
+and [deployment details](docs/deployment.md) for daily use. The [migration runbook](docs/migration.md)
+documents the initial adoption and remaining legacy retirement work.
 The old Terraform roots remain frozen for inventory and manual retirement.
