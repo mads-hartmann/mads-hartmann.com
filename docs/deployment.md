@@ -43,7 +43,12 @@ GitHub's emitted subject before applying the kernel. Audience remains
 `sts.amazonaws.com`. See [GitHub's AWS OIDC guide](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws).
 
 CloudFront distribution updates use the `Stack` tag; existing distributions must
-be tagged during the human adoption apply. Function permissions use exact names.
+be tagged during the human adoption apply. Distribution and function creation
+require `Resource = "*"` with the site's requested `Stack` tag. Separate
+`TagResource` permissions authorize those initial tags without allowing a site to
+retag another stack's resources. Function updates and tagging use exact names and
+the existing `Stack` tag. See [CloudFront's IAM action reference](https://docs.aws.amazon.com/service-authorization/latest/reference/list_cloudfront.html)
+and the [distribution creation API's required IAM actions](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_CreateDistributionWithTags.html).
 OAC and response-header-policy write APIs need broader CloudFront configuration
 permissions because they lack tag-based isolation. Those permissions do not grant
 access to IAM, another component's state, or other buckets. This boundary is
@@ -97,6 +102,8 @@ terraform -chdir=terraform/kernel apply kernel.tfplan
 Review IAM, trust and GitHub-control changes here manually. A merge that changes
 the kernel validates it but does not apply it. When adjusting component permissions,
 apply the kernel before merging the component change that needs those permissions.
+Regenerate a saved plan after changing the kernel; applying an earlier plan uses
+the old configuration and policies stored in that plan.
 
 ## Recovery
 

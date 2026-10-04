@@ -73,6 +73,9 @@ installs branch rules and OIDC roles, and sets `TERRAFORM_DEPLOY_ENABLED=false`.
 Existing inventory manifests from before this change remain usable: the import
 helper maps the former default-branch resource address to its current address.
 Do not enable deployment until the state transfers below are complete.
+If the kernel changes after you create `kernel.tfplan`, regenerate and review the
+plan before applying it. A saved plan retains the earlier configuration and IAM
+policies even when the checkout has changed.
 
 If an import attempt stops partway through, rerun the same helper after fixing the
 reported error. It reads the current state and skips resources whose IDs already

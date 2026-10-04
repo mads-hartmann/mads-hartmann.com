@@ -80,10 +80,16 @@ resource "aws_iam_role_policy" "site_apply" {
   name     = "ManageSite"
   role     = aws_iam_role.github["${each.key}-apply"].id
   policy = jsonencode({ Version = "2012-10-17", Statement = [
-    { Effect = "Allow", Action = ["s3:CreateBucket", "s3:DeleteBucket", "s3:Get*", "s3:List*", "s3:PutBucket*", "s3:DeleteBucketPolicy", "s3:PutEncryptionConfiguration", "s3:PutObject", "s3:PutObjectTagging", "s3:DeleteObjectTagging", "s3:DeleteObject", "s3:PutBucketOwnershipControls", "s3:DeleteBucketOwnershipControls", "s3:PutBucketPublicAccessBlock", "s3:PutBucketTagging"], Resource = ["arn:aws:s3:::${each.value}", "arn:aws:s3:::${each.value}/*"] },
-    { Effect = "Allow", Action = ["cloudfront:CreateDistributionWithTags"], Resource = "*", Condition = { StringEquals = { "aws:RequestTag/Stack" = each.key } } },
+    { Effect = "Allow", Action = ["s3:CreateBucket", "s3:DeleteBucket", "s3:Get*", "s3:List*", "s3:PutBucket*", "s3:DeleteBucketPolicy", "s3:PutEncryptionConfiguration", "s3:PutObject", "s3:PutObjectTagging", "s3:DeleteObjectTagging", "s3:DeleteObject", "s3:PutBucketOwnershipControls", "s3:PutBucketPublicAccessBlock", "s3:PutBucketTagging"], Resource = ["arn:aws:s3:::${each.value}", "arn:aws:s3:::${each.value}/*"] },
+    # Creation uses IAM action names, not the CreateDistributionWithTags API name.
+    # Neither create action supports resource ARNs; initial tagging is checked separately.
+    { Effect = "Allow", Action = ["cloudfront:CreateDistribution", "cloudfront:CreateFunction"], Resource = "*", Condition = { StringEquals = { "aws:RequestTag/Stack" = each.key } } },
+    { Effect = "Allow", Action = ["cloudfront:TagResource"], Resource = ["arn:aws:cloudfront::${var.account_id}:distribution/*", "arn:aws:cloudfront::${var.account_id}:function/mads-sites-${each.key}"], Condition = {
+      StringEquals         = { "aws:RequestTag/Stack" = each.key }
+      StringEqualsIfExists = { "aws:ResourceTag/Stack" = each.key }
+    } },
     { Effect = "Allow", Action = ["cloudfront:UpdateDistribution", "cloudfront:DeleteDistribution", "cloudfront:CreateInvalidation", "cloudfront:TagResource", "cloudfront:UntagResource"], Resource = "arn:aws:cloudfront::${var.account_id}:distribution/*", Condition = { StringEquals = { "aws:ResourceTag/Stack" = each.key } } },
-    { Effect = "Allow", Action = ["cloudfront:CreateFunction", "cloudfront:UpdateFunction", "cloudfront:PublishFunction", "cloudfront:DeleteFunction"], Resource = "arn:aws:cloudfront::${var.account_id}:function/mads-sites-${each.key}" },
+    { Effect = "Allow", Action = ["cloudfront:UpdateFunction", "cloudfront:PublishFunction", "cloudfront:DeleteFunction", "cloudfront:TagResource", "cloudfront:UntagResource"], Resource = "arn:aws:cloudfront::${var.account_id}:function/mads-sites-${each.key}", Condition = { StringEquals = { "aws:ResourceTag/Stack" = each.key } } },
     # These CloudFront configuration APIs do not support tag-based isolation.
     { Effect = "Allow", Action = ["cloudfront:CreateOriginAccessControl", "cloudfront:UpdateOriginAccessControl", "cloudfront:DeleteOriginAccessControl", "cloudfront:CreateResponseHeadersPolicy", "cloudfront:UpdateResponseHeadersPolicy", "cloudfront:DeleteResponseHeadersPolicy"], Resource = "*" },
     { Effect = "Allow", Action = "route53:ChangeResourceRecordSets", Resource = "arn:aws:route53:::hostedzone/${var.zone_id}", Condition = { "ForAllValues:StringEquals" = {
