@@ -1,0 +1,123 @@
+name: Sites
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      stack:
+        description: Stack to deploy (shared always runs first)
+        type: choice
+        options: [all, shared, homepage, blog, uses]
+        default: all
+permissions:
+  contents: read
+# Queue production changes; never interrupt an apply or invalidate a saved plan.
+concurrency:
+  group: sites-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'production' }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+        with:
+          ruby-version: '3.3'
+          bundler: '4.0.16'
+          bundler-cache: true
+          working-directory: sites/blog.mads-hartmann.com
+      - run: scripts/build.sh
+      - run: node scripts/check-sites.mjs
+      - run: python3 scripts/test-migration.py
+      - run: tar -czf sites.tar.gz .build/homepage .build/blog .build/uses .build/routing
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sites
+          path: sites.tar.gz
+          retention-days: 7
+  terraform:
+    needs: build
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        terraform_version: ['1.16.4', '1.16.5']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sites
+      - run: tar -xzf sites.tar.gz
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: ${{ matrix.terraform_version }}
+          terraform_wrapper: false
+      - run: scripts/check-terraform.sh
+      - run: scripts/check-workflows.sh
+  checks:
+    name: Checks
+    if: always()
+    needs: [build, terraform]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require every check
+        env:
+          BUILD_RESULT: ${{ needs.build.result }}
+          TERRAFORM_RESULT: ${{ needs.terraform.result }}
+        run: test "$BUILD_RESULT" = success && test "$TERRAFORM_RESULT" = success
+  shared:
+    if: >-
+      github.ref == 'refs/heads/main' && github.event_name != 'pull_request' &&
+      vars.TERRAFORM_DEPLOY_ENABLED == 'true'
+    needs: [checks]
+    uses: ./.github/workflows/apply-stack.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      stack: shared
+      role_arn: ${{ vars.AWS_ROLE_SHARED_APPLY }}
+  homepage:
+    if: github.event_name != 'workflow_dispatch' || inputs.stack == 'all' || inputs.stack == 'homepage'
+    needs: [shared]
+    uses: ./.github/workflows/apply-stack.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      stack: homepage
+      role_arn: ${{ vars.AWS_ROLE_HOMEPAGE_APPLY }}
+      zone_id: ${{ needs.shared.outputs.zone_id }}
+      certificate_arn: ${{ needs.shared.outputs.certificate_arn }}
+  blog:
+    if: github.event_name != 'workflow_dispatch' || inputs.stack == 'all' || inputs.stack == 'blog'
+    needs: [shared]
+    uses: ./.github/workflows/apply-stack.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      stack: blog
+      role_arn: ${{ vars.AWS_ROLE_BLOG_APPLY }}
+      zone_id: ${{ needs.shared.outputs.zone_id }}
+      certificate_arn: ${{ needs.shared.outputs.certificate_arn }}
+  uses:
+    if: github.event_name != 'workflow_dispatch' || inputs.stack == 'all' || inputs.stack == 'uses'
+    needs: [shared]
+    uses: ./.github/workflows/apply-stack.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      stack: uses
+      role_arn: ${{ vars.AWS_ROLE_USES_APPLY }}
+      zone_id: ${{ needs.shared.outputs.zone_id }}
+      certificate_arn: ${{ needs.shared.outputs.certificate_arn }}

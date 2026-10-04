@@ -1,0 +1,65 @@
+name: Apply stack
+on:
+  workflow_call:
+    inputs:
+      stack:
+        type: string
+        required: true
+      role_arn:
+        type: string
+        required: true
+      zone_id:
+        type: string
+        default: ''
+      certificate_arn:
+        type: string
+        default: ''
+    outputs:
+      zone_id:
+        value: ${{ jobs.apply.outputs.zone_id }}
+      certificate_arn:
+        value: ${{ jobs.apply.outputs.certificate_arn }}
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    environment: Production
+    outputs:
+      zone_id: ${{ steps.deploy.outputs.zone_id }}
+      certificate_arn: ${{ steps.deploy.outputs.certificate_arn }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Only deploy the current main commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/main
+          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          test "$GITHUB_SHA" = "$latest"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sites
+      - run: tar -xzf sites.tar.gz
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.16.5
+          terraform_wrapper: false
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ inputs.role_arn }}
+          aws-region: eu-central-1
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+          role-session-name: sites-${{ github.run_id }}-${{ inputs.stack }}
+      - name: Plan and apply this stack
+        id: deploy
+        env:
+          STACK: ${{ inputs.stack }}
+          TF_VAR_zone_id: ${{ inputs.zone_id }}
+          TF_VAR_certificate_arn: ${{ inputs.certificate_arn }}
+          TF_IN_AUTOMATION: 'true'
+          TF_INPUT: 'false'
+        run: scripts/deploy-stack.sh "$STACK"

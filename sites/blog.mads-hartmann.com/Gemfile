@@ -8,3 +8,6 @@ gem 'jekyll-sitemap', "~> 1.4.0"
 gem 'jekyll-feed', "~> 0.15.0"
 
 gem "webrick", "~> 1.7"
+
+# Native protobuf builds invoke rake on Ruby 3.3.
+gem "rake", "~> 13.0"

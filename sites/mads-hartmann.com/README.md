@@ -1,7 +1,7 @@
-# mads-hartmann.com
+# Homepage
 
-Tiny landing page for my *.mads-hartmann.com sites.
+Edit `src/index.html`. It is the complete page, including CSS, favicon and portrait.
+There is no framework, runtime JavaScript, font download or theme control.
 
-```sh
-python -m http.server --bind 0.0.0.0 --directory src 8080
-```
+Run `scripts/build.sh homepage` from the repository root. Terraform uploads only
+`.build/homepage/index.html`; CloudFront handles redirects and retired paths.
