@@ -1,10 +1,9 @@
 # Migration runbook
 
-This branch changes source and deployment configuration; it does not apply AWS,
-rename the remote branch, change DNS, revoke keys or archive repositories.
-The first merge is safe because deployment defaults to disabled. The initial
-migration requires human AWS access for inventory, state transfer and the origin
-transition, in addition to the small permanently manual kernel.
+The initial migration requires human AWS access for inventory, state transfer and
+the origin transition, in addition to the small permanently manual kernel. Merge
+the migration code while the GitHub deployment variable is disabled, then enable
+Actions only after adoption and DNS cutover have passed verification.
 
 ## 1. Merge with deployment disabled and freeze old writers
 
@@ -59,7 +58,7 @@ helper after correcting the version requirement.
 export GITHUB_TOKEN="$(gh auth token)"
 python3 scripts/adopt.py kernel
 python3 scripts/adopt.py kernel --execute
-terraform -chdir=terraform/kernel plan -out=kernel.tfplan
+terraform -chdir=terraform/kernel plan -var=deploy_enabled=false -out=kernel.tfplan
 terraform -chdir=terraform/kernel apply kernel.tfplan
 unset GITHUB_TOKEN
 ```
@@ -70,6 +69,8 @@ it with the TLS-only policy; preserve unrelated required grants explicitly.
 Use `GITHUB_TOKEN` for both imports and the manual plan/apply. The manual apply
 keeps `main` as the default branch, manages the existing Production environment,
 installs branch rules and OIDC roles, and sets `TERRAFORM_DEPLOY_ENABLED=false`.
+The explicit override keeps bootstrap disabled; the production config now records
+`deploy_enabled=true` after the completed adoption and DNS cutover.
 Existing inventory manifests from before this change remain usable: the import
 helper maps the former default-branch resource address to its current address.
 Do not enable deployment until the state transfers below are complete.
@@ -218,19 +219,24 @@ and tools/photography 410 responses. Keep the DNS snapshot for rollback.
 
 Commit any reviewed adoption settings, clear all local import/plan files, and
 confirm each retained physical resource belongs to exactly one remote state.
-With human AWS/GitHub credentials, apply the kernel with `deploy_enabled=true`:
+Merge the reviewed monorepo PR to `main` while the GitHub deployment variable is
+still false, then wait for the required checks on `main`. The workflow must exist
+on `main` before it can be dispatched there. The committed production kernel now
+sets `deploy_enabled=true`, so future manual applies preserve the enabled state.
+With human AWS/GitHub credentials, plan and review that kernel change:
 
 ```sh
 export GITHUB_TOKEN="$(gh auth token)"
-terraform -chdir=terraform/kernel plan -var=deploy_enabled=true -out=enable.tfplan
+terraform -chdir=terraform/kernel plan -out=enable.tfplan
 terraform -chdir=terraform/kernel apply enable.tfplan
 unset GITHUB_TOKEN
 gh workflow run sites.yml --ref main -f stack=all
 ```
 
-Also set `deploy_enabled=true` in the committed kernel config so future manual
-applies preserve it. Confirm the first Actions run successfully assumes all four
-roles, plans/applies its own state, invalidates caches and passes HTTP checks.
+The enable plan should only change `TERRAFORM_DEPLOY_ENABLED` from false to true;
+review any other changes before applying. Confirm the first Actions run
+successfully assumes all four roles, plans/applies its own state, invalidates
+caches and passes HTTP checks.
 A harmless content PR then confirms automatic apply on merge. A PR cloud plan
 should read state and never apply. Inspect CloudTrail session identities if an
 AWS API permission needs adjustment; only the human kernel can change policies.

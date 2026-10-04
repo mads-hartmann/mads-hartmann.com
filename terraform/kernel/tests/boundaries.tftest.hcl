@@ -2,6 +2,10 @@ mock_provider "aws" {}
 mock_provider "github" {}
 run "kernel_boundaries" {
   command = apply
+  # Bootstrap must stay disabled even after production has been enabled.
+  variables {
+    deploy_enabled = false
+  }
   assert {
     condition     = jsondecode(aws_iam_role.github["homepage-apply"].assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:mads-hartmann/mads-hartmann.com:environment:Production"
     error_message = "Apply must use the protected Production environment."
