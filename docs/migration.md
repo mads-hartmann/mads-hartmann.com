@@ -74,6 +74,12 @@ Existing inventory manifests from before this change remain usable: the import
 helper maps the former default-branch resource address to its current address.
 Do not enable deployment until the state transfers below are complete.
 
+If an import attempt stops partway through, rerun the same helper after fixing the
+reported error. It reads the current state and skips resources whose IDs already
+match the manifest. Keep the state and inventory intact; no reset or targeted apply
+is needed. The kernel defines GitHub variable keys from the configured identities
+so imports can run before any OIDC roles have been created.
+
 ## 3. Adopt shared and blog resources
 
 ```sh

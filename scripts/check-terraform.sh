@@ -15,3 +15,4 @@ for root in terraform/kernel terraform/stacks/shared terraform/stacks/homepage t
   terraform -chdir="$root" validate -no-color
   terraform -chdir="$root" test -no-color
 done
+python3 scripts/test-kernel-import.py

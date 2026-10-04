@@ -150,12 +150,13 @@ resource "github_repository_ruleset" "main" {
   }
   depends_on = [github_branch_default.main]
 }
+# Import evaluates this before role instances exist; derive keys from configuration.
 locals {
   github_variables = merge({
     AWS_ACCOUNT_ID           = var.account_id
     TF_STATE_BUCKET          = var.state_bucket
     TERRAFORM_DEPLOY_ENABLED = tostring(var.deploy_enabled)
-  }, { for key, role in aws_iam_role.github : "AWS_ROLE_${upper(replace(key, "-", "_"))}" => role.arn })
+  }, { for key in keys(local.identities) : "AWS_ROLE_${upper(replace(key, "-", "_"))}" => aws_iam_role.github[key].arn })
 }
 resource "github_actions_variable" "deployment" {
   for_each      = local.github_variables
