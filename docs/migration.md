@@ -14,7 +14,8 @@ other repositories, and pause automatic Vercel deployments. The cloud repository
 is already archived. Do not run the old production Terraform apply.
 
 Authenticate to AWS account `790804032123` as a human and install AWS CLI,
-Terraform 1.16.5 and `gh`. Authenticate `gh` with repository administration access.
+Terraform 1.16.4 or a later 1.16 patch release (1.16.5 recommended), and `gh`.
+Authenticate `gh` with repository administration access.
 Do not place credentials in tfvars. Run:
 
 ```sh
@@ -48,6 +49,11 @@ scripts/build.sh
 
 The existing state bucket bootstraps its own remote backend. The kernel key is
 new and distinct from both legacy keys. Preview the imports, then execute them:
+
+Check `terraform version` first. Both 1.16.4 and 1.16.5 are validated in CI; all
+automatic plans/applies use the pinned 1.16.5 release. If an earlier attempt stopped
+at `init` with a version error, no imports ran. Update the checkout and rerun the
+helper after correcting the version requirement.
 
 ```sh
 export GITHUB_TOKEN="$(gh auth token)"

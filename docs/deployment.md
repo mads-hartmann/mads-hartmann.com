@@ -15,6 +15,10 @@ All states use the existing `terraform-state-cloud-mads-hartmann-com` bucket in
 Only the default Terraform workspace is supported. Site bucket regions are
 preserved during adoption; the existing blog is in `us-east-1`.
 
+Terraform Core supports `>= 1.16.4, < 1.17.0`. CI validates both 1.16.4 and 1.16.5;
+automatic cloud plans/applies remain pinned to 1.16.5. Provider versions and their
+checksums remain pinned independently of the Core version range.
+
 The kernel uses a human AWS session and a human GitHub token through `GITHUB_TOKEN`.
 The provider needs repository administration permissions. Neither credential is
 stored in Terraform variables or passed to Actions. Only public configuration
