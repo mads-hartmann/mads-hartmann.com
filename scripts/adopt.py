@@ -12,6 +12,15 @@ parser.add_argument('--var-file', action='append', default=[])
 args = parser.parse_args()
 os.umask(0o077)
 manifest = json.loads((ROOT / f'.migration/{args.stack}-imports.json').read_text())
+kernel_moves = {
+    f'{kind}.master': f'{kind}.main' for kind in [
+        'github_branch_default', 'github_repository_environment_deployment_policy', 'github_repository_ruleset'
+    ]
+}
+def current_address(address):
+    return kernel_moves.get(address, address) if args.stack == 'kernel' else address
+for item in manifest:
+    item['address'] = current_address(item['address'])
 root = ROOT / ('terraform/kernel' if args.stack == 'kernel' else f'terraform/stacks/{args.stack}')
 prefix = ['terraform', f'-chdir={root}']
 variables = [f'-var-file={Path(file).resolve()}' for file in args.var_file]
@@ -35,7 +44,7 @@ def resources(state):
         address = (resource.get('module','') + '.' if resource.get('module') else '') + resource['type'] + '.' + resource['name']
         for instance in resource.get('instances', []):
             suffix = f'[{json.dumps(instance["index_key"])}]' if 'index_key' in instance else ''
-            found[address + suffix] = instance['attributes'].get('id')
+            found[current_address(address + suffix)] = instance['attributes'].get('id')
     return found
 
 run(prefix + ['init','-input=false','-lockfile=readonly','-backend-config=backend.hcl'])

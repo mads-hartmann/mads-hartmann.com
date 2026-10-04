@@ -2,7 +2,7 @@ name: Sites
 on:
   pull_request:
   push:
-    branches: [main, master]
+    branches: [main]
   workflow_dispatch:
     inputs:
       stack:
@@ -72,7 +72,7 @@ jobs:
         run: test "$BUILD_RESULT" = success && test "$TERRAFORM_RESULT" = success
   shared:
     if: >-
-      github.ref == 'refs/heads/master' && github.event_name != 'pull_request' &&
+      github.ref == 'refs/heads/main' && github.event_name != 'pull_request' &&
       vars.TERRAFORM_DEPLOY_ENABLED == 'true'
     needs: [checks]
     uses: ./.github/workflows/apply-stack.yml

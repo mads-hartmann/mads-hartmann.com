@@ -108,11 +108,11 @@ resource "aws_iam_role_policy" "shared_apply" {
     { Effect = "Allow", Action = ["acm:AddTagsToCertificate", "acm:RemoveTagsFromCertificate"], Resource = "arn:aws:acm:us-east-1:${var.account_id}:certificate/*", Condition = { StringEquals = { "aws:ResourceTag/Stack" = "shared", "aws:ResourceTag/Project" = "mads-hartmann.com" } } }
   ] })
 }
-resource "github_branch_default" "master" {
+resource "github_branch_default" "main" {
   repository      = var.github_repository
-  branch          = "master"
-  rename          = true
-  wait_for_rename = true
+  branch          = "main"
+  rename          = false
+  wait_for_rename = false
 }
 resource "github_repository_environment" "production" {
   repository  = var.github_repository
@@ -122,20 +122,20 @@ resource "github_repository_environment" "production" {
     custom_branch_policies = true
   }
 }
-resource "github_repository_environment_deployment_policy" "master" {
+resource "github_repository_environment_deployment_policy" "main" {
   repository     = var.github_repository
   environment    = github_repository_environment.production.environment
-  branch_pattern = "master"
-  depends_on     = [github_branch_default.master]
+  branch_pattern = "main"
+  depends_on     = [github_branch_default.main]
 }
-resource "github_repository_ruleset" "master" {
+resource "github_repository_ruleset" "main" {
   repository  = var.github_repository
-  name        = "master"
+  name        = "main"
   target      = "branch"
   enforcement = "active"
   conditions {
     ref_name {
-      include = ["refs/heads/master"]
+      include = ["refs/heads/main"]
       exclude = []
     }
   }
@@ -148,7 +148,7 @@ resource "github_repository_ruleset" "master" {
       required_check { context = "Checks" }
     }
   }
-  depends_on = [github_branch_default.master]
+  depends_on = [github_branch_default.main]
 }
 locals {
   github_variables = merge({

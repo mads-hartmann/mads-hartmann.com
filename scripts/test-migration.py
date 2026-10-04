@@ -21,6 +21,8 @@ with open(os.environ['COMMAND_LOG'],'a') as log: log.write(json.dumps(sys.argv[1
 if sys.argv[-2:] == ['state','pull']:
  if os.environ.get('EMPTY_STATE') == 'true':
   print('No state file was found!',file=sys.stderr);sys.exit(1)
+ if os.environ.get('STATE_JSON'):
+  print(os.environ['STATE_JSON']);sys.exit(0)
  print(json.dumps({'resources':[{'module':'module.site','mode':'managed','type':'aws_s3_bucket','name':'bucket','instances':[{'attributes':{'id':os.environ['BUCKET_ID']}}]}]}))
 ''')
         self.fake.chmod(0o755)
@@ -52,6 +54,23 @@ if sys.argv[-2:] == ['state','pull']:
         result=self.run_adopt('blog')
         self.assertEqual(result.returncode,0,result.stderr)
         self.assertEqual(self.commands(),[])
+    def test_old_kernel_inventory_imports_current_address(self):
+        item={'address':'github_branch_default.master','id':'mads-hartmann.com','legacy_address':None}
+        path=self.root/'.migration/kernel-imports.json'
+        path.write_text(json.dumps([item]))
+        self.environment['EMPTY_STATE']='true'
+        result=self.run_adopt('kernel','--execute')
+        self.assertEqual(result.returncode,0,result.stderr)
+        imported=[command for command in self.commands() if 'import' in command]
+        self.assertEqual(imported[0][-2:],['github_branch_default.main','mads-hartmann.com'])
+        self.assertEqual(json.loads(path.read_text()),[item])
+    def test_partially_imported_kernel_keeps_existing_owner(self):
+        item={'address':'github_branch_default.master','id':'mads-hartmann.com','legacy_address':None}
+        (self.root/'.migration/kernel-imports.json').write_text(json.dumps([item]))
+        self.environment['STATE_JSON']=json.dumps({'resources':[{'mode':'managed','type':'github_branch_default','name':'master','instances':[{'attributes':{'id':item['id']}}]}]})
+        result=self.run_adopt('kernel','--execute')
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertFalse(any('import' in command for command in self.commands()))
     def test_homepage_defers_alias_imports_during_preview(self):
         item=dict(self.item,address='module.site.aws_route53_record.records["mads-hartmann.com-A"]',id='ZEXAMPLE_mads-hartmann.com_A',legacy_address=None)
         (self.root/'.migration/homepage-imports.json').write_text(json.dumps([item]))

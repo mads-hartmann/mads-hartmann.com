@@ -23,8 +23,12 @@ run "kernel_boundaries" {
     error_message = "CI must not administer IAM."
   }
   assert {
-    condition     = github_repository_environment_deployment_policy.master.branch_pattern == "master" && github_actions_variable.deployment["TERRAFORM_DEPLOY_ENABLED"].value == "false"
-    error_message = "Deployment must be restricted to master and disabled until adoption."
+    condition     = github_repository_environment_deployment_policy.main.branch_pattern == "main" && github_actions_variable.deployment["TERRAFORM_DEPLOY_ENABLED"].value == "false"
+    error_message = "Deployment must be restricted to main and disabled until adoption."
+  }
+  assert {
+    condition     = github_branch_default.main.branch == "main" && !github_branch_default.main.rename && !github_branch_default.main.wait_for_rename && length(github_repository_ruleset.main.conditions[0].ref_name[0].include) == 1 && one(github_repository_ruleset.main.conditions[0].ref_name[0].include) == "refs/heads/main"
+    error_message = "The kernel must preserve main and protect it without renaming the branch."
   }
   assert {
     condition     = jsondecode(aws_iam_role_policy.shared_apply.policy).Statement[3].Action == "acm:RequestCertificate" && jsondecode(aws_iam_role_policy.shared_apply.policy).Statement[3].Condition.StringEquals["acm:ValidationMethod"] == "DNS" && jsondecode(aws_iam_role_policy.shared_apply.policy).Statement[3].Condition.StringEquals["aws:RequestTag/Stack"] == "shared" && jsondecode(aws_iam_role_policy.shared_apply.policy).Statement[3].Condition["ForAllValues:StringEquals"]["acm:DomainNames"] == ["mads-hartmann.com", "*.mads-hartmann.com"]

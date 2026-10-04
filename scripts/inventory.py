@@ -50,9 +50,9 @@ def main():
     oidc = f'arn:aws:iam::{ACCOUNT}:oidc-provider/token.actions.githubusercontent.com'
     if aws('iam', 'get-open-id-connect-provider', '--open-id-connect-provider-arn', oidc, optional=['NoSuchEntity']):
         add('kernel', 'aws_iam_openid_connect_provider.github', oidc)
-    # Production already exists in this repository. The default branch is intentionally renamed by a manual apply.
+    # Adopt the existing Production environment and keep main as the default branch.
     add('kernel', 'github_repository_environment.production', 'mads-hartmann.com:Production')
-    add('kernel', 'github_branch_default.master', 'mads-hartmann.com')
+    add('kernel', 'github_branch_default.main', 'mads-hartmann.com')
     add('shared', 'aws_route53_zone.primary', ZONE)
     add('shared', 'aws_acm_certificate.primary', CERT)
     seen = set()

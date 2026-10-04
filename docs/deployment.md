@@ -28,7 +28,7 @@ legacy state. Sites receive the zone/certificate through workflow outputs, witho
 reading shared state. They cannot assume other component roles.
 
 Apply trusts GitHub's `Production` environment. The kernel permits that environment
-only on `master`, requires pull requests and the `Checks` status, and prevents branch
+only on `main`, requires pull requests and the `Checks` status, and prevents branch
 deletion/force pushes. There is no approval gate after a merge. Plan trusts the
 `pull_request` subject; the workflow runs cloud plans only for owner-authored PRs
 from this repository. Fork PRs still receive every offline check.
@@ -49,12 +49,12 @@ explicit rather than claiming complete account isolation for those APIs.
 
 `.github/workflows/sites.yml` builds all sites and checks routes, Terraform and
 workflows on every PR and merge. No path filters can skip a required check.
-On `master`, with `TERRAFORM_DEPLOY_ENABLED=true`, it applies shared then the three
+On `main`, with `TERRAFORM_DEPLOY_ENABLED=true`, it applies shared then the three
 sites using `.github/workflows/apply-stack.yml`. A manual run can choose a site;
 shared still runs first to provide the certificate and zone outputs.
 
 Production runs queue without cancellation. Each apply job checks that its commit
-is still the current `master`, creates a fresh plan, and applies that saved plan in
+is still the current `main`, creates a fresh plan, and applies that saved plan in
 the same job with the same built files. If a newer commit arrives before a queued
 run starts applying, the old run fails the freshness check; the newer run deploys.
 A commit arriving during an apply does not interrupt it. Terraform locking handles
@@ -96,7 +96,7 @@ apply the kernel before merging the component change that needs those permission
 
 ## Recovery
 
-If an apply fails, rerun the Sites workflow on the current `master`. Terraform
+If an apply fails, rerun the Sites workflow on the current `main`. Terraform
 reconciles partial work. Never force-unlock a live run. Content rollback is a Git
 revert merged through the same checks; the revert rebuilds and deploys all objects.
 During initial cutover, keep the Vercel projects and old DNS snapshot until AWS

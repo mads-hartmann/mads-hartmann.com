@@ -8,8 +8,8 @@ transition, in addition to the small permanently manual kernel.
 
 ## 1. Merge with deployment disabled and freeze old writers
 
-Merge after the `Checks` job passes. The new workflow checks both `main` and
-`master` during the transition. Disable any old scheduled/deploy workflows in
+Merge after the `Checks` job passes. The workflow checks pull requests and pushes
+to `main`. Disable any old scheduled/deploy workflows in
 other repositories, and pause automatic Vercel deployments. The cloud repository
 is already archived. Do not run the old production Terraform apply.
 
@@ -61,10 +61,12 @@ unset GITHUB_TOKEN
 The import helper skips matching existing addresses, so a partially completed
 import can be resumed. Inspect any existing managed bucket policy before replacing
 it with the TLS-only policy; preserve unrelated required grants explicitly.
-Use `GITHUB_TOKEN` for both imports and the manual plan/apply. The manual apply renames the default branch from `main` to `master`, manages the
-existing Production environment, installs branch rules and OIDC roles, and sets
-`TERRAFORM_DEPLOY_ENABLED=false`. Rebase local branches onto `origin/master` after
-fetching. Do not enable deployment until the state transfers below are complete.
+Use `GITHUB_TOKEN` for both imports and the manual plan/apply. The manual apply
+keeps `main` as the default branch, manages the existing Production environment,
+installs branch rules and OIDC roles, and sets `TERRAFORM_DEPLOY_ENABLED=false`.
+Existing inventory manifests from before this change remain usable: the import
+helper maps the former default-branch resource address to its current address.
+Do not enable deployment until the state transfers below are complete.
 
 ## 3. Adopt shared and blog resources
 
@@ -180,7 +182,7 @@ export GITHUB_TOKEN="$(gh auth token)"
 terraform -chdir=terraform/kernel plan -var=deploy_enabled=true -out=enable.tfplan
 terraform -chdir=terraform/kernel apply enable.tfplan
 unset GITHUB_TOKEN
-gh workflow run sites.yml --ref master -f stack=all
+gh workflow run sites.yml --ref main -f stack=all
 ```
 
 Also set `deploy_enabled=true` in the committed kernel config so future manual

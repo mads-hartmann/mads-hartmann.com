@@ -19,13 +19,13 @@ python3 -m http.server 8080 --directory .build/homepage
 ```
 
 The **manual kernel** in `terraform/kernel` owns the state bucket, GitHub OIDC
-provider, separate plan/apply roles, repository variables, `master` branch rules
+provider, separate plan/apply roles, repository variables, `main` branch rules
 and the Production environment. Run it with human AWS and GitHub credentials.
 GitHub Actions never applies the kernel or reads its state.
 
 The four independent roots under `terraform/stacks` are `shared`, `homepage`,
 `blog` and `uses`. Each has its own S3 state key and OIDC roles. Merging to
-`master` builds and checks all sites, applies shared infrastructure first, then
+`main` builds and checks all sites, applies shared infrastructure first, then
 applies the site roots. Content is uploaded by Terraform, followed by CloudFront
 invalidation and HTTP checks. No AWS access keys or Vercel deployment are needed.
 
