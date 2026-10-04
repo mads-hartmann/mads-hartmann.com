@@ -144,13 +144,41 @@ while retaining the old origin identity. After it completes, apply with OAC enab
 ```sh
 terraform -chdir=terraform/stacks/blog plan -var-file="../../../.migration/blog.tfvars.json" -out=oac.tfplan
 terraform -chdir=terraform/stacks/blog apply oac.tfplan
+blog_invalidation_id="$(aws cloudfront create-invalidation \
+  --distribution-id "$(terraform -chdir=terraform/stacks/blog output -raw distribution_id)" \
+  --paths '/*' --query Invalidation.Id --output text)"
+aws cloudfront wait invalidation-completed \
+  --distribution-id "$(terraform -chdir=terraform/stacks/blog output -raw distribution_id)" \
+  --id "$blog_invalidation_id"
 python3 scripts/smoke-test.py blog "https://$(terraform -chdir=terraform/stacks/blog output -raw distribution_domain)"
 ```
 
-Keep `legacy_oai_arn` in committed config until this deployment passes, then remove
-it and apply to remove the old grant. Check feed, dated/category permalinks, images,
-audio, book reviews and 404 responses. All 36 migrated v2 URLs are checked against
-the generated Jekyll files by CI, including frontmatter date/category exceptions.
+Manual Terraform applies do not invalidate CloudFront's cached content; the
+Actions deployment script does. Wait for the invalidation before verifying the
+new feed/content and 404 behavior.
+
+Keep `legacy_oai_arn` in the adoption var-file until this deployment passes. Check
+feed, dated/category permalinks, images, audio, book reviews and 404 responses. All
+36 migrated v2 URLs are checked against the generated Jekyll files by CI, including
+frontmatter date/category exceptions.
+
+After verification, remove the old grant with a separate reviewed plan. For the
+inventoried production bucket and region, the committed blog settings already
+match and `legacy_oai_arn` defaults to null. Omit the adoption var-file for cleanup:
+
+```sh
+unset TF_VAR_legacy_oai_arn TF_VAR_use_oac
+export TF_VAR_zone_id="$(terraform -chdir=terraform/stacks/shared output -raw zone_id)"
+export TF_VAR_certificate_arn="$(terraform -chdir=terraform/stacks/shared output -raw certificate_arn)"
+terraform -chdir=terraform/stacks/blog plan -out=cleanup.tfplan
+terraform -chdir=terraform/stacks/blog apply cleanup.tfplan
+```
+
+The cleanup plan should only update the bucket policy to remove the OAI grant;
+the OAC grants, distribution, content and DNS remain unchanged. If adoption used
+different bucket/region settings, retain those settings in committed config and
+remove only `legacy_oai_arn` before planning. Keep the actual legacy OAI resource
+until the later legacy retirement.
 
 ## 4. Stage homepage and uses, then cut over DNS
 
