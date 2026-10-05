@@ -1,6 +1,0 @@
-{ pkgs, ... }:
-
-{
-  packages = [  ];
-  enterShell = "";
-}
