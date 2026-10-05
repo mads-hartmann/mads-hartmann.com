@@ -1,6 +1,6 @@
 :host {
   display: block;
-  color: var(--mh-header-color, #292923);
+  color: var(--mh-color-text, #292923);
   font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -9,8 +9,8 @@
 }
 
 .header {
-  background: var(--mh-header-background, #faf9f6);
-  border-bottom: 1px solid #e3e2db;
+  background: var(--mh-color-surface, #faf9f6);
+  border-bottom: 1px solid var(--mh-color-border, #e3e2db);
 }
 
 .inner {
@@ -34,7 +34,7 @@ a:hover {
 }
 
 a:focus-visible {
-  outline: 2px solid var(--mh-header-accent, #375a42);
+  outline: 2px solid var(--mh-color-accent, #375a42);
   outline-offset: 4px;
   border-radius: 4px;
 }
@@ -67,8 +67,8 @@ nav a {
 }
 
 nav a[aria-current] {
-  background: #e7ece5;
-  color: var(--mh-header-accent, #375a42);
+  background: var(--mh-color-accent-subtle, #e7ece5);
+  color: var(--mh-color-on-accent-subtle, #375a42);
   font-weight: 650;
 }
 

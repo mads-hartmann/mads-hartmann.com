@@ -10,10 +10,19 @@ $scroll-indicator-height: 10px;
 
 $scroll-indicator-heigght: 10px;
 
+:root {
+  --mh-color-surface: #fff;
+  --mh-color-text: rgba(46, 48, 58, 0.96);
+  --mh-color-border: #e0dedd;
+  --mh-color-accent: #ad141e;
+  --mh-color-accent-subtle: #f8e5e7;
+  --mh-color-on-accent-subtle: #ad141e;
+}
+
 body {
   --background: #edeceb;
   --foreground: #000;
-  --link-color: #ad141e;
+  --link-color: var(--mh-color-accent);
 }
 
 .container.purple {

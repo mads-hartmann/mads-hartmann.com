@@ -21,9 +21,39 @@ uses native links, a visible keyboard focus outline, and `aria-current`. All URL
 are absolute so they work across domains and on nested blog pages. The Blog link
 uses `aria-current="location"` for the blog section; Home and About use `page`.
 
-Set `--mh-header-background`, `--mh-header-color`, `--mh-header-accent`, or
-`--mh-header-width` on `mh-site-header` to customize an embedding site. The header
-sets its own system font, wraps into two rows on mobile, and is hidden for print.
+The header consumes a fixed set of semantic color properties. Each site defines
+its palette on `:root`; the values inherit through the shadow boundary. Every
+header color uses these properties, with homepage colors as defaults when omitted.
+
+| Property | Role | Default |
+| --- | --- | --- |
+| `--mh-color-surface` | Header background | `#faf9f6` |
+| `--mh-color-text` | Brand and navigation text | `#292923` |
+| `--mh-color-border` | Bottom divider | `#e3e2db` |
+| `--mh-color-accent` | Keyboard focus outline; also used for site links | `#375a42` |
+| `--mh-color-accent-subtle` | Active navigation background | `#e7ece5` |
+| `--mh-color-on-accent-subtle` | Text on the active navigation background | `#375a42` |
+
+For example, a site can define a red palette in its own stylesheet:
+
+```css
+:root {
+  --mh-color-surface: #fff;
+  --mh-color-text: #2e303a;
+  --mh-color-border: #e0dedd;
+  --mh-color-accent: #ad141e;
+  --mh-color-accent-subtle: #f8e5e7;
+  --mh-color-on-accent-subtle: #ad141e;
+}
+```
+
+These properties can also be overridden on `mh-site-header` to scope a palette to
+one instance. Foreground/background pairs are separate so a site can choose legible
+colors for each surface. Use the same semantic properties in other shared components.
+The header's layout and selectors remain inside its shadow tree.
+
+`--mh-header-width` controls the maximum content width. The header sets its own
+system font, wraps into two rows on mobile, and is hidden for print.
 
 Run `scripts/build.sh` and `node scripts/check-sites.mjs` from the repository root.
 Changes are incorporated into both sites at build time, so deploy both after edits.
