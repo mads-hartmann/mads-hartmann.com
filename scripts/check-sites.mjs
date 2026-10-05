@@ -68,7 +68,12 @@ for (const [from,to] of Object.entries(routes)) {
 assert.equal(request('/uses/').headers.location.value,'https://uses.mads-hartmann.com/');
 assert.equal(request('/blog/feed.xml').headers.location.value,'https://blog.mads-hartmann.com/feed.xml');
 assert.equal(request('/blog/images/a.png').headers.location.value,'https://blog.mads-hartmann.com/images/a.png');
-assert.equal(request('/blog/2017', 'www.mads-hartmann.com', { a: { multiValue: [{value:'hello world'}, {value:'x&y'}] } }).headers.location.value, routes['/blog/2017'] + '?a=hello%20world&a=x%26y');
+const query = { source: { value: 'old%20about' }, tag: { multiValue: [{ value: 'a%26b' }, { value: 'c' }] }, empty: { value: '' } };
+for (const uri of [...Object.keys(routes), '/blog', '/writings', '/blog/feed.xml', '/blog/images/a.png', '/blog/uploads/a.png', '/uses', '/']) {
+  const host = uri === '/' ? 'mads-hartmann.com' : 'www.mads-hartmann.com';
+  const target = request(uri, host).headers.location.value;
+  assert.equal(request(uri, host, query).headers.location.value, target);
+}
 assert.equal(request('/tools/ascii-art').statusCode,410);
 assert.equal(request('/photography').statusCode,410);
 assert.equal(request('/unknown').statusCode,404);
@@ -79,16 +84,14 @@ for (const site of ['uses','blog']) {
   if(site==='uses') assert.equal(ctx.handler({ request:{uri:'/unknown'} }).statusCode,404);
   else {
     for (const [uri, target] of Object.entries(redirects.blog)) {
-      const result = ctx.handler({ request: { uri, querystring: { source: { value: 'old link' }, tag: { multiValue: [{ value: 'a&b' }, { value: 'c' }] } } } });
+      const result = ctx.handler({ request: { uri, querystring: query } });
       assert.equal(result.statusCode, 301);
-      assert.equal(result.headers.location.value, target + '?source=old%20link&tag=a%26b&tag=c');
+      assert.equal(result.headers.location.value, target);
     }
     for (const uri of ['/about', '/about/', '/about/index.html']) {
       const result = ctx.handler({ request: { uri } });
       assert.equal(result.statusCode, 301);
       assert.equal(result.headers.location.value, 'https://www.mads-hartmann.com/');
-      const withQuery = ctx.handler({ request: { uri, querystring: { source: { value: 'old about' }, tag: { multiValue: [{ value: 'a&b' }, { value: 'c' }] } } } });
-      assert.equal(withQuery.headers.location.value, 'https://www.mads-hartmann.com/?source=old%20about&tag=a%26b&tag=c');
     }
     for (const comma of [',', '%2C', '%2c']) {
       const result = ctx.handler({ request:{uri:`/sre${comma}/reliability/2021/03/14/increment-magazine.html`} });
