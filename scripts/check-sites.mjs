@@ -3,10 +3,43 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import { createContext, runInContext } from 'node:vm';
 const homepage = await readFile('.build/homepage/index.html', 'utf8');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:|theme-picker/i.test(homepage));
-assert(homepage.includes('data:image/png;base64,'));
+assert(homepage.includes('data:image/jpeg;base64,'));
 assert(homepage.includes('https://blog.mads-hartmann.com/'));
 assert(homepage.includes('https://uses.mads-hartmann.com/'));
 assert.deepEqual(await readdir('.build/homepage'), ['index.html']);
+
+function checkHeader(html, current) {
+  assert.equal((html.match(/<mh-site-header /g) || []).length, 1);
+  assert(html.includes(`<mh-site-header data-current="${current}">`));
+  assert(html.includes('<template shadowrootmode="open">'));
+  assert(!html.includes('<!-- shared-header -->'));
+  const [shadow, fallback] = html.split('<mh-site-header ')[1].split('</template>');
+  const activeHref = {
+    home: 'https://www.mads-hartmann.com/',
+    blog: 'https://blog.mads-hartmann.com/',
+    about: 'https://blog.mads-hartmann.com/about/',
+  }[current];
+  for (const content of [shadow, fallback.split('</mh-site-header>')[0]]) {
+    assert.equal((content.match(/aria-current=/g) || []).length, 1);
+    assert(content.includes(`<a href="${activeHref}" aria-current=`));
+    for (const href of ['https://www.mads-hartmann.com/', 'https://blog.mads-hartmann.com/', 'https://blog.mads-hartmann.com/about/', 'https://uses.mads-hartmann.com/']) {
+      assert(content.includes(`href="${href}"`));
+    }
+  }
+}
+
+checkHeader(homepage, 'home');
+// Check every rendered blog page so layouts and collection pages cannot silently
+// lose the shared header; CSS, feeds and other static files are left alone.
+let blogPages = 0;
+for (const file of await readdir('.build/blog', { recursive: true })) {
+  if (!file.endsWith('.html')) continue;
+  const html = await readFile(`.build/blog/${file}`, 'utf8');
+  if (!html.includes('<html')) continue;
+  checkHeader(html, file === 'about/index.html' ? 'about' : 'blog');
+  blogPages++;
+}
+assert(blogPages > 0);
 const routes = JSON.parse(await readFile('routing/blog-redirects.json', 'utf8'));
 const context = createContext({});
 runInContext(await readFile('.build/routing/homepage.js', 'utf8'), context);
@@ -46,4 +79,4 @@ for (const site of ['uses','blog']) {
 }
 assert((await readFile('.build/uses/index.html','utf8')).includes('Travel'));
 await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
-console.log(`Sites validated; ${Object.keys(routes).length} post redirects match generated blog files.`);
+console.log(`Sites validated; shared header on homepage and ${blogPages} blog pages; ${Object.keys(routes).length} post redirects match generated blog files.`);

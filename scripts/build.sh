@@ -8,7 +8,7 @@ node scripts/build-routing.mjs
 if [[ "$site" == all || "$site" == homepage ]]; then
   rm -rf .build/homepage
   mkdir -p .build/homepage
-  cp sites/mads-hartmann.com/src/index.html .build/homepage/index.html
+  node scripts/build-homepage.mjs
 fi
 if [[ "$site" == all || "$site" == uses ]]; then
   rm -rf .build/uses
