@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-# Offline checks must not load a backend already configured for human migration.
+# Keep offline checks separate from local backend configuration.
 verification_dir="$(mktemp -d)"
 trap 'rm -rf "$verification_dir"' EXIT
 export TF_DATA_DIR="$verification_dir/format"
@@ -15,4 +15,3 @@ for root in terraform/kernel terraform/stacks/shared terraform/stacks/homepage t
   terraform -chdir="$root" validate -no-color
   terraform -chdir="$root" test -no-color
 done
-python3 scripts/test-kernel-import.py

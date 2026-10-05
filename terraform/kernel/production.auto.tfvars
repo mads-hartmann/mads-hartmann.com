@@ -1,4 +1,3 @@
-# Adoption and DNS cutover are complete; manual applies preserve enabled CI.
 account_id        = "790804032123"
 region            = "eu-central-1"
 github_owner      = "mads-hartmann"

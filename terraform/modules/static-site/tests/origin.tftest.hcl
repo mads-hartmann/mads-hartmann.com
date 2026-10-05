@@ -11,8 +11,6 @@ variables {
   certificate_arn = "arn:aws:acm:us-east-1:790804032123:certificate/ab1542c8-a6eb-43dd-a1ca-2d624c27efba"
   content_dir     = "../../../.build/homepage"
   routing_file    = "../../../.build/routing/homepage.js"
-  publish_dns     = true
-  legacy_oai_arn  = null
 }
 run "private_origin" {
   command = apply
@@ -25,6 +23,18 @@ run "private_origin" {
     error_message = "CloudFront must sign origin requests."
   }
   assert {
+    condition     = one(aws_cloudfront_distribution.distribution.origin).origin_access_control_id == aws_cloudfront_origin_access_control.site.id && length(one(aws_cloudfront_distribution.distribution.origin).s3_origin_config) == 0
+    error_message = "The distribution must use its signed origin access control."
+  }
+  assert {
+    condition     = length(jsondecode(aws_s3_bucket_policy.policy.policy).Statement) == 3 && jsondecode(aws_s3_bucket_policy.policy.policy).Statement[0].Principal.Service == "cloudfront.amazonaws.com" && jsondecode(aws_s3_bucket_policy.policy.policy).Statement[0].Condition.StringEquals["AWS:SourceArn"] == aws_cloudfront_distribution.distribution.arn
+    error_message = "Only this CloudFront distribution may read site objects."
+  }
+  assert {
+    condition     = length(aws_route53_record.records) == length(var.domains) * 2 && toset([for record in aws_route53_record.records : record.type]) == toset(["A", "AAAA"])
+    error_message = "Every site domain must have both IPv4 and IPv6 aliases."
+  }
+  assert {
     condition     = length(aws_s3_object.pages) == 1 && length(aws_s3_object.assets) == 0
     error_message = "The homepage must upload exactly one HTML file."
   }
@@ -35,21 +45,6 @@ run "private_origin" {
   assert {
     condition     = jsondecode(aws_s3_bucket_policy.policy.policy).Statement[2].Effect == "Deny" && jsondecode(aws_s3_bucket_policy.policy.policy).Statement[2].Condition.Bool["aws:SecureTransport"] == "false"
     error_message = "The bucket must deny insecure transport."
-  }
-}
-run "prepare_oac_without_breaking_oai" {
-  command = apply
-  variables {
-    use_oac        = false
-    legacy_oai_arn = "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ETEST"
-  }
-  assert {
-    condition     = one(one(aws_cloudfront_distribution.distribution.origin).s3_origin_config).origin_access_identity == "origin-access-identity/cloudfront/ETEST"
-    error_message = "The first migration apply must keep the old origin selected."
-  }
-  assert {
-    condition     = length(jsondecode(aws_s3_bucket_policy.policy.policy).Statement) == 4 && jsondecode(aws_s3_bucket_policy.policy.policy).Statement[3].Principal.AWS == "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ETEST"
-    error_message = "During transition the policy must grant both identities access."
   }
 }
 run "reject_missing_build" {

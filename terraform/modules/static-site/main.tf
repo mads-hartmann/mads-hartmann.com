@@ -77,13 +77,7 @@ resource "aws_cloudfront_distribution" "distribution" {
   origin {
     domain_name              = aws_s3_bucket.bucket.bucket_regional_domain_name
     origin_id                = "site-${var.bucket_name}"
-    origin_access_control_id = var.use_oac ? aws_cloudfront_origin_access_control.site.id : null
-    dynamic "s3_origin_config" {
-      for_each = var.use_oac ? [] : [1]
-      content {
-        origin_access_identity = replace(coalesce(var.legacy_oai_arn, "missing"), "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ", "origin-access-identity/cloudfront/")
-      }
-    }
+    origin_access_control_id = aws_cloudfront_origin_access_control.site.id
   }
   default_cache_behavior {
     target_origin_id           = "site-${var.bucket_name}"
@@ -124,22 +118,16 @@ resource "aws_cloudfront_distribution" "distribution" {
   tags = { Stack = var.stack }
   lifecycle {
     prevent_destroy = true
-    precondition {
-      condition     = var.use_oac || var.legacy_oai_arn != null
-      error_message = "An OAI ARN is required during the first migration apply."
-    }
   }
 }
 resource "aws_s3_bucket_policy" "policy" {
   bucket = aws_s3_bucket.bucket.id
-  policy = jsonencode({ Version = "2012-10-17", Statement = concat([
+  policy = jsonencode({ Version = "2012-10-17", Statement = [
     { Effect = "Allow", Principal = { Service = "cloudfront.amazonaws.com" }, Action = ["s3:GetObject"], Resource = "${aws_s3_bucket.bucket.arn}/*", Condition = { StringEquals = { "AWS:SourceArn" = aws_cloudfront_distribution.distribution.arn } } },
     # List permission makes a missing object return 404 rather than masking real access failures as 403.
     { Effect = "Allow", Principal = { Service = "cloudfront.amazonaws.com" }, Action = ["s3:ListBucket"], Resource = aws_s3_bucket.bucket.arn, Condition = { StringEquals = { "AWS:SourceArn" = aws_cloudfront_distribution.distribution.arn } } },
     { Effect = "Deny", Principal = "*", Action = "s3:*", Resource = [aws_s3_bucket.bucket.arn, "${aws_s3_bucket.bucket.arn}/*"], Condition = { Bool = { "aws:SecureTransport" = "false" } } }
-    ], var.legacy_oai_arn == null ? [] : [
-    { Effect = "Allow", Principal = { AWS = var.legacy_oai_arn }, Action = ["s3:GetObject"], Resource = "${aws_s3_bucket.bucket.arn}/*" }
-  ]) })
+  ] })
   depends_on = [aws_s3_bucket_public_access_block.public_access_block]
 }
 resource "aws_s3_object" "assets" {
@@ -163,7 +151,7 @@ resource "aws_s3_object" "pages" {
   depends_on    = [aws_s3_object.assets, aws_s3_bucket_ownership_controls.ownership, aws_s3_bucket_policy.policy]
 }
 resource "aws_route53_record" "records" {
-  for_each = var.publish_dns ? { for pair in setproduct(var.domains, ["A", "AAAA"]) : "${pair[0]}-${pair[1]}" => pair } : {}
+  for_each = { for pair in setproduct(var.domains, ["A", "AAAA"]) : "${pair[0]}-${pair[1]}" => pair }
   zone_id  = var.zone_id
   name     = each.value[0]
   type     = each.value[1]

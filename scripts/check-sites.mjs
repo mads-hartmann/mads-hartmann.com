@@ -46,4 +46,4 @@ for (const site of ['uses','blog']) {
 }
 assert((await readFile('.build/uses/index.html','utf8')).includes('Travel'));
 await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
-console.log(`Sites validated; ${Object.keys(routes).length} migrated post URLs match generated blog files.`);
+console.log(`Sites validated; ${Object.keys(routes).length} post redirects match generated blog files.`);

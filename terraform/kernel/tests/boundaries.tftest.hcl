@@ -2,10 +2,6 @@ mock_provider "aws" {}
 mock_provider "github" {}
 run "kernel_boundaries" {
   command = apply
-  # Bootstrap must stay disabled even after production has been enabled.
-  variables {
-    deploy_enabled = false
-  }
   assert {
     condition     = jsondecode(aws_iam_role.github["homepage-apply"].assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:mads-hartmann/mads-hartmann.com:environment:Production"
     error_message = "Apply must use the protected Production environment."
@@ -23,12 +19,20 @@ run "kernel_boundaries" {
     error_message = "A stack must write only its own state key."
   }
   assert {
+    condition     = alltrue([for name, policy in aws_iam_role_policy.state : jsondecode(policy.policy).Statement[1].Resource == "${aws_s3_bucket.state.arn}/stacks/${local.identities[name].stack}.tfstate" && jsondecode(policy.policy).Statement[2].Resource == "${aws_s3_bucket.state.arn}/stacks/${local.identities[name].stack}.tfstate.tflock"])
+    error_message = "Every CI role must access only its own state object and lock."
+  }
+  assert {
+    condition     = alltrue([for policy in aws_iam_role_policy.site_apply : jsondecode(policy.policy).Statement[6].Condition["ForAllValues:StringEquals"]["route53:ChangeResourceRecordSetsRecordTypes"] == ["A", "AAAA"]])
+    error_message = "Site roles may manage only IPv4 and IPv6 DNS aliases."
+  }
+  assert {
     condition     = contains(jsondecode(aws_iam_role_policy.state["shared-apply"].policy).Statement[3].Action, "iam:*") && jsondecode(aws_iam_role_policy.state["shared-apply"].policy).Statement[3].Effect == "Deny"
     error_message = "CI must not administer IAM."
   }
   assert {
-    condition     = github_repository_environment_deployment_policy.main.branch_pattern == "main" && github_actions_variable.deployment["TERRAFORM_DEPLOY_ENABLED"].value == "false"
-    error_message = "Deployment must be restricted to main and disabled until adoption."
+    condition     = github_repository_environment_deployment_policy.main.branch_pattern == "main" && github_actions_variable.deployment["TERRAFORM_DEPLOY_ENABLED"].value == "true"
+    error_message = "Production deployment must be enabled and restricted to main."
   }
   assert {
     condition     = github_branch_default.main.branch == "main" && !github_branch_default.main.rename && !github_branch_default.main.wait_for_rename && length(github_repository_ruleset.main.conditions[0].ref_name[0].include) == 1 && one(github_repository_ruleset.main.conditions[0].ref_name[0].include) == "refs/heads/main"

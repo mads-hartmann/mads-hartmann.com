@@ -8,8 +8,8 @@ variable "zone_id" { type = string }
 variable "certificate_arn" { type = string }
 variable "deploy_enabled" {
   type        = bool
-  default     = false
-  description = "Enable only after every existing resource has exactly one state owner."
+  default     = true
+  description = "Allow GitHub Actions to plan and deploy the sites. Set false to pause cloud workflows."
 }
 variable "oidc_subject_prefix" {
   type        = string

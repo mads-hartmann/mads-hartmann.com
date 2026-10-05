@@ -9,7 +9,6 @@
 !*.tfvars.example
 .terraform.tfstate.lock.info
 .build/
-.migration/
 node_modules/
 vendor/
 .bundle/
