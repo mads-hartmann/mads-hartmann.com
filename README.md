@@ -35,5 +35,6 @@ All three sites are live on AWS, and GitHub Actions deployments are enabled.
 Production kernel config sets `deploy_enabled=true`, so future manual applies
 preserve that setting. See the [Sites workflow](https://github.com/mads-hartmann/mads-hartmann.com/actions/workflows/sites.yml)
 and [deployment details](docs/deployment.md) for daily use. The [historical migration runbook](docs/archive/migration.md)
-records adoption and cutover. Legacy site infrastructure has been destroyed;
-[cleanup](docs/cleanup.md) describes certificate retirement and the remaining external cleanup.
+records adoption and cutover. Legacy infrastructure and external deployment
+cleanup are complete; the [cleanup record](docs/cleanup.md) documents retirement,
+verification and preserved recovery data.

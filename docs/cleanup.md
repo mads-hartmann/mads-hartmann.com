@@ -1,54 +1,55 @@
-# Remaining migration cleanup
+# Migration cleanup complete
 
-The homepage, blog and uses sites are live on AWS. Both manual and merge-triggered
-OIDC deployments have passed. The example, library, computer, links and travel
-stacks and the howto DNS record have been destroyed; both legacy states are empty.
-The primary repository's 15 obsolete AWS/Notion deployment secrets were removed.
-Content backups for the retired buckets were explicitly waived.
+Cleanup was completed on 5 October 2026. The homepage, blog and uses sites are
+live on AWS, and merges to `main` deploy through GitHub Actions using OIDC.
 
-Private state snapshots, local plans/backend metadata and legacy source (including
-locally modified provider locks) remain under the ignored `.migration/` directory.
-The original procedure is in the [historical runbook](archive/migration.md).
-Do not recreate the retired roots or remove state entries to hide deletion errors.
+## Completed retirement
 
-## Retire the unused email certificate before merging this change
+- Destroyed the example, library, computer, links and travel infrastructure and
+  removed the howto DNS record. Both legacy Terraform states are empty, and the
+  retired roots and adoption scripts have been removed from this repository.
+- Deleted the unused email-validated certificate with a reviewed human apply.
+  Updated the kernel's shared role permission to tag the active DNS certificate.
+  Automatic deployment remains enabled; CI has no certificate
+  deletion permission.
+- Removed the primary repository's 15 obsolete AWS/Notion deployment secrets.
+  Deleted the remaining `computer.mads-hartmann.com` and `mads-hartmann.com` IAM
+  deployment users, their access keys and their policies.
+- Backed up and removed seven stale current S3 objects outside Terraform state:
+  two from the homepage bucket and five from the blog bucket. Retained
+  Terraform-managed content remains present. CloudFront invalidations completed.
+- Removed the old Vercel projects, as confirmed by the owner.
+- Retired the old Notion integration and removed its saved token from 1Password,
+  as confirmed by the owner. Uses is maintained as Markdown in this repository.
+- Deprecated and archived
+  [mads-hartmann.com-v2](https://github.com/mads-hartmann/mads-hartmann.com-v2) and
+  [cloud.mads-hartmann.com](https://github.com/mads-hartmann/cloud.mads-hartmann.com).
+  Both repositories point here.
 
-The human AWS check confirmed the old certificate's `InUseBy` is empty. The
-cleanup removes `aws_acm_certificate.primary` and its legacy output from shared;
-the DNS certificate, validation CNAME and hosted zone retain their protections.
-The kernel's exact certificate-tagging grant is updated to the active DNS ARN.
-CI intentionally has no `acm:DeleteCertificate` permission. Apply the shared
-removal manually from this branch before merging so Actions sees no deletion.
+The retired blog object at
+`/sre,/reliability/2021/03/14/increment-magazine.html` was removed after its 301
+redirect deployed. The literal comma and both `%2C`/`%2c` forms redirect to the
+retained `/sre/2021/03/14/increment-magazine.html` post.
 
-```sh
-terraform -chdir=terraform/stacks/shared plan -out=retire-certificate.tfplan
-terraform -chdir=terraform/stacks/shared apply retire-certificate.tfplan
-export GITHUB_TOKEN="$(gh auth token)"
-terraform -chdir=terraform/kernel plan -out=cleanup-kernel.tfplan
-terraform -chdir=terraform/kernel apply cleanup-kernel.tfplan
-unset GITHUB_TOKEN
-```
+## Verification and recovery records
 
-Review both saved plans before applying. The shared plan should delete only
-`aws_acm_certificate.primary`; it must preserve the DNS certificate, its renewal
-CNAME and the hosted zone. The kernel plan should change only the shared apply
-role's certificate-tagging grant from the old ARN to the active DNS ARN, with
-`TERRAFORM_DEPLOY_ENABLED=true` and OIDC trust/branch controls unchanged.
-Regenerate saved plans whenever their configuration or state changes.
+The [merge-triggered deployment for PR #9](https://github.com/mads-hartmann/mads-hartmann.com/actions/runs/37265318664)
+passed all four OIDC applies and site checks. The final authenticated cleanup
+helper recorded `verified-complete`: both retired IAM users and all seven stale
+current objects are absent, retained content is present, and the live sites and
+legacy blog redirects pass HTTP checks.
 
-## Finish external cleanup
+The private report is under `.migration/remaining-cleanup/<run>/report.json`,
+with object backups under that run's `objects/` directory and state snapshots
+under `states/`. Earlier state snapshots, local plans/backend metadata and legacy
+source, including locally modified provider locks, remain under the ignored
+`.migration/` directory. Content backups for the five retired buckets were waived
+by the owner. No private reports, states, plans or credential data are committed.
 
-Inventory retained bucket objects against the current stack states, then review
-unmanaged stale keys before deleting them. Terraform owns generated content;
-it cannot remove old objects that were never adopted into its state. This cleanup
-must not delete tracked content, media or the backend buckets/state history.
+The active DNS certificate, its renewal CNAME, the hosted zone and mail records
+remain in place. Both backend buckets and their state history are preserved;
+personal and unrelated IAM users were outside this cleanup's scope.
 
-Check remaining retired DNS records and any old Vercel validation records before
-removing them. Preserve mail, NS/SOA and the active ACM renewal CNAME. Identify any
-older homepage deployment IAM key outside the destroyed legacy states and revoke
-it after confirming its owner and purpose. Removing GitHub secrets does not revoke
-an AWS key or the Notion integration token at its issuer.
-
-Remove the old Vercel projects through the authenticated Vercel account. `mads-hartmann.com-v2` now has a deprecation README and is archived.
-`cloud.mads-hartmann.com` is also archived and points here. Preserve private
-state snapshots for recovery after removing disposable local migration plans.
+Use [deployment](deployment.md) for current operations. The original migration
+procedure is in the [historical runbook](archive/migration.md); its retired
+commands must not be rerun.

@@ -3,7 +3,8 @@
 The AWS cutover and legacy site retirement are complete. This document records
 the original migration; its scripts and Terraform roots have been retired.
 Do not execute these historical commands. Use [deployment](../deployment.md) for
-current operations and [cleanup](../cleanup.md) for the remaining retirement work.
+current operations and the [cleanup record](../cleanup.md) for completed retirement
+and preserved recovery data.
 
 # Migration runbook
 

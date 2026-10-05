@@ -71,9 +71,10 @@ manual/Actions overlap. There is no `-target`, uploaded plan artifact, S3 sync j
 or long-lived AWS secret.
 
 Terraform manages every generated object. Assets are uploaded before HTML;
-removed tracked files are deleted by Terraform. Existing untracked objects must
-be archived and cleaned during migration. Cache lifetime is 60 seconds, capped
-at five minutes; successful deployments invalidate and wait, then smoke-test the
+removed tracked files are deleted by Terraform. The seven untracked legacy objects
+were backed up and removed during migration; see the [cleanup record](cleanup.md).
+Future untracked objects require separate review and removal. Cache lifetime is
+60 seconds, capped at five minutes; successful deployments invalidate and wait, then smoke-test the
 CloudFront hostname. Homepage/uses functions return actual 404/410 responses.
 Blog missing objects use the generated 404 page; access errors remain 403.
 

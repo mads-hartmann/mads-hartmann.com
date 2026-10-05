@@ -5,8 +5,9 @@ The independent `stacks/shared`, `stacks/homepage`, `stacks/blog` and `stacks/us
 roots deploy through GitHub Actions after merges to `main`.
 
 See [deployment](../docs/deployment.md) for state ownership, authentication,
-manual kernel updates and recovery. See [cleanup](../docs/cleanup.md) for the
-remaining retirement work. The legacy AWS roots have been destroyed and removed.
+manual kernel updates and recovery. See the [cleanup record](../docs/cleanup.md)
+for completed retirement and preserved recovery data. The legacy AWS roots have
+been destroyed and removed.
 
 ```sh
 scripts/check-terraform.sh # from the repository root; no cloud credentials needed
