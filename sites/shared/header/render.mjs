@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 const links = [
   { id: 'home', label: 'Home', href: 'https://www.mads-hartmann.com/' },
   { id: 'blog', label: 'Blog', href: 'https://blog.mads-hartmann.com/' },
-  { id: 'about', label: 'About', href: 'https://blog.mads-hartmann.com/about/' },
   { id: 'uses', label: 'Uses', href: 'https://uses.mads-hartmann.com/' },
 ];
 

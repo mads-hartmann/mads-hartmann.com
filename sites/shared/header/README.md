@@ -1,17 +1,18 @@
 # Shared header
 
-The homepage and blog use the same static header. Edit `header.html` for the brand,
+The homepage, blog and Uses use the same static header. Edit `header.html` for the brand,
 `header.css` for its appearance, and the `links` array in `render.mjs` for navigation.
 `portrait.jpg` is a 96px thumbnail of the existing blog portrait, embedded as a data
 URL so the header needs no image request.
 
-`renderHeader('home' | 'blog' | 'about' | 'uses')` returns ordinary HTML containing
+`renderHeader('home' | 'blog' | 'uses')` returns ordinary HTML containing
 a Declarative Shadow DOM template. There is no browser JavaScript or custom-element
 registration. The browser creates the shadow tree while parsing the page and scopes
 the stylesheet to that tree. Light-DOM navigation provides a fallback for browsers
 without Declarative Shadow DOM. Only one navigation is visible in either case.
 
 The Node homepage build inserts the rendered header at `<!-- shared-header -->`.
+The Uses Markdown build calls `renderHeader('uses')` directly.
 The Jekyll plugin calls `node sites/shared/header/render.mjs` to get the same headers
 as JSON and exposes them through `site.data.shared_headers`. Other site generators
 can call the renderer or consume its JSON output; the template has no Jekyll syntax.
@@ -19,7 +20,11 @@ can call the renderer or consume its JSON output; the template has no Jekyll syn
 The host is `<mh-site-header>` inside a semantic `<header>` landmark. Navigation
 uses native links, a visible keyboard focus outline, and `aria-current`. All URLs
 are absolute so they work across domains and on nested blog pages. The Blog link
-uses `aria-current="location"` for the blog section; Home and About use `page`.
+uses `aria-current="location"` for the blog section; Home and Uses use `page`.
+
+The header links to Home, Blog and Uses. Biography, work history and education live
+on Home. The blog redirects its former `/about`, `/about/` and `/about/index.html`
+URLs to Home with HTTP 301 responses, preserving query parameters.
 
 The header consumes a fixed set of semantic color properties. Each site defines
 its palette on `:root`; the values inherit through the shadow boundary. Every
@@ -56,4 +61,4 @@ The header's layout and selectors remain inside its shadow tree.
 system font, wraps into two rows on mobile, and is hidden for print.
 
 Run `scripts/build.sh` and `node scripts/check-sites.mjs` from the repository root.
-Changes are incorporated into both sites at build time, so deploy both after edits.
+Changes are incorporated into all three sites at build time, so deploy all after edits.
