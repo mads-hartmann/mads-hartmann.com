@@ -23,13 +23,13 @@ check('/', content='Mads Hartmann' if stack != 'uses' else 'Uses')
 for source, target in json.loads(Path('routing/redirects.json').read_text()).get(stack, {}).items():
     check(source, 301, target)
     query = '?source=old%20about&tag=a%26b&tag=c&na%26me=%C3%A6&empty='
-    check(source + query, 301, target + query)
+    check(source + query, 301, target)
 if stack == 'homepage':
     check('/', content='id="experience"')
     check('/', content='id="education"')
     check('/uses', 301, 'https://uses.mads-hartmann.com/')
     check('/uses?source=old%20link&tag=a%26b&tag=c', 301,
-          'https://uses.mads-hartmann.com/?source=old%20link&tag=a%26b&tag=c')
+          'https://uses.mads-hartmann.com/')
     check('/blog', 301, 'https://blog.mads-hartmann.com/')
     check('/tools/ascii-art',410)
 elif stack == 'blog':

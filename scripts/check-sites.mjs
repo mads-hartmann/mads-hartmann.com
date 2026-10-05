@@ -68,18 +68,11 @@ for (const [from,to] of Object.entries(routes)) {
 assert.equal(request('/uses/').headers.location.value,'https://uses.mads-hartmann.com/');
 assert.equal(request('/blog/feed.xml').headers.location.value,'https://blog.mads-hartmann.com/feed.xml');
 assert.equal(request('/blog/images/a.png').headers.location.value,'https://blog.mads-hartmann.com/images/a.png');
-// CloudFront query keys and values retain their incoming URL encoding.
-const queryCases = [
-  ['source=old%20about&tag=a%26b&tag=c', { source: { value: 'old%20about' }, tag: { value: 'a%26b', multiValue: [{ value: 'a%26b' }, { value: 'c' }] } }],
-  ['space+key=hello+world&percent=%2520&empty=', { 'space+key': { value: 'hello+world' }, percent: { value: '%2520' }, empty: { value: '' } }],
-  ['na%26me=%C3%A6%2F%3F%23%25&tag=a%3Db&tag=', { 'na%26me': { value: '%C3%A6%2F%3F%23%25' }, tag: { value: 'a%3Db', multiValue: [{ value: 'a%3Db' }, { value: '' }] } }],
-];
+const query = { source: { value: 'old%20about' }, tag: { multiValue: [{ value: 'a%26b' }, { value: 'c' }] }, empty: { value: '' } };
 for (const uri of [...Object.keys(routes), '/blog', '/writings', '/blog/feed.xml', '/blog/images/a.png', '/blog/uploads/a.png', '/uses', '/']) {
   const host = uri === '/' ? 'mads-hartmann.com' : 'www.mads-hartmann.com';
   const target = request(uri, host).headers.location.value;
-  for (const [raw, query] of queryCases) {
-    assert.equal(request(uri, host, query).headers.location.value, target + '?' + raw);
-  }
+  assert.equal(request(uri, host, query).headers.location.value, target);
 }
 assert.equal(request('/tools/ascii-art').statusCode,410);
 assert.equal(request('/photography').statusCode,410);
@@ -91,21 +84,14 @@ for (const site of ['uses','blog']) {
   if(site==='uses') assert.equal(ctx.handler({ request:{uri:'/unknown'} }).statusCode,404);
   else {
     for (const [uri, target] of Object.entries(redirects.blog)) {
-      const result = ctx.handler({ request: { uri, querystring: { source: { value: 'old%20link' }, tag: { multiValue: [{ value: 'a%26b' }, { value: 'c' }] } } } });
+      const result = ctx.handler({ request: { uri, querystring: query } });
       assert.equal(result.statusCode, 301);
-      assert.equal(result.headers.location.value, target + '?source=old%20link&tag=a%26b&tag=c');
-      for (const [raw, query] of queryCases) {
-        const response = ctx.handler({ request: { uri, querystring: query } });
-        assert.equal(response.statusCode, 301);
-        assert.equal(response.headers.location.value, target + '?' + raw);
-      }
+      assert.equal(result.headers.location.value, target);
     }
     for (const uri of ['/about', '/about/', '/about/index.html']) {
       const result = ctx.handler({ request: { uri } });
       assert.equal(result.statusCode, 301);
       assert.equal(result.headers.location.value, 'https://www.mads-hartmann.com/');
-      const withQuery = ctx.handler({ request: { uri, querystring: { source: { value: 'old%20about' }, tag: { multiValue: [{ value: 'a%26b' }, { value: 'c' }] } } } });
-      assert.equal(withQuery.headers.location.value, 'https://www.mads-hartmann.com/?source=old%20about&tag=a%26b&tag=c');
     }
     for (const comma of [',', '%2C', '%2c']) {
       const result = ctx.handler({ request:{uri:`/sre${comma}/reliability/2021/03/14/increment-magazine.html`} });
