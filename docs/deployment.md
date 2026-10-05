@@ -126,10 +126,6 @@ revert merged through the same checks; the revert rebuilds and deploys all objec
 State bucket versioning retains previous states. Keep any local snapshots private;
 do not push raw states or plans.
 
-If a removed page fails with `AccessDenied` for `s3:DeleteObjectVersion`, apply the
-reviewed kernel permissions with a human AWS session before rerunning deployment.
-Merging a kernel permission change validates it but does not apply it.
-
 Mock tests and validation check configuration and dependency graphs. Authenticated
 plans and applies check AWS service permissions against the account. See
 [Terraform's S3 backend documentation](https://developer.hashicorp.com/terraform/language/backend/s3).
