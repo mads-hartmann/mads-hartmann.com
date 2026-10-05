@@ -5,7 +5,7 @@
 | Root | State key | Responsibility |
 | --- | --- | --- |
 | Manual kernel | `kernel/terraform.tfstate` | Backend storage, OIDC, IAM roles/policies, GitHub controls |
-| Shared | `stacks/shared.tfstate` | Route 53 zone, protected legacy certificate, new DNS certificate and validation CNAME |
+| Shared | `stacks/shared.tfstate` | Route 53 zone, DNS certificate and validation CNAME |
 | Homepage | `stacks/homepage.tfstate` | Homepage S3/CloudFront, apex and www DNS, URL redirects |
 | Blog | `stacks/blog.tfstate` | Existing blog S3/CloudFront/DNS, generated posts and assets |
 | Uses | `stacks/uses.tfstate` | Uses S3/CloudFront/DNS, generated HTML |
@@ -90,8 +90,9 @@ tag permissions cover the existing certificate and shared-tagged certificates;
 creation also needs permission to add the initial shared/project tags. ACM
 certificate deletion is intentionally excluded. The shared output waits for DNS
 validation before downstream stacks can switch their CloudFront viewer certificate.
-Keep the validation CNAME for automatic renewal and the legacy certificate until
-every distribution using it has migrated or been retired.
+Keep the validation CNAME for automatic renewal. ACM certificate deletion is a
+human operation: apply a reviewed removal plan before merging it so Actions
+never needs certificate deletion permissions. See [cleanup](cleanup.md).
 
 ```sh
 terraform -chdir=terraform/kernel init -backend-config=backend.hcl
@@ -110,9 +111,8 @@ the old configuration and policies stored in that plan.
 If an apply fails, rerun the Sites workflow on the current `main`. Terraform
 reconciles partial work. Never force-unlock a live run. Content rollback is a Git
 revert merged through the same checks; the revert rebuilds and deploys all objects.
-During initial cutover, keep the Vercel projects and old DNS snapshot until AWS
-checks pass. Restore DNS from that snapshot if needed, then fix the branch before
-retrying. Keep private state snapshots for recovery; do not push raw states or plans.
+Keep private state snapshots for recovery; do not push raw states or plans.
+The original cutover is recorded in the [historical runbook](archive/migration.md).
 
 Mock tests and validation confirm configuration/graph behavior, not AWS service
 permissions or live adoption. The first authenticated human plan and OIDC run must

@@ -1,3 +1,10 @@
+# Historical migration runbook
+
+The AWS cutover and legacy site retirement are complete. This document records
+the original migration; its scripts and Terraform roots have been retired.
+Do not execute these historical commands. Use [deployment](../deployment.md) for
+current operations and [cleanup](../cleanup.md) for the remaining retirement work.
+
 # Migration runbook
 
 The initial migration requires human AWS access for inventory, state transfer and
