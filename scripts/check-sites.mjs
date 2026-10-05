@@ -34,7 +34,15 @@ for (const site of ['uses','blog']) {
   runInContext(await readFile(`.build/routing/${site}.js`, 'utf8'),ctx);
   assert.equal(ctx.handler({ request:{uri:'/'} }).uri,'/index.html');
   if(site==='uses') assert.equal(ctx.handler({ request:{uri:'/unknown'} }).statusCode,404);
-  else assert.equal(ctx.handler({ request:{uri:'/about/'} }).uri,'/about/index.html');
+  else {
+    assert.equal(ctx.handler({ request:{uri:'/about/'} }).uri,'/about/index.html');
+    for (const comma of [',', '%2C', '%2c']) {
+      const result = ctx.handler({ request:{uri:`/sre${comma}/reliability/2021/03/14/increment-magazine.html`} });
+      assert.equal(result.statusCode,301);
+      assert.equal(result.headers.location.value,'/sre/2021/03/14/increment-magazine.html');
+      await stat('.build/blog' + result.headers.location.value);
+    }
+  }
 }
 assert((await readFile('.build/uses/index.html','utf8')).includes('Travel'));
 await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
