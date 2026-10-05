@@ -8,7 +8,7 @@ variables {
   bucket_name     = "mads-hartmann.com"
   domains         = ["mads-hartmann.com", "www.mads-hartmann.com"]
   zone_id         = "Z18NSONI21UYAE"
-  certificate_arn = "arn:aws:acm:us-east-1:790804032123:certificate/344b3275-d3d8-4d12-81d3-eda18bf46967"
+  certificate_arn = "arn:aws:acm:us-east-1:790804032123:certificate/ab1542c8-a6eb-43dd-a1ca-2d624c27efba"
   content_dir     = "../../../.build/homepage"
   routing_file    = "../../../.build/routing/homepage.js"
   publish_dns     = true

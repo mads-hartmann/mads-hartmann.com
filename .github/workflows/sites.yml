@@ -35,7 +35,6 @@ jobs:
           working-directory: sites/blog.mads-hartmann.com
       - run: scripts/build.sh
       - run: node scripts/check-sites.mjs
-      - run: python3 scripts/test-migration.py
       - run: tar -czf sites.tar.gz .build/homepage .build/blog .build/uses .build/routing
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

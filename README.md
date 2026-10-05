@@ -34,6 +34,6 @@ invalidation and HTTP checks. No AWS access keys or Vercel deployment are needed
 All three sites are live on AWS, and GitHub Actions deployments are enabled.
 Production kernel config sets `deploy_enabled=true`, so future manual applies
 preserve that setting. See the [Sites workflow](https://github.com/mads-hartmann/mads-hartmann.com/actions/workflows/sites.yml)
-and [deployment details](docs/deployment.md) for daily use. The [migration runbook](docs/migration.md)
-documents the initial adoption and remaining legacy retirement work.
-The old Terraform roots remain frozen for inventory and manual retirement.
+and [deployment details](docs/deployment.md) for daily use. The [historical migration runbook](docs/archive/migration.md)
+records adoption and cutover. Legacy site infrastructure has been destroyed;
+[cleanup](docs/cleanup.md) describes certificate retirement and the remaining external cleanup.
