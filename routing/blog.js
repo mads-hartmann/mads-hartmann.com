@@ -1,11 +1,18 @@
+var redirects = __REDIRECTS__;
 function handler(event) {
   var request = event.request;
-  // Send the category-prefixed permalink to the canonical post URL.
-  if (request.uri.replace(/%2c/gi, ',') === '/sre,/reliability/2021/03/14/increment-magazine.html') {
+  var target = redirects[request.uri.replace(/%2c/gi, ',')];
+  if (target) {
+    var parts = [];
+    var query = request.querystring || {};
+    for (var key in query) {
+      var values = query[key].multiValue || [query[key]];
+      for (var i = 0; i < values.length; i++) parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(values[i].value));
+    }
     return {
       statusCode: 301,
       statusDescription: 'Moved Permanently',
-      headers: { location: { value: '/sre/2021/03/14/increment-magazine.html' } }
+      headers: { location: { value: target + (parts.length ? '?' + parts.join('&') : '') } }
     };
   }
   // The source uses both directory indexes and dated .html permalinks.

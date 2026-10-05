@@ -17,18 +17,27 @@ function checkHeader(html, current) {
   const activeHref = {
     home: 'https://www.mads-hartmann.com/',
     blog: 'https://blog.mads-hartmann.com/',
-    about: 'https://blog.mads-hartmann.com/about/',
+    uses: 'https://uses.mads-hartmann.com/',
   }[current];
   for (const content of [shadow, fallback.split('</mh-site-header>')[0]]) {
     assert.equal((content.match(/aria-current=/g) || []).length, 1);
     assert(content.includes(`<a href="${activeHref}" aria-current=`));
-    for (const href of ['https://www.mads-hartmann.com/', 'https://blog.mads-hartmann.com/', 'https://blog.mads-hartmann.com/about/', 'https://uses.mads-hartmann.com/']) {
+    assert(!content.includes('>About</a>'));
+    for (const href of ['https://www.mads-hartmann.com/', 'https://blog.mads-hartmann.com/', 'https://uses.mads-hartmann.com/']) {
       assert(content.includes(`href="${href}"`));
     }
   }
 }
 
 checkHeader(homepage, 'home');
+const uses = await readFile('.build/uses/index.html', 'utf8');
+checkHeader(uses, 'uses');
+assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(uses));
+assert.deepEqual(await readdir('.build/uses'), ['index.html']);
+for (const content of ['id="experience"', 'id="education"', 'Ona', 'Glitch', 'Famly', 'Issuu', 'Masters degree in Computer Science', 'Bachelors degree in Computer Science']) {
+  assert(homepage.includes(content), `Homepage is missing About content: ${content}`);
+}
+await assert.rejects(stat('.build/blog/about/index.html'), { code: 'ENOENT' });
 // Check every rendered blog page so layouts and collection pages cannot silently
 // lose the shared header; CSS, feeds and other static files are left alone.
 let blogPages = 0;
@@ -36,11 +45,12 @@ for (const file of await readdir('.build/blog', { recursive: true })) {
   if (!file.endsWith('.html')) continue;
   const html = await readFile(`.build/blog/${file}`, 'utf8');
   if (!html.includes('<html')) continue;
-  checkHeader(html, file === 'about/index.html' ? 'about' : 'blog');
+  checkHeader(html, 'blog');
   blogPages++;
 }
 assert(blogPages > 0);
-const routes = JSON.parse(await readFile('routing/blog-redirects.json', 'utf8'));
+const redirects = JSON.parse(await readFile('routing/redirects.json', 'utf8'));
+const routes = redirects.homepage;
 const context = createContext({});
 runInContext(await readFile('.build/routing/homepage.js', 'utf8'), context);
 function request(uri, host='www.mads-hartmann.com', querystring={}) {
@@ -68,7 +78,18 @@ for (const site of ['uses','blog']) {
   assert.equal(ctx.handler({ request:{uri:'/'} }).uri,'/index.html');
   if(site==='uses') assert.equal(ctx.handler({ request:{uri:'/unknown'} }).statusCode,404);
   else {
-    assert.equal(ctx.handler({ request:{uri:'/about/'} }).uri,'/about/index.html');
+    for (const [uri, target] of Object.entries(redirects.blog)) {
+      const result = ctx.handler({ request: { uri, querystring: { source: { value: 'old link' }, tag: { multiValue: [{ value: 'a&b' }, { value: 'c' }] } } } });
+      assert.equal(result.statusCode, 301);
+      assert.equal(result.headers.location.value, target + '?source=old%20link&tag=a%26b&tag=c');
+    }
+    for (const uri of ['/about', '/about/', '/about/index.html']) {
+      const result = ctx.handler({ request: { uri } });
+      assert.equal(result.statusCode, 301);
+      assert.equal(result.headers.location.value, 'https://www.mads-hartmann.com/');
+      const withQuery = ctx.handler({ request: { uri, querystring: { source: { value: 'old about' }, tag: { multiValue: [{ value: 'a&b' }, { value: 'c' }] } } } });
+      assert.equal(withQuery.headers.location.value, 'https://www.mads-hartmann.com/?source=old%20about&tag=a%26b&tag=c');
+    }
     for (const comma of [',', '%2C', '%2c']) {
       const result = ctx.handler({ request:{uri:`/sre${comma}/reliability/2021/03/14/increment-magazine.html`} });
       assert.equal(result.statusCode,301);
@@ -77,6 +98,6 @@ for (const site of ['uses','blog']) {
     }
   }
 }
-assert((await readFile('.build/uses/index.html','utf8')).includes('Travel'));
+assert(uses.includes('Travel'));
 await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
-console.log(`Sites validated; shared header on homepage and ${blogPages} blog pages; ${Object.keys(routes).length} post redirects match generated blog files.`);
+console.log(`Sites validated; shared header on homepage, Uses and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);

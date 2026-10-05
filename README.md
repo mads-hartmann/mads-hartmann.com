@@ -8,7 +8,7 @@ The source and AWS infrastructure for my three sites:
 | [Blog](https://blog.mads-hartmann.com/) | `sites/blog.mads-hartmann.com/src` | Jekyll |
 | [Uses](https://uses.mads-hartmann.com/) | `sites/uses.mads-hartmann.com/index.md` | Markdown → HTML with a small Node script |
 
-The homepage and blog share a static header from [`sites/shared/header`](sites/shared/header/README.md),
+All three sites share a static header from [`sites/shared/header`](sites/shared/header/README.md),
 using Declarative Shadow DOM for style isolation and requiring no browser JavaScript.
 
 Install Node 24, Ruby 3.3 with Bundler 4.0.16, and Terraform 1.16.4 or a later

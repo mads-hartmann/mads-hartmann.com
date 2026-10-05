@@ -1,5 +1,5 @@
 // CloudFront Functions runtime 2.0. Keep below the 10 KB source limit.
-var posts = __BLOG_REDIRECTS__;
+var redirects = __REDIRECTS__;
 function redirect(url, query) {
   var parts = [];
   for (var key in query) {
@@ -12,7 +12,7 @@ function handler(event) {
   var request = event.request;
   var path = request.uri.replace(/\/$/, '') || '/';
   var query = request.querystring || {};
-  if (posts[path]) return redirect(posts[path], query);
+  if (redirects[path]) return redirect(redirects[path], query);
   if (path === '/blog' || path === '/writings') return redirect('https://blog.mads-hartmann.com/', query);
   if (path.indexOf('/blog/images/') === 0 || path.indexOf('/blog/uploads/') === 0 || path === '/blog/feed.xml') return redirect('https://blog.mads-hartmann.com' + path.slice(5), query);
   if (path === '/uses') return redirect('https://uses.mads-hartmann.com/', query);
