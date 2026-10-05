@@ -27,6 +27,22 @@ run "kernel_boundaries" {
     error_message = "Site roles may manage only IPv4 and IPv6 DNS aliases."
   }
   assert {
+    condition = alltrue([for stack, policy in aws_iam_role_policy.site_apply :
+      anytrue([for statement in jsondecode(policy.policy).Statement :
+        statement.Effect == "Allow" && contains(flatten([statement.Action]), "s3:DeleteObjectVersion") && statement.Resource == "arn:aws:s3:::${var.site_buckets[stack]}/*"
+        ]) && alltrue([for statement in jsondecode(policy.policy).Statement :
+        !contains(flatten([statement.Action]), "s3:DeleteObjectVersion") || statement.Resource == "arn:aws:s3:::${var.site_buckets[stack]}/*"
+      ])
+    ])
+    error_message = "Site applies must delete object versions only in their own content bucket, never in another site or the state bucket."
+  }
+  assert {
+    condition = alltrue(flatten([for policy in aws_iam_role_policy.read : [for statement in jsondecode(policy.policy).Statement :
+      !contains(flatten([statement.Action]), "s3:DeleteObjectVersion")
+    ]]))
+    error_message = "Infrastructure inspection policies must not grant object-version deletion to plan roles."
+  }
+  assert {
     condition     = contains(jsondecode(aws_iam_role_policy.state["shared-apply"].policy).Statement[3].Action, "iam:*") && jsondecode(aws_iam_role_policy.state["shared-apply"].policy).Statement[3].Effect == "Deny"
     error_message = "CI must not administer IAM."
   }

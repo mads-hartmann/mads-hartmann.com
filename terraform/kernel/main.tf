@@ -95,7 +95,9 @@ resource "aws_iam_role_policy" "site_apply" {
     { Effect = "Allow", Action = "route53:ChangeResourceRecordSets", Resource = "arn:aws:route53:::hostedzone/${var.zone_id}", Condition = { "ForAllValues:StringEquals" = {
       "route53:ChangeResourceRecordSetsNormalizedRecordNames" = each.key == "homepage" ? ["mads-hartmann.com", "www.mads-hartmann.com"] : ["${each.key}.mads-hartmann.com"]
       "route53:ChangeResourceRecordSetsRecordTypes"           = ["A", "AAAA"]
-    } } }
+    } } },
+    # Terraform deletes object versions, including the null version in unversioned buckets.
+    { Effect = "Allow", Action = "s3:DeleteObjectVersion", Resource = "arn:aws:s3:::${each.value}/*" }
   ] })
 }
 resource "aws_iam_role_policy" "shared_apply" {

@@ -32,6 +32,11 @@ State access is limited to the role's own root. Sites receive the zone/certifica
 through workflow outputs, without reading shared state. They cannot assume other
 component roles.
 
+Site apply roles can delete object versions only in their own content bucket.
+Terraform's S3 object resource deletes versions, including the null version in
+unversioned buckets, so removing a generated page needs `s3:DeleteObjectVersion`
+as well as `s3:DeleteObject`. See [S3 deletion permissions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-with-s3-policy-actions.html).
+
 Apply trusts GitHub's `Production` environment. The kernel permits that environment
 only on `main`, requires pull requests and the `Checks` status, and prevents branch
 deletion/force pushes. There is no approval gate after a merge. Plan trusts the
@@ -120,6 +125,10 @@ reconciles partial work. Never force-unlock a live run. Content rollback is a Gi
 revert merged through the same checks; the revert rebuilds and deploys all objects.
 State bucket versioning retains previous states. Keep any local snapshots private;
 do not push raw states or plans.
+
+If a removed page fails with `AccessDenied` for `s3:DeleteObjectVersion`, apply the
+reviewed kernel permissions with a human AWS session before rerunning deployment.
+Merging a kernel permission change validates it but does not apply it.
 
 Mock tests and validation check configuration and dependency graphs. Authenticated
 plans and applies check AWS service permissions against the account. See
