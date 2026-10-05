@@ -28,30 +28,18 @@
   </head>
 
   <body>
+    {% if page.url == '/about/' or page.url == '/about/index.html' %}
+    {{ site.data.shared_headers.about }}
+    {% else %}
+    {{ site.data.shared_headers.blog }}
+    {% endif %}
+
     <div class="container {{page.colors | default: 'default' }} {{page.class}}">
       {% unless page.disable_scroll_indicator %}
       <div class="scroll-indicator-container">
         <div class="scroll-indicator-progress"></div>
       </div>
       {% endunless %}
-
-      <div class="menu">
-        <a href="/">
-          <img
-            alt="Portrait photo of Mads Hartmann"
-            height="45"
-            src="/images/profile.png"
-            width="45"
-          />
-          Mads Hartmann
-        </a>
-        <ul>
-          <li><a href="/">Posts 📝</a></li>
-          <li><a href="/about/index.html">About 👋</a></li>
-          <li><a href="https://www.mads-hartmann.com/">Home</a></li>
-          <li><a href="https://uses.mads-hartmann.com/">Uses</a></li>
-        </ul>
-      </div>
 
       <div class="site">{{ content }}</div>
 
