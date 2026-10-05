@@ -11,6 +11,6 @@ run "private_site" {
   command = apply
   assert {
     condition     = module.site.bucket_name == var.bucket_name
-    error_message = "Adoption must preserve the physical bucket."
+    error_message = "The site must use its configured content bucket."
   }
 }

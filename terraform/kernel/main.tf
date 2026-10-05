@@ -59,7 +59,7 @@ resource "aws_iam_role_policy" "state" {
       { Effect = "Allow", Action = each.value.mode == "apply" ? ["s3:GetObject", "s3:PutObject"] : ["s3:GetObject"], Resource = "${aws_s3_bucket.state.arn}/stacks/${each.value.stack}.tfstate" },
       { Effect = "Allow", Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"], Resource = "${aws_s3_bucket.state.arn}/stacks/${each.value.stack}.tfstate.tflock" },
       { Effect = "Deny", Action = ["iam:*", "organizations:*", "account:*"], Resource = "*" },
-      { Effect = "Deny", Action = "s3:*", Resource = ["${aws_s3_bucket.state.arn}/kernel/*", "${aws_s3_bucket.state.arn}/production.tfstate"] },
+      { Effect = "Deny", Action = "s3:*", Resource = ["${aws_s3_bucket.state.arn}/kernel/*"] },
       { Effect = "Deny", Action = ["s3:DeleteBucket", "s3:PutBucketPolicy", "s3:DeleteBucketPolicy", "s3:PutBucketVersioning", "s3:PutEncryptionConfiguration", "s3:PutBucketPublicAccessBlock", "s3:PutBucketAcl"], Resource = aws_s3_bucket.state.arn }
     ]
   })
@@ -94,7 +94,7 @@ resource "aws_iam_role_policy" "site_apply" {
     { Effect = "Allow", Action = ["cloudfront:CreateOriginAccessControl", "cloudfront:UpdateOriginAccessControl", "cloudfront:DeleteOriginAccessControl", "cloudfront:CreateResponseHeadersPolicy", "cloudfront:UpdateResponseHeadersPolicy", "cloudfront:DeleteResponseHeadersPolicy"], Resource = "*" },
     { Effect = "Allow", Action = "route53:ChangeResourceRecordSets", Resource = "arn:aws:route53:::hostedzone/${var.zone_id}", Condition = { "ForAllValues:StringEquals" = {
       "route53:ChangeResourceRecordSetsNormalizedRecordNames" = each.key == "homepage" ? ["mads-hartmann.com", "www.mads-hartmann.com"] : ["${each.key}.mads-hartmann.com"]
-      "route53:ChangeResourceRecordSetsRecordTypes"           = each.key == "homepage" ? ["A", "AAAA", "CNAME"] : ["A", "AAAA"]
+      "route53:ChangeResourceRecordSetsRecordTypes"           = ["A", "AAAA"]
     } } }
   ] })
 }
@@ -156,7 +156,7 @@ resource "github_repository_ruleset" "main" {
   }
   depends_on = [github_branch_default.main]
 }
-# Import evaluates this before role instances exist; derive keys from configuration.
+# Keep variable keys known while role ARNs are computed.
 locals {
   github_variables = merge({
     AWS_ACCOUNT_ID           = var.account_id

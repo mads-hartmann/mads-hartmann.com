@@ -16,7 +16,7 @@ function handler(event) {
   if (path === '/blog' || path === '/writings') return redirect('https://blog.mads-hartmann.com/', query);
   if (path.indexOf('/blog/images/') === 0 || path.indexOf('/blog/uploads/') === 0 || path === '/blog/feed.xml') return redirect('https://blog.mads-hartmann.com' + path.slice(5), query);
   if (path === '/uses') return redirect('https://uses.mads-hartmann.com/', query);
-  if (path === '/tools' || path.indexOf('/tools/') === 0 || path === '/photography') return { statusCode: 410, statusDescription: 'Gone', body: 'This page has been retired.' };
+  if (path === '/tools' || path.indexOf('/tools/') === 0 || path === '/photography') return { statusCode: 410, statusDescription: 'Gone', body: 'Gone.' };
   if (path !== '/' && path !== '/index.html') return { statusCode: 404, statusDescription: 'Not Found', body: 'Page not found.' };
   if (request.headers.host.value === 'mads-hartmann.com') return redirect('https://www.mads-hartmann.com/', query);
   request.uri = '/index.html';

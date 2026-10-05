@@ -1,6 +1,6 @@
 function handler(event) {
   var request = event.request;
-  // Preserve the permalink served by the retired build before its stale object is removed.
+  // Send the category-prefixed permalink to the canonical post URL.
   if (request.uri.replace(/%2c/gi, ',') === '/sre,/reliability/2021/03/14/increment-magazine.html') {
     return {
       statusCode: 301,
