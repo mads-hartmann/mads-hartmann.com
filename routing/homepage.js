@@ -2,9 +2,10 @@
 var redirects = __REDIRECTS__;
 function redirect(url, query) {
   var parts = [];
+  // CloudFront supplies URL-encoded keys and values; preserve that encoding.
   for (var key in query) {
     var values = query[key].multiValue || [query[key]];
-    for (var i = 0; i < values.length; i++) parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(values[i].value));
+    for (var i = 0; i < values.length; i++) parts.push(key + '=' + values[i].value);
   }
   return { statusCode: 301, statusDescription: 'Moved Permanently', headers: { location: { value: url + (parts.length ? '?' + parts.join('&') : '') } } };
 }
