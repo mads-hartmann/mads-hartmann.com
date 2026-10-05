@@ -49,7 +49,8 @@ for (const file of await readdir('.build/blog', { recursive: true })) {
   blogPages++;
 }
 assert(blogPages > 0);
-const routes = JSON.parse(await readFile('routing/blog-redirects.json', 'utf8'));
+const redirects = JSON.parse(await readFile('routing/redirects.json', 'utf8'));
+const routes = redirects.homepage;
 const context = createContext({});
 runInContext(await readFile('.build/routing/homepage.js', 'utf8'), context);
 function request(uri, host='www.mads-hartmann.com', querystring={}) {
@@ -77,6 +78,11 @@ for (const site of ['uses','blog']) {
   assert.equal(ctx.handler({ request:{uri:'/'} }).uri,'/index.html');
   if(site==='uses') assert.equal(ctx.handler({ request:{uri:'/unknown'} }).statusCode,404);
   else {
+    for (const [uri, target] of Object.entries(redirects.blog)) {
+      const result = ctx.handler({ request: { uri, querystring: { source: { value: 'old link' }, tag: { multiValue: [{ value: 'a&b' }, { value: 'c' }] } } } });
+      assert.equal(result.statusCode, 301);
+      assert.equal(result.headers.location.value, target + '?source=old%20link&tag=a%26b&tag=c');
+    }
     for (const uri of ['/about', '/about/', '/about/index.html']) {
       const result = ctx.handler({ request: { uri } });
       assert.equal(result.statusCode, 301);
@@ -94,4 +100,4 @@ for (const site of ['uses','blog']) {
 }
 assert(uses.includes('Travel'));
 await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
-console.log(`Sites validated; shared header on homepage, Uses and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} post redirects match generated blog files.`);
+console.log(`Sites validated; shared header on homepage, Uses and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);

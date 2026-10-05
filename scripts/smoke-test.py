@@ -20,17 +20,16 @@ def check(path, status=200, location=None, content=None):
             if attempt == 7: raise
             time.sleep(10)
 check('/', content='Mads Hartmann' if stack != 'uses' else 'Uses')
+for source, target in json.loads(Path('routing/redirects.json').read_text()).get(stack, {}).items():
+    check(source, 301, target)
 if stack == 'homepage':
     check('/', content='id="experience"')
     check('/', content='id="education"')
     check('/uses', 301, 'https://uses.mads-hartmann.com/')
     check('/blog', 301, 'https://blog.mads-hartmann.com/')
-    for source, target in json.loads(Path('routing/blog-redirects.json').read_text()).items(): check(source, 301, target)
     check('/tools/ascii-art',410)
 elif stack == 'blog':
     check('/feed.xml', content='<feed')
-    for path in ['/about', '/about/', '/about/index.html']:
-        check(path, 301, 'https://www.mads-hartmann.com/')
     check('/2026/01/27/using-ai-to-do-your-best-work.html',content='Using AI')
 if stack in ['homepage', 'blog', 'uses']:
     current = 'home' if stack == 'homepage' else stack

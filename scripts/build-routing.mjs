@@ -1,8 +1,9 @@
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
-const routes = JSON.parse(await readFile('routing/blog-redirects.json', 'utf8'));
-const template = await readFile('routing/homepage.js', 'utf8');
-const source = template.replace('__BLOG_REDIRECTS__', JSON.stringify(routes));
-if (Buffer.byteLength(source) > 10240) throw new Error('CloudFront function exceeds 10 KB');
+const redirects = JSON.parse(await readFile('routing/redirects.json', 'utf8'));
 await mkdir('.build/routing', { recursive: true });
-await writeFile('.build/routing/homepage.js', source);
-for (const site of ['blog', 'uses']) await writeFile(`.build/routing/${site}.js`, await readFile(`routing/${site}.js`));
+for (const site of ['homepage', 'blog', 'uses']) {
+  const template = await readFile(`routing/${site}.js`, 'utf8');
+  const source = template.replace('__REDIRECTS__', JSON.stringify(redirects[site] || {}));
+  if (Buffer.byteLength(source) > 10240) throw new Error(`${site} CloudFront function exceeds 10 KB`);
+  await writeFile(`.build/routing/${site}.js`, source);
+}

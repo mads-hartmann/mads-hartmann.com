@@ -1,6 +1,8 @@
+var redirects = __REDIRECTS__;
 function handler(event) {
   var request = event.request;
-  if (request.uri === '/about' || request.uri === '/about/' || request.uri === '/about/index.html') {
+  var target = redirects[request.uri.replace(/%2c/gi, ',')];
+  if (target) {
     var parts = [];
     var query = request.querystring || {};
     for (var key in query) {
@@ -10,15 +12,7 @@ function handler(event) {
     return {
       statusCode: 301,
       statusDescription: 'Moved Permanently',
-      headers: { location: { value: 'https://www.mads-hartmann.com/' + (parts.length ? '?' + parts.join('&') : '') } }
-    };
-  }
-  // Send the category-prefixed permalink to the canonical post URL.
-  if (request.uri.replace(/%2c/gi, ',') === '/sre,/reliability/2021/03/14/increment-magazine.html') {
-    return {
-      statusCode: 301,
-      statusDescription: 'Moved Permanently',
-      headers: { location: { value: '/sre/2021/03/14/increment-magazine.html' } }
+      headers: { location: { value: target + (parts.length ? '?' + parts.join('&') : '') } }
     };
   }
   // The source uses both directory indexes and dated .html permalinks.
