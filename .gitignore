@@ -16,3 +16,9 @@ dist/
 .DS_Store
 __pycache__/
 *.pyc
+.devenv/
+.devenv-state/
+.direnv/
+devenv.local.nix
+devenv.local.yaml
+devenv.user.yaml

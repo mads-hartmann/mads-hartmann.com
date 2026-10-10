@@ -11,17 +11,21 @@ The source and AWS infrastructure for my three sites:
 All three sites share a static header from [`sites/shared/header`](sites/shared/header/README.md),
 using Declarative Shadow DOM for style isolation and requiring no browser JavaScript.
 
-Install Node 24, Ruby 3.3 with Bundler 4.0.16, and Terraform 1.16.4 or a later
-1.16 patch release (1.16.5 recommended). CI checks 1.16.4 and 1.16.5; deployments
-use 1.16.5. Then:
+Development uses [devenv](https://devenv.sh/) and Nix on macOS (Apple Silicon)
+and Linux (x86-64). With Nix installed, install the pinned environment tools:
 
 ```sh
-scripts/build.sh
-node scripts/check-sites.mjs
-scripts/check-terraform.sh
-scripts/check-workflows.sh
-python3 -m http.server 8080 --directory .build/homepage
+./scripts/bootstrap-dev.sh
+devenv shell
+devenv tasks run repo:check
+devenv up
 ```
+
+Run these from the root for all tools and sites, or enter a project directory
+and use `devenv shell` and `devenv up` there. Dependencies install automatically
+on activation. [Development instructions](docs/development.md) cover direnv,
+project tasks, ports, tool updates, and cloud setup. CI retains its own installation
+steps and checks Terraform 1.16.4 and 1.16.5; development and deployment use 1.16.5.
 
 The **manual kernel** in `terraform/kernel` owns the state bucket, GitHub OIDC
 provider, separate plan/apply roles, repository variables, `main` branch rules
