@@ -26,6 +26,10 @@ and use `devenv shell` and `devenv up` there. Dependencies install automatically
 on activation. [Development instructions](docs/development.md) cover direnv,
 project tasks, ports, tool updates, and cloud setup. CI retains its own installation
 steps and checks Terraform 1.16.4 and 1.16.5; development and deployment use 1.16.5.
+The Terraform check matrix runs only when `terraform/`, its check script, or CI
+workflows change (and on manual runs). PR plans likewise run only for Terraform,
+Terraform script, or workflow changes. Site builds and workflow linting always
+run, and site-only changes still deploy on `main`.
 
 The **manual kernel** in `terraform/kernel` owns the state bucket, GitHub OIDC
 provider, separate plan/apply roles, repository variables, `main` branch rules
