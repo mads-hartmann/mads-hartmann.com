@@ -29,7 +29,7 @@ for (const node of content.querySelectorAll('[href], [src]')) {
 }
 const turndown = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-' });
 turndown.addRule('timelineLines', {
-  filter: node => /experience__(?:title|duration|location)/.test(node.getAttribute?.('class') || ''),
+  filter: node => /timeline__(?:title|duration|location)/.test(node.getAttribute?.('class') || ''),
   replacement: content => `\n\n${content}\n\n`,
 });
 const markdown = `${turndown.turndown(content.innerHTML)}\n\n---\n\nCanonical page: ${origin}/\n`;
