@@ -6,20 +6,37 @@ stack, base = sys.argv[1:]
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, *args): return None
 opener = urllib.request.build_opener(NoRedirect)
-def check(path, status=200, location=None, content=None):
+def check(path, status=200, location=None, content=None, accept=None, content_type=None):
     for attempt in range(8):
         try:
-            try: response = opener.open(base + path, timeout=30)
+            request = urllib.request.Request(base + path, headers={'Accept': accept} if accept else {})
+            try: response = opener.open(request, timeout=30)
             except urllib.error.HTTPError as error: response = error
             body = response.read().decode('utf-8')
             assert response.code == status, (path, response.code, status)
             if location: assert response.headers.get('Location') == location, (path,response.headers)
             if content: assert content in body, path
+            if content_type:
+                assert response.headers.get_content_type() == content_type, (path, response.headers)
+                assert 'accept' in [value.strip().lower() for value in response.headers.get('Vary', '').split(',')], (path, response.headers)
+                assert '</llms.txt>' in response.headers.get('Link', ''), (path, response.headers)
             return
         except (AssertionError, urllib.error.URLError):
             if attempt == 7: raise
             time.sleep(10)
 check('/', content='Mads Hartmann' if stack != 'uses' else 'Uses')
+# Alternate formats must work directly and through negotiation. Alternate
+# requests also catch HTML/Markdown cache contamination after deployment.
+check('/llms.txt', content='## Content', content_type='text/plain')
+check('/index.md', content='Canonical page:', content_type='text/markdown')
+for accept, content_type, content in [
+    ('text/markdown', 'text/markdown', 'Canonical page:'),
+    ('text/html', 'text/html', 'type="text/markdown"'),
+    ('text/markdown;q=0.8,text/html;q=0.2', 'text/markdown', 'Canonical page:'),
+    ('text/markdown;q=0,text/html', 'text/html', '<html'),
+    ('*/*', 'text/html', '<html'),
+]:
+    check('/', accept=accept, content_type=content_type, content=content)
 for source, target in json.loads(Path('routing/redirects.json').read_text()).get(stack, {}).items():
     check(source, 301, target)
     query = '?source=old%20about&tag=a%26b&tag=c&na%26me=%C3%A6&empty='
@@ -35,6 +52,9 @@ if stack == 'homepage':
 elif stack == 'blog':
     check('/feed.xml', content='<feed')
     check('/2026/01/27/using-ai-to-do-your-best-work.html',content='Using AI')
+    check('/2026/01/27/using-ai-to-do-your-best-work.html', accept='text/markdown', content_type='text/markdown', content='# Using AI')
+    check('/2026/01/27/using-ai-to-do-your-best-work.md', content_type='text/markdown', content='# Using AI')
+    check('/series/observability/', accept='text/markdown', content_type='text/markdown', content='# Journey into Observability')
 if stack in ['homepage', 'blog', 'uses']:
     current = 'home' if stack == 'homepage' else stack
     check('/', content=f'<mh-site-header data-current="{current}">')

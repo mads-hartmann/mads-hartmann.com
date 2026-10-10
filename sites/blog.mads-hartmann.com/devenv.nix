@@ -31,7 +31,7 @@
   };
   tasks."blog:build" = {
     cwd = config.git.root;
-    after = [ "blog:setup" ];
+    after = [ "blog:setup" "markdown:setup" ];
     exec = "scripts/build.sh blog";
   };
   processes.blog = {

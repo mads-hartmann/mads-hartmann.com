@@ -7,7 +7,7 @@
   ];
   languages.terraform.enable = true;
   packages = [ pkgs.actionlint ];
-  tasks."repo:setup".after = [ "blog:setup" "uses:setup" ];
+  tasks."repo:setup".after = [ "blog:setup" "uses:setup" "markdown:setup" ];
   tasks."repo:build" = {
     after = [ "repo:setup" ];
     cwd = config.git.root;
