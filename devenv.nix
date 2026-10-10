@@ -1,11 +1,12 @@
-{ config, lib, ... }:
+{ pkgs, config, lib, ... }:
 {
   imports = [
     ./sites/mads-hartmann.com/devenv.nix
     ./sites/blog.mads-hartmann.com/devenv.nix
     ./sites/uses.mads-hartmann.com/devenv.nix
-    ./dev/modules/terraform.nix
   ];
+  languages.terraform.enable = true;
+  packages = [ pkgs.actionlint ];
   tasks."repo:setup".after = [ "blog:setup" "uses:setup" ];
   tasks."repo:build" = {
     after = [ "repo:setup" ];

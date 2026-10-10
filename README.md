@@ -12,10 +12,10 @@ All three sites share a static header from [`sites/shared/header`](sites/shared/
 using Declarative Shadow DOM for style isolation and requiring no browser JavaScript.
 
 Development uses [devenv](https://devenv.sh/) and Nix on macOS (Apple Silicon)
-and Linux (x86-64). With Nix installed, activate the pinned environment tools:
+and Linux (x86-64). With Nix installed, install the pinned environment tools:
 
 ```sh
-dev_activation="$(scripts/bootstrap-dev.sh)" && eval "$dev_activation"
+./scripts/bootstrap-dev.sh
 devenv shell
 devenv tasks run repo:check
 devenv up

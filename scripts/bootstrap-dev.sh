@@ -10,21 +10,14 @@ nix_flags=(--extra-experimental-features 'nix-command flakes')
 read_pin() {
   nix "${nix_flags[@]}" eval --raw --file "$repo_root/dev/bootstrap.nix" "$1"
 }
-version="$(read_pin devenvVersion)"
-fingerprint="$(read_pin fingerprint)"
-profile="${XDG_STATE_HOME:-$HOME/.local/state}/mads-hartmann-dev/$fingerprint"
-mkdir -p "$(dirname "$profile")"
-if [[ ! -x "$profile/bin/devenv" || ! -x "$profile/bin/direnv" || ! -x "$profile/bin/bash" ]]; then
-  nix "${nix_flags[@]}" \
-    --extra-substituters https://devenv.cachix.org \
-    --extra-trusted-public-keys 'devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=' \
-    profile install --profile "$profile" \
-    "$(read_pin devenvRef)" "$(read_pin nixpkgsRef)#direnv" "$(read_pin nixpkgsRef)#bashInteractive" >&2
-fi
-installed_version="$("$profile/bin/devenv" --version)"
-case "$installed_version" in
-  "devenv $version"|"devenv $version ("*|"devenv $version+"*) ;;
-  *) echo "Expected devenv $version; found $installed_version" >&2; exit 1 ;;
-esac
-profile_bin="$(cd "$profile/bin" && pwd -P)"
-printf 'export PATH=%q:"$PATH"\n' "$profile_bin"
+nix_flags+=(
+  --extra-substituters https://devenv.cachix.org
+  --extra-trusted-public-keys 'devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw='
+)
+tools=("$(read_pin devenvRef)" "$(read_pin nixpkgsRef)#direnv" "$(read_pin nixpkgsRef)#bashInteractive")
+# Realize the replacement first; leave installed tools available if a build fails.
+nix "${nix_flags[@]}" build --no-link "${tools[@]}"
+# Replace just the activation tools, including duplicate entries from older runs.
+nix "${nix_flags[@]}" profile remove 'devenv(-[0-9]+)?' 'direnv(-[0-9]+)?' 'bashInteractive(-[0-9]+)?'
+nix "${nix_flags[@]}" profile install "${tools[@]}"
+echo 'Setup complete. Run devenv shell from the root or a project directory.'
