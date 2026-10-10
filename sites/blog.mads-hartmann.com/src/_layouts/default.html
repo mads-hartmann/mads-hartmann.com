@@ -5,6 +5,11 @@
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
     <meta content="width=device-width" name="viewport" />
 
+    {% if page.markdown_url %}
+    <link rel="alternate" type="text/markdown" href="{{ page.markdown_url | escape }}" />
+    <link rel="describedby" type="text/plain" href="{{ '/llms.txt' | absolute_url | escape }}" />
+    {% endif %}
+
     <link
       rel="alternate"
       type="application/rss+xml"

@@ -3,6 +3,12 @@ description: Mads Hartmann's Blog
 url: https://blog.mads-hartmann.com
 author: Mads Hartmann
 
+# The local _plugins/markdown_output.rb plugin writes sibling .md files and
+# publishes the editable guide from the project directory, outside src/.
+markdown_output:
+  enabled: true
+  llms_txt: ../llms.txt
+
 highlighter: rouge
 
 collections:

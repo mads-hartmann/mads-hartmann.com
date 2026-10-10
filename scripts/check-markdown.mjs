@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { createContext, runInContext } from 'node:vm';
-import { parseHTML } from 'linkedom';
-import { pageMarkdown } from './build-markdown.mjs';
 
 const origins = {
   homepage: 'https://www.mads-hartmann.com',
@@ -45,11 +43,11 @@ for (const [site, origin] of Object.entries(origins)) {
     if (!file.endsWith('.html')) continue;
     const html = await readFile(`.build/${site}/${file}`, 'utf8');
     if (!/<html[\s>]/i.test(html)) continue;
-    const { document } = parseHTML(html);
     const markdownPath = file.replace(/\.html$/, '.md');
-    assert.equal(document.querySelectorAll('link[rel="alternate"][type="text/markdown"]').length, 1);
-    assert.equal(document.querySelector('link[rel="alternate"][type="text/markdown"]').getAttribute('href'), `${origin}/${markdownPath}`);
-    assert.equal(document.querySelector('link[rel="describedby"]').getAttribute('href'), `${origin}/llms.txt`);
+    const alternates = [...html.matchAll(/<link\s+rel="alternate"\s+type="text\/markdown"\s+href="([^"]+)"/g)];
+    assert.equal(alternates.length, 1);
+    assert.equal(alternates[0][1], `${origin}/${markdownPath}`);
+    assert(html.includes(`rel="describedby" type="text/plain" href="${origin}/llms.txt"`));
     const markdown = await readFile(`.build/${site}/${markdownPath}`, 'utf8');
     assert(markdown.includes('Canonical page: ' + origin));
     assert(!markdown.includes('data:image/'), `${file}: embedded image bytes`);
@@ -87,20 +85,7 @@ for (const [site, origin] of Object.entries(origins)) {
   }
 }
 
-// Exercise the content structures that could lose meaning during conversion.
-const sample = pageMarkdown(`<!doctype html><html><head><title>Example</title></head><body>
-<nav>Not article content</nav><main><h1>Example &amp; code</h1>
-<p><a href="../other.html">Other article</a> <a href="#note">Footnote</a></p>
-<div class="language-sh highlighter-rouge"><pre><code>echo '&lt;tag&gt; &amp; value'
-\`\`\`
-</code></pre></div>
-<table><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody><tr><td>One</td><td>Two</td></tr></tbody></table>
-<details><summary>More detail</summary><p>Still readable</p></details>
-<img src="/images/example.png" alt="Useful diagram"><img src="data:image/png;base64,abc" alt="Portrait">
-<audio controls><source src="/recording.mp3"></audio><iframe src="https://example.net/video" title="Conference talk"></iframe>
-<script>Not article code</script></main></body></html>`, 'https://example.com/docs/article.html', new Map([['https://example.com/other.html', 'https://example.com/other.md']]));
-for (const expected of ['# Example & code', '[Other article](https://example.com/other.md)', '[Footnote](https://example.com/docs/article.html#note)', "````sh\necho '<tag> & value'\n```\n````", '| Name | Value |', '| One | Two |', 'More detail', 'Still readable', '![Useful diagram](https://example.com/images/example.png)', 'Portrait', '(https://example.com/recording.mp3)', '[Conference talk](https://example.net/video)']) assert(sample.includes(expected), `Missing: ${expected}\n${sample}`);
-assert(!sample.includes('Not article'));
+assert.equal(await readFile('.build/uses/index.md', 'utf8'), `${(await readFile('sites/uses.mads-hartmann.com/index.md', 'utf8')).trimEnd()}\n\n---\n\nCanonical page: https://uses.mads-hartmann.com/\n`);
 
 const article = await readFile('.build/blog/2026/01/27/using-ai-to-do-your-best-work.md', 'utf8');
 assert(article.includes('# Using AI to do your best work'));
@@ -109,5 +94,5 @@ assert(article.includes('## A worthy bug'));
 assert(article.includes('jsonl'));
 assert((await readFile('.build/blog/sre/2020/05/07/feelings-during-incident-response.md', 'utf8')).includes('https://blog.mads-hartmann.com/uploads/feelings-during-incident-response.mp3'));
 const homepage = await readFile('.build/homepage/index.md', 'utf8');
-for (const value of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'Experience', 'Education']) assert(homepage.includes(value));
+for (const value of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'University of Copenhagen', 'IT University of Copenhagen']) assert(homepage.includes(value));
 console.log(`Markdown validated: ${count} pages, three llms.txt indexes, discovery links, content preservation, and negotiated routes.`);

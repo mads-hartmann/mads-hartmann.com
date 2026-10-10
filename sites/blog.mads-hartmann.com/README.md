@@ -25,3 +25,21 @@ first-time activation and tool versions.
 
 The development server also restarts after editing `sites/shared/footer`, which is
 outside Jekyll's watched source directory.
+
+Markdown output belongs to Jekyll. `markdown_output` in `src/_config.yml` enables
+`src/_plugins/markdown_output.rb`, which emits a `.md` sibling for every HTML
+page, post, and output collection document. It converts the rendered main content
+with `reverse_markdown`, preserving Liquid output, titles, dates, code, and media
+links. The default layout advertises the Markdown alternative. Jekyll writes and
+cleans up both representations, including in development previews with drafts.
+
+The `llms_txt` setting points to this directory's tracked `llms.txt`, which Jekyll
+publishes unchanged at the site root. The devenv watcher includes it; restart a
+manually launched Jekyll server after editing this file outside `src/`.
+
+A direct Jekyll build produces all three outputs without a root build step:
+
+```sh
+bundle exec jekyll build --source src --destination dist
+bundle exec ruby test/markdown_output_test.rb
+```

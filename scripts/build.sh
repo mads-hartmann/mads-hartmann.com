@@ -7,15 +7,13 @@ mkdir -p .build
 node scripts/build-routing.mjs
 if [[ "$site" == all || "$site" == homepage ]]; then
   rm -rf .build/homepage
-  mkdir -p .build/homepage
-  node scripts/build-homepage.mjs
-  node scripts/build-markdown.mjs homepage
+  npm --prefix sites/mads-hartmann.com ci --ignore-scripts
+  node sites/mads-hartmann.com/build.mjs "$PWD/.build/homepage"
 fi
 if [[ "$site" == all || "$site" == uses ]]; then
   rm -rf .build/uses
   npm --prefix sites/uses.mads-hartmann.com ci --ignore-scripts
   node sites/uses.mads-hartmann.com/build.mjs "$PWD/.build/uses"
-  node scripts/build-markdown.mjs uses
 fi
 if [[ "$site" == all || "$site" == blog ]]; then
   root="$PWD"
@@ -25,6 +23,4 @@ if [[ "$site" == all || "$site" == blog ]]; then
   cd sites/blog.mads-hartmann.com
   bundle check || bundle install
   bundle exec jekyll build --source src --destination "$root/.build/blog" --config "src/_config.yml,$root/.build/jekyll.yml" --strict_front_matter
-  cd "$root"
-  node scripts/build-markdown.mjs blog
 fi

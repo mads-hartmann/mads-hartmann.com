@@ -62,9 +62,10 @@ jobs:
           bundler: '4.0.16'
           bundler-cache: true
           working-directory: sites/blog.mads-hartmann.com
-      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: scripts/build.sh
       - run: node scripts/check-sites.mjs
+      - run: bundle exec ruby test/markdown_output_test.rb
+        working-directory: sites/blog.mads-hartmann.com
       - run: scripts/check-workflows.sh
       - run: tar -czf sites.tar.gz .build/homepage .build/blog .build/uses .build/routing
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

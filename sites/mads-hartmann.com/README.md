@@ -2,6 +2,11 @@
 
 Edit `src/index.html` for the page content, CSS and favicon. The build replaces
 `<!-- shared-footer -->` with the footer from `sites/shared/footer`.
+`build.mjs` also generates `index.md` from the main content, adds discovery links
+to HTML, and copies this directory’s editable `llms.txt` unchanged. Its dependencies
+and lockfile live here. Run `npm ci && npm run build` for a standalone build in
+`dist/`, or pass an output directory to `node build.mjs`.
+
 There is no framework, runtime JavaScript, font download or theme control.
 
 Home includes the introduction, work history and education formerly split across

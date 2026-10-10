@@ -59,7 +59,7 @@ Run `make` in the root or a project directory to see its targets.
 | Directory | Commands | Development server |
 | --- | --- | --- |
 | Repository root | `make setup`, `make build`, `make check`, `make lint` | `make dev` starts all three |
-| `sites/mads-hartmann.com` | `make build`, `make check`, `make lint` | `make dev`, port 8080 |
+| `sites/mads-hartmann.com` | `make setup`, `make build`, `make check`, `make lint` | `make dev`, port 8080 |
 | `sites/blog.mads-hartmann.com` | `make setup`, `make build`, `make check`, `make lint` | `make dev`, port 4000 |
 | `sites/uses.mads-hartmann.com` | `make setup`, `make build`, `make check`, `make lint` | `make dev`, port 8081 |
 | `terraform` | `make fmt`, `make lint`, `make check` | None |
@@ -72,7 +72,7 @@ make -C terraform check
 ```
 
 `make check` installs locked dependencies, builds all sites, checks generated
-pages and routing, validates and tests Terraform, and checks workflows with
+pages, Markdown output, and routing, validates and tests Terraform, and checks workflows with
 actionlint. `make lint` at the root runs the same checks. Site `check` and `lint`
 targets build and check all three sites because shared footer and redirect
 assertions span their artifacts. Terraform `lint` checks formatting; `check`
@@ -80,7 +80,11 @@ includes site builds, formatting, validation, and offline tests. These checks
 need no AWS or GitHub credentials. Actual plans and applies use the authentication
 described in [deployment](deployment.md).
 
-`make dev` uses watchexec to rebuild and restart a foreground server when source,
+Each site's own build produces its Markdown alternatives and publishes its
+committed `llms.txt`. `scripts/build.sh` installs site-local dependencies and
+invokes those builds; there is no root npm package or shared Markdown generator.
+
+`make dev` uses watchexec to rebuild and restart a foreground server when source, `llms.txt`,
 build scripts, or the shared footer change. Jekyll includes drafts and disables
 its disk cache. Its preview output is `.build/blog-preview`, separate from the
 production `.build/blog` output. Each `dev` target handles its own build or setup
@@ -115,11 +119,11 @@ deliberate change. Kubernetes utilities are included in the normal environment.
 ## Local state and cloud workspaces
 
 `.devenv`, `.direnv`, `.devenv-state`, generated output, and dependencies are
-ignored. `make setup` installs frozen blog gems and Uses npm dependencies; builds
+ignored. `make setup` installs frozen blog gems and Home and Uses npm dependencies; builds
 and development servers also prepare their dependencies. Gem caches include the
 platform and Ruby derivation identity. The locked protobuf gem needs a build flag
 that keeps format warnings from being fatal; it applies only while compiling
-that gem. Delete `.devenv-state` and the Uses `node_modules` directory to reinstall
+that gem. Delete `.devenv-state` and the Home and Uses `node_modules` directories to reinstall
 dependencies. Setup does not change application lockfiles.
 
 Cloud startup uses the same bootstrap and root `make setup`. A host without
