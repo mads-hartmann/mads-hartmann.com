@@ -118,6 +118,55 @@ To pause cloud plans and applies, set `deploy_enabled=false` in the kernel's
 production configuration and apply the kernel manually. Set it back to `true`
 and apply again to resume. Offline PR checks run while deployment is paused.
 
+## Markdown and agent discovery
+
+`scripts/build.sh` runs `scripts/build-markdown.mjs` after each HTML build. It
+extracts the main content from the rendered HTML, so Jekyll's Liquid templates,
+collections, code examples, and the homepage remain the source of truth. Root
+npm dependencies are pinned in `package-lock.json`, installed by devenv and CI.
+
+Each generated HTML page has a `rel="alternate" type="text/markdown"` link and
+a `rel="describedby"` link to that site's `llms.txt`. The small `llms.txt` guides
+link to Markdown entry points and the other sites; the blog's Markdown archive
+links to every published post. Same-site page links in Markdown target generated
+Markdown versions when available. Fragment links retain their HTML targets so
+custom anchors and footnotes continue to resolve. Images retain URLs and alt
+text; inline base64 images retain only alt text. Audio/video embeds become links.
+
+| HTML URL | Markdown URL |
+| --- | --- |
+| `/` or `/index.html` | `/index.md` |
+| `/series/observability/` | `/series/observability/index.md` |
+| `/2026/01/27/using-ai-to-do-your-best-work.html` | `/2026/01/27/using-ai-to-do-your-best-work.md` |
+
+Direct `.md` URLs work with any `Accept` header. The shared CloudFront
+viewer-request code also rewrites an HTML request to its Markdown object when
+`Accept` explicitly includes `text/markdown` with a nonzero quality at least as
+high as HTML. Missing headers, wildcards alone, an HTML preference, and
+`text/markdown;q=0` keep HTML. Existing redirects run before negotiation; feeds
+and assets are never converted.
+
+The URI rewrite happens before CloudFront's cache lookup, keeping HTML and
+Markdown in distinct cache entries without forwarding `Accept` to S3. The
+response headers policy adds `Vary: Accept, Accept-Encoding` for downstream
+caches and `Link: </llms.txt>; rel="describedby"; type="text/plain"` for discovery
+from Markdown responses too. S3 serves `.md` as `text/markdown; charset=utf-8`
+and `llms.txt` as `text/plain; charset=utf-8`. These changes use the existing
+site stacks, functions, policies, and private buckets; no kernel/IAM change is
+needed.
+
+Build and check locally with `devenv tasks run repo:check`. The plain local
+static servers expose the generated files but do not emulate CloudFront's
+negotiation or headers; the blog's draft preview remains HTML-only. Routing
+tests run the generated functions in a JavaScript VM, and deployment smoke tests
+verify the live headers, explicit URLs, and alternating HTML/Markdown requests:
+
+```sh
+curl -i https://www.mads-hartmann.com/ -H 'Accept: text/markdown'
+curl -i https://blog.mads-hartmann.com/index.md
+curl -i https://uses.mads-hartmann.com/llms.txt
+```
+
 ## Recovery
 
 If an apply fails, rerun the Sites workflow on the current `main`. Terraform

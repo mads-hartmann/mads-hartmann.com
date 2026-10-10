@@ -1,6 +1,6 @@
 locals {
   files      = fileset(var.content_dir, "**")
-  mime_types = { html = "text/html; charset=utf-8", css = "text/css; charset=utf-8", js = "text/javascript; charset=utf-8", json = "application/json", xml = "application/xml; charset=utf-8", txt = "text/plain; charset=utf-8", png = "image/png", jpg = "image/jpeg", jpeg = "image/jpeg", gif = "image/gif", svg = "image/svg+xml", ico = "image/x-icon", webp = "image/webp", mp3 = "audio/mpeg", m4a = "audio/mp4", pdf = "application/pdf", woff = "font/woff", woff2 = "font/woff2" }
+  mime_types = { html = "text/html; charset=utf-8", md = "text/markdown; charset=utf-8", css = "text/css; charset=utf-8", js = "text/javascript; charset=utf-8", json = "application/json", xml = "application/xml; charset=utf-8", txt = "text/plain; charset=utf-8", png = "image/png", jpg = "image/jpeg", jpeg = "image/jpeg", gif = "image/gif", svg = "image/svg+xml", ico = "image/x-icon", webp = "image/webp", mp3 = "audio/mpeg", m4a = "audio/mp4", pdf = "application/pdf", woff = "font/woff", woff2 = "font/woff2" }
 }
 resource "aws_s3_bucket" "bucket" {
   bucket        = var.bucket_name
@@ -8,7 +8,7 @@ resource "aws_s3_bucket" "bucket" {
   lifecycle {
     prevent_destroy = true
     precondition {
-      condition     = fileexists("${var.content_dir}/index.html")
+      condition     = alltrue([for file in ["index.html", "index.md", "llms.txt"] : fileexists("${var.content_dir}/${file}")])
       error_message = "Build this site before planning or applying Terraform."
     }
   }
@@ -44,6 +44,18 @@ resource "aws_cloudfront_function" "routing" {
 }
 resource "aws_cloudfront_response_headers_policy" "site" {
   name = "mads-sites-${var.stack}"
+  custom_headers_config {
+    items {
+      header   = "Vary"
+      value    = "Accept, Accept-Encoding"
+      override = true
+    }
+    items {
+      header   = "Link"
+      value    = "</llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+      override = true
+    }
+  }
   security_headers_config {
     content_type_options { override = true }
     frame_options {

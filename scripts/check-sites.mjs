@@ -5,7 +5,7 @@ const homepage = await readFile('.build/homepage/index.html', 'utf8');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:|theme-picker/i.test(homepage));
 assert(homepage.includes('https://blog.mads-hartmann.com/'));
 assert(homepage.includes('https://uses.mads-hartmann.com/'));
-assert.deepEqual(await readdir('.build/homepage'), ['index.html']);
+assert.deepEqual((await readdir('.build/homepage')).sort(), ['index.html', 'index.md', 'llms.txt']);
 
 function checkFooter(html, current) {
   assert.equal((html.match(/<mh-site-footer /g) || []).length, 1);
@@ -42,7 +42,7 @@ assert(homepage.includes('>What I use</a>'));
 const uses = await readFile('.build/uses/index.html', 'utf8');
 checkFooter(uses, 'uses');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(uses));
-assert.deepEqual(await readdir('.build/uses'), ['index.html']);
+assert.deepEqual((await readdir('.build/uses')).sort(), ['index.html', 'index.md', 'llms.txt']);
 for (const content of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'master’s degree in Computer Science', 'University of Copenhagen', 'bachelor’s degree in Computer Science', 'IT University of Copenhagen']) {
   assert(homepage.includes(content), `Homepage is missing About content: ${content}`);
 }
@@ -119,3 +119,4 @@ for (const site of ['uses','blog']) {
 assert(uses.includes('Travel'));
 await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
 console.log(`Sites validated; shared footer on homepage, Uses and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);
+await import('./check-markdown.mjs');

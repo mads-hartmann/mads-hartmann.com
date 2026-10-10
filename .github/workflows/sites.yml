@@ -62,6 +62,7 @@ jobs:
           bundler: '4.0.16'
           bundler-cache: true
           working-directory: sites/blog.mads-hartmann.com
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: scripts/build.sh
       - run: node scripts/check-sites.mjs
       - run: scripts/check-workflows.sh

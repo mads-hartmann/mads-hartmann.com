@@ -12,5 +12,5 @@ directory run `make build` to build, `make dev` to watch and serve on port 8080,
 or `make check` (also `make lint`) to check site content and routing.
 See [development setup](../../docs/development.md) for first-time activation.
 
-Terraform uploads only
-`.build/homepage/index.html`; CloudFront handles redirects and HTTP error responses.
+Terraform uploads `.build/homepage/index.html`, its generated `index.md`, and
+`llms.txt`. CloudFront handles content negotiation, redirects, and HTTP errors.
