@@ -48,6 +48,8 @@ and [devenv's monorepo guidance](https://devenv.sh/guides/monorepo/).
 | `terraform` | Terraform, actionlint, all site build tools | `infra:check` | None |
 
 Every environment also provides Bash, Git, curl, Python, jq, gawk, and direnv.
+Activation installs the root npm dependencies used to generate Markdown. Outside
+devenv, run `npm ci --ignore-scripts` at the repository root before `scripts/build.sh`.
 Enter a directory and run `devenv shell`. Blog and Uses dependencies install
 automatically using frozen lockfiles. Exiting that shell lets you activate
 another project. Use direnv for automatic switching between root and child

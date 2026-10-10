@@ -11,5 +11,5 @@ From this directory, run `devenv shell` to activate tools, `devenv tasks run
 homepage:build` to build, or `devenv up` to watch and serve on port 8080.
 See [development setup](../../docs/development.md) for first-time activation.
 
-Terraform uploads only
-`.build/homepage/index.html`; CloudFront handles redirects and HTTP error responses.
+Terraform uploads `.build/homepage/index.html`, its generated `index.md`, and
+`llms.txt`. CloudFront handles content negotiation, redirects, and HTTP errors.

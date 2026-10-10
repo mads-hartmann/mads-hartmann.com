@@ -11,6 +11,12 @@ The source and AWS infrastructure for my three sites:
 All three sites share a static header from [`sites/shared/header`](sites/shared/header/README.md),
 using Declarative Shadow DOM for style isolation and requiring no browser JavaScript.
 
+All three production builds also generate Markdown versions of every HTML page
+and an `llms.txt` guide. HTML advertises its Markdown alternative; CloudFront
+serves that alternative when requested with `Accept: text/markdown`. See the
+[deployment guide](docs/deployment.md#markdown-and-agent-discovery) for URLs,
+content negotiation, and cache behavior.
+
 Development uses [devenv](https://devenv.sh/) and Nix on macOS (Apple Silicon)
 and Linux (x86-64). With Nix installed, install the pinned environment tools:
 
