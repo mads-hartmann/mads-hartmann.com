@@ -1,6 +1,12 @@
 name: Terraform plan
 on:
   pull_request:
+    paths:
+      - 'terraform/**'
+      - 'scripts/check-terraform.sh'
+      - 'scripts/plan-stack.sh'
+      - 'scripts/deploy-stack.sh'
+      - '.github/workflows/**'
 permissions:
   contents: read
 concurrency:
