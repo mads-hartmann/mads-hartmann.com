@@ -1,0 +1,14 @@
+# Mads Hartmann
+
+> Software engineer and tech lead focused on reliability. Biography, experience, education, and publications.
+
+Pages are available as Markdown using the links below, or by requesting their HTML URLs with `Accept: text/markdown`. Markdown and HTML are generated from the same published content.
+
+## Content
+
+- [About Mads Hartmann](https://www.mads-hartmann.com/index.md): Biography, experience, education, and publications.
+
+## Related sites
+
+- [Uses — Mads Hartmann](https://uses.mads-hartmann.com/llms.txt): The hardware, software, and equipment Mads Hartmann uses.
+- [Mads Hartmann's Blog](https://blog.mads-hartmann.com/llms.txt): Writing about software engineering, reliability, observability, and developer tools.

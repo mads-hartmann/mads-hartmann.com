@@ -64,6 +64,8 @@ for (const [site, origin] of Object.entries(origins)) {
     count++;
   }
   const index = await readFile(`.build/${site}/llms.txt`, 'utf8');
+  const sourceDirectory = new URL(origin).hostname.replace(/^www\./, '');
+  assert.equal(index, await readFile(`sites/${sourceDirectory}/llms.txt`, 'utf8'), `${site}: publish the tracked llms.txt unchanged`);
   assert(index.startsWith('# '));
   for (const [, target] of index.matchAll(/\]\((https:[^)]+)\)/g)) {
     const url = new URL(target);

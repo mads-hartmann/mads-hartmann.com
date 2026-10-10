@@ -1,4 +1,4 @@
-import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { copyFile, readFile, readdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseHTML } from 'linkedom';
@@ -8,26 +8,15 @@ import { gfm } from 'turndown-plugin-gfm';
 const sites = {
   homepage: {
     origin: 'https://www.mads-hartmann.com',
-    title: 'Mads Hartmann',
-    description: 'Software engineer and tech lead focused on reliability. Biography, experience, education, and publications.',
-    pages: [['index.md', 'About Mads Hartmann', 'Biography, experience, education, and publications.']],
+    sourceDir: 'sites/mads-hartmann.com',
   },
   uses: {
     origin: 'https://uses.mads-hartmann.com',
-    title: 'Uses — Mads Hartmann',
-    description: 'The hardware, software, and equipment Mads Hartmann uses.',
-    pages: [['index.md', 'Uses', 'Hardware, software, and equipment.']],
+    sourceDir: 'sites/uses.mads-hartmann.com',
   },
   blog: {
     origin: 'https://blog.mads-hartmann.com',
-    title: "Mads Hartmann's Blog",
-    description: 'Writing about software engineering, reliability, observability, and developer tools.',
-    pages: [
-      ['index.md', 'All posts', 'Chronological archive with links to every published post.'],
-      ['series/observability/index.md', 'Journey into Observability', 'A series on observability tools and practices.'],
-      ['book-reviews/index.md', 'Book reviews', 'Index of book reviews.'],
-      ['talks/index.md', 'Conference talks', 'Talk descriptions and recordings.'],
-    ],
+    sourceDir: 'sites/blog.mads-hartmann.com',
   },
 };
 
@@ -121,12 +110,8 @@ export async function buildMarkdown(site, directory) {
     const discovery = `<link rel="alternate" type="text/markdown" href="${page.markdown}">\n<link rel="describedby" type="text/plain" href="${config.origin}/llms.txt">\n`;
     await writeFile(`${directory}/${page.file}`, page.html.replace('</head>', `${discovery}</head>`));
   }
-  const links = config.pages.map(([file, title, description]) => {
-    if (!pages.some(page => page.markdown === `${config.origin}/${file}`)) throw new Error(`Missing llms.txt target: ${site}/${file}`);
-    return `- [${title}](${config.origin}/${file}): ${description}`;
-  });
-  await writeFile(`${directory}/llms.txt`, `# ${config.title}\n\n> ${config.description}\n\nPages are available as Markdown using the links below, or by requesting their HTML URLs with \`Accept: text/markdown\`. Markdown and HTML are generated from the same published content.\n\n## Content\n\n${links.join('\n')}\n\n## Related sites\n\n${Object.entries(sites).filter(([key]) => key !== site).map(([, other]) => `- [${other.title}](${other.origin}/llms.txt): ${other.description}`).join('\n')}\n`);
-  console.log(`${site}: generated ${pages.length} Markdown pages and llms.txt`);
+  await copyFile(`${config.sourceDir}/llms.txt`, `${directory}/llms.txt`);
+  console.log(`${site}: generated ${pages.length} Markdown pages and copied llms.txt`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

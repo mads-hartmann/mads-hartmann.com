@@ -2,17 +2,18 @@
 
 The source and AWS infrastructure for my three sites:
 
-| Site | Source | Build |
-| --- | --- | --- |
-| [Homepage](https://www.mads-hartmann.com/) | `sites/mads-hartmann.com/src/index.html` | Insert shared footer into one self-contained HTML file |
-| [Blog](https://blog.mads-hartmann.com/) | `sites/blog.mads-hartmann.com/src` | Jekyll |
-| [Uses](https://uses.mads-hartmann.com/) | `sites/uses.mads-hartmann.com/index.md` | Markdown → HTML with a small Node script |
+| Site | Source | Build | LLM guide |
+| --- | --- | --- | --- |
+| [Homepage](https://www.mads-hartmann.com/) | `sites/mads-hartmann.com/src/index.html` | Insert shared footer into one self-contained HTML file | [llms.txt](sites/mads-hartmann.com/llms.txt) |
+| [Blog](https://blog.mads-hartmann.com/) | `sites/blog.mads-hartmann.com/src` | Jekyll | [llms.txt](sites/blog.mads-hartmann.com/llms.txt) |
+| [Uses](https://uses.mads-hartmann.com/) | `sites/uses.mads-hartmann.com/index.md` | Markdown → HTML with a small Node script | [llms.txt](sites/uses.mads-hartmann.com/llms.txt) |
 
 All three sites share a static footer from [`sites/shared/footer`](sites/shared/footer/README.md),
 using Declarative Shadow DOM for style isolation and requiring no browser JavaScript.
 
 All three production builds also generate Markdown versions of every HTML page
-and an `llms.txt` guide. HTML advertises its Markdown alternative; CloudFront
+and copy each site's tracked `llms.txt` unchanged to the site root. Edit the
+guides directly in the site folders linked above. HTML advertises its Markdown alternative; CloudFront
 serves that alternative when requested with `Accept: text/markdown`. See the
 [deployment guide](docs/deployment.md#markdown-and-agent-discovery) for URLs,
 content negotiation, and cache behavior.
