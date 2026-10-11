@@ -83,9 +83,9 @@ described in [deployment](deployment.md).
 `make dev` uses watchexec to rebuild and restart a foreground server when source,
 build scripts, or the shared footer change. Jekyll includes drafts and disables
 its disk cache. Its preview output is `.build/blog-preview`, separate from the
-production `.build/blog` output. `make serve` starts a server without the outer
-watcher. Stop servers with Ctrl-C. Avoid starting root and project servers
-simultaneously on the same ports.
+production `.build/blog` output. Each `dev` target handles its own build or setup
+and starts the server directly under the watcher. Stop servers with Ctrl-C. Avoid
+starting root and project servers simultaneously on the same ports.
 
 Override ports with Make variables or environment variables:
 
