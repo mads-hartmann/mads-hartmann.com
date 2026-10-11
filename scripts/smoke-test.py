@@ -42,8 +42,9 @@ for source, target in json.loads(Path('routing/redirects.json').read_text()).get
     query = '?source=old%20about&tag=a%26b&tag=c&na%26me=%C3%A6&empty='
     check(source + query, 301, target)
 if stack == 'homepage':
-    check('/', content='id="experience"')
-    check('/', content='id="education"')
+    # Work history and education now appear in the introductory prose.
+    check('/', content='Member of Technical Staff at OpenAI')
+    check('/', content='master’s degree in Computer Science')
     check('/uses', 301, 'https://uses.mads-hartmann.com/')
     check('/uses?source=old%20link&tag=a%26b&tag=c', 301,
           'https://uses.mads-hartmann.com/')
