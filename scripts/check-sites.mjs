@@ -43,7 +43,7 @@ const uses = await readFile('.build/uses/index.html', 'utf8');
 checkFooter(uses, 'uses');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(uses));
 assert.deepEqual(await readdir('.build/uses'), ['index.html']);
-for (const content of ['id="experience"', 'id="education"', 'Ona', 'Glitch', 'Famly', 'Issuu', 'Masters degree in Computer Science', 'Bachelors degree in Computer Science']) {
+for (const content of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'master’s degree in Computer Science', 'University of Copenhagen', 'bachelor’s degree in Computer Science', 'IT University of Copenhagen']) {
   assert(homepage.includes(content), `Homepage is missing About content: ${content}`);
 }
 await assert.rejects(stat('.build/blog/about/index.html'), { code: 'ENOENT' });
