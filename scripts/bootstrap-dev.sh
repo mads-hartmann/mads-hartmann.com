@@ -20,4 +20,4 @@ nix "${nix_flags[@]}" build --no-link "${tools[@]}"
 # Replace just the activation tools, including duplicate entries from older runs.
 nix "${nix_flags[@]}" profile remove 'devenv(-[0-9]+)?' 'direnv(-[0-9]+)?' 'bashInteractive(-[0-9]+)?'
 nix "${nix_flags[@]}" profile install "${tools[@]}"
-echo 'Setup complete. Run devenv shell from the root or a project directory.'
+echo 'Setup complete. Run devenv shell from the repository root.'

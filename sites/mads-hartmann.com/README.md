@@ -7,8 +7,9 @@ There is no framework, runtime JavaScript, font download or theme control.
 Home includes the introduction, work history and education formerly split across
 Home and the blog's About page, followed by social and contact links.
 
-From this directory, run `devenv shell` to activate tools, `devenv tasks run
-homepage:build` to build, or `devenv up` to watch and serve on port 8080.
+Activate tools with `devenv shell` at the repository root, then from this
+directory run `make build` to build, `make dev` to watch and serve on port 8080,
+or `make check` (also `make lint`) to check site content and routing.
 See [development setup](../../docs/development.md) for first-time activation.
 
 Terraform uploads only

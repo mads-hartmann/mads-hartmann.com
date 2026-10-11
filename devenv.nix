@@ -1,33 +1,25 @@
 { pkgs, config, lib, ... }:
 {
-  imports = [
-    ./sites/mads-hartmann.com/devenv.nix
-    ./sites/blog.mads-hartmann.com/devenv.nix
-    ./sites/uses.mads-hartmann.com/devenv.nix
+  packages = with pkgs; [
+    actionlint awscli2 bashInteractive curl direnv gawk gh git gnumake jq
+    kubectl kubectx python3 stern watchexec
+    libffi libyaml openssl zlib
   ];
+
+  languages.javascript = {
+    enable = true;
+    package = pkgs.nodejs_24;
+  };
+  languages.ruby = {
+    enable = true;
+    version = "3.3.11";
+    lsp.enable = false;
+  };
   languages.terraform.enable = true;
-  packages = [ pkgs.actionlint ];
-  tasks."repo:setup".after = [ "blog:setup" "uses:setup" ];
-  tasks."repo:build" = {
-    after = [ "repo:setup" ];
-    cwd = config.git.root;
-    exec = "scripts/build.sh";
-    before = lib.optional config.devenv.isTesting "devenv:enterTest";
-  };
-  tasks."repo:check" = {
-    showOutput = true;
-    after = [ "repo:build" ];
-    cwd = config.git.root;
-    exec = ''
-      node scripts/check-sites.mjs
-      scripts/check-terraform.sh
-      scripts/check-workflows.sh
-    '';
-  };
-  enterTest = ''
-    cd "$DEV_REPO_ROOT"
-    node scripts/check-sites.mjs
-    scripts/check-terraform.sh
-    scripts/check-workflows.sh
-  '';
+
+  # Keep tool and dependency caches local, platform-specific, and ignored.
+  env.DEV_STATE = "${config.git.root}/.devenv-state/${pkgs.stdenv.hostPlatform.system}";
+  env.npm_config_cache = "${config.env.DEV_STATE}/npm-cache";
+  env.BUNDLE_PATH = lib.mkForce "${config.env.DEV_STATE}/blog/${builtins.baseNameOf config.languages.ruby.package.outPath}/bundle";
+  env.BUNDLE_FROZEN = "true";
 }
