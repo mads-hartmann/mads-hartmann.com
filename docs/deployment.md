@@ -118,6 +118,76 @@ To pause cloud plans and applies, set `deploy_enabled=false` in the kernel's
 production configuration and apply the kernel manually. Set it back to `true`
 and apply again to resume. Offline PR checks run while deployment is paused.
 
+## Markdown and agent discovery
+
+Each site owns Markdown generation in its build tool. The root `scripts/build.sh`
+installs site-local dependencies and invokes those builds:
+
+- Home's `sites/mads-hartmann.com/build.mjs` inserts the shared footer, extracts
+  Markdown from the main content, adds discovery links, and copies `llms.txt`.
+  Its Node dependencies are pinned in that site's `package-lock.json`.
+- Uses' `sites/uses.mads-hartmann.com/build.mjs` renders HTML and publishes its
+  existing Markdown source, adding the canonical URL and copying `llms.txt`.
+- The blog uses the released [jekyll-md](https://github.com/dblock/jekyll-md) gem,
+  pinned in its Gemfile/lockfile and enabled in `src/_config.yml`. It converts
+  rendered `.site` content, generates Markdown files, and injects discovery links
+  during normal Jekyll builds and previews. A Markdown layout adds the canonical
+  HTML URL. Jekyll rebuilds refresh the Markdown and remove deleted pages.
+  The small `src/_plugins/llms.rb` generator registers the editable guide in the
+  blog project folder as a static file so Jekyll publishes it unchanged.
+
+Each site owns an editable, tracked `llms.txt` in its project folder:
+`sites/mads-hartmann.com/llms.txt`, `sites/blog.mads-hartmann.com/llms.txt`, and
+`sites/uses.mads-hartmann.com/llms.txt`. The build copies these files unchanged to
+the corresponding site's root. Edit those files directly to change the guides;
+their contents are not generated. The site checks verify that the
+published copies match the tracked files and that their links resolve.
+
+Each generated HTML page has a `rel="alternate" type="text/markdown"` link and
+a `rel="describedby"` link to that site's `llms.txt`. The small `llms.txt` guides
+link to Markdown entry points and the other sites; the blog's Markdown archive
+links to every published post. The blog's Markdown keeps the source links and
+image URLs, including relative URLs; linked HTML pages advertise their Markdown
+alternatives. Recording links remain available in the article text. Home strips
+inline image bytes while retaining alt text, and Uses publishes its source.
+
+| HTML URL | Markdown URL |
+| --- | --- |
+| `/` or `/index.html` | `/index.md` |
+| `/series/observability/` | `/series/observability.md` |
+| `/2026/01/27/using-ai-to-do-your-best-work.html` | `/2026/01/27/using-ai-to-do-your-best-work.md` |
+
+The blog follows jekyll-md’s convention for directory pages: `/talks/` and
+`/talks/index.html` both negotiate to `/talks.md`. The root uses `/index.md`.
+
+Direct `.md` URLs work with any `Accept` header. The shared CloudFront
+viewer-request code also rewrites an HTML request to its Markdown object when
+`Accept` explicitly includes `text/markdown` with a nonzero quality at least as
+high as HTML. Missing headers, wildcards alone, an HTML preference, and
+`text/markdown;q=0` keep HTML. Existing redirects run before negotiation; feeds
+and assets are never converted.
+
+The URI rewrite happens before CloudFront's cache lookup, keeping HTML and
+Markdown in distinct cache entries without forwarding `Accept` to S3. The
+response headers policy adds `Vary: Accept, Accept-Encoding` for downstream
+caches and `Link: </llms.txt>; rel="describedby"; type="text/plain"` for discovery
+from Markdown responses too. S3 serves `.md` as `text/markdown; charset=utf-8`
+and `llms.txt` as `text/plain; charset=utf-8`. These changes use the existing
+site stacks, functions, policies, and private buckets; no kernel/IAM change is
+needed.
+
+Build and check locally with `make check` inside the root devenv shell. The plain local
+static servers expose the generated files but do not emulate CloudFront's
+negotiation or headers. The blog preview also publishes Markdown for drafts. Routing
+tests run the generated functions in a JavaScript VM, and deployment smoke tests
+verify the live headers, explicit URLs, and alternating HTML/Markdown requests:
+
+```sh
+curl -i https://www.mads-hartmann.com/ -H 'Accept: text/markdown'
+curl -i https://blog.mads-hartmann.com/index.md
+curl -i https://uses.mads-hartmann.com/llms.txt
+```
+
 ## Recovery
 
 If an apply fails, rerun the Sites workflow on the current `main`. Terraform

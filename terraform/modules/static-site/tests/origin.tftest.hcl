@@ -35,8 +35,12 @@ run "private_origin" {
     error_message = "Every site domain must have both IPv4 and IPv6 aliases."
   }
   assert {
-    condition     = length(aws_s3_object.pages) == 1 && length(aws_s3_object.assets) == 0
-    error_message = "The homepage must upload exactly one HTML file."
+    condition     = length(aws_s3_object.pages) == 1 && length(aws_s3_object.assets) == 2 && aws_s3_object.assets["index.md"].content_type == "text/markdown; charset=utf-8" && aws_s3_object.assets["llms.txt"].content_type == "text/plain; charset=utf-8"
+    error_message = "Upload the homepage and its Markdown and llms.txt representations with correct content types."
+  }
+  assert {
+    condition     = alltrue([for header in one(aws_cloudfront_response_headers_policy.site.custom_headers_config).items : header.override && (header.header == "Vary" ? header.value == "Accept, Accept-Encoding" : header.header == "Link" && header.value == "</llms.txt>; rel=\"describedby\"; type=\"text/plain\"")])
+    error_message = "Caches must distinguish negotiated formats, and all responses must advertise llms.txt."
   }
   assert {
     condition     = length(aws_cloudfront_distribution.distribution.custom_error_response) == 0

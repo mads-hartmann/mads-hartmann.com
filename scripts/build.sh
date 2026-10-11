@@ -7,8 +7,8 @@ mkdir -p .build
 node scripts/build-routing.mjs
 if [[ "$site" == all || "$site" == homepage ]]; then
   rm -rf .build/homepage
-  mkdir -p .build/homepage
-  node scripts/build-homepage.mjs
+  npm --prefix sites/mads-hartmann.com ci --ignore-scripts
+  node sites/mads-hartmann.com/build.mjs "$PWD/.build/homepage"
 fi
 if [[ "$site" == all || "$site" == uses ]]; then
   rm -rf .build/uses

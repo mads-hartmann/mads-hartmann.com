@@ -11,8 +11,8 @@ function handler(event) {
   if (path.indexOf('/blog/images/') === 0 || path.indexOf('/blog/uploads/') === 0 || path === '/blog/feed.xml') return redirect('https://blog.mads-hartmann.com' + path.slice(5));
   if (path === '/uses') return redirect('https://uses.mads-hartmann.com/');
   if (path === '/tools' || path.indexOf('/tools/') === 0 || path === '/photography') return { statusCode: 410, statusDescription: 'Gone', body: 'Gone.' };
-  if (path !== '/' && path !== '/index.html') return { statusCode: 404, statusDescription: 'Not Found', body: 'Page not found.' };
-  if (request.headers.host.value === 'mads-hartmann.com') return redirect('https://www.mads-hartmann.com/');
-  request.uri = '/index.html';
-  return request;
+  if (path !== '/' && path !== '/index.html' && path !== '/index.md' && path !== '/llms.txt') return { statusCode: 404, statusDescription: 'Not Found', body: 'Page not found.' };
+  if (request.headers.host.value === 'mads-hartmann.com') return redirect('https://www.mads-hartmann.com' + (path === '/index.html' ? '/' : path));
+  request.uri = path === '/' ? '/index.html' : path;
+  return negotiateMarkdown(request);
 }

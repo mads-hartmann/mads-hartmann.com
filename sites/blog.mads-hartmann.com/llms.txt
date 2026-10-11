@@ -1,0 +1,17 @@
+# Mads Hartmann's Blog
+
+> Writing about software engineering, reliability, observability, and developer tools.
+
+Pages are available as Markdown using the links below, or by requesting their HTML URLs with `Accept: text/markdown`. Markdown and HTML are generated from the same published content.
+
+## Content
+
+- [All posts](https://blog.mads-hartmann.com/index.md): Chronological archive with links to every published post.
+- [Journey into Observability](https://blog.mads-hartmann.com/series/observability.md): A series on observability tools and practices.
+- [Book reviews](https://blog.mads-hartmann.com/book-reviews.md): Index of book reviews.
+- [Conference talks](https://blog.mads-hartmann.com/talks.md): Talk descriptions and recordings.
+
+## Related sites
+
+- [Mads Hartmann](https://www.mads-hartmann.com/llms.txt): Software engineer and tech lead focused on reliability. Biography, experience, education, and publications.
+- [Uses — Mads Hartmann](https://uses.mads-hartmann.com/llms.txt): The hardware, software, and equipment Mads Hartmann uses.

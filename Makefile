@@ -9,6 +9,7 @@ help:
 	@echo 'Infrastructure commands: make -C terraform fmt|lint|check'
 
 setup:
+	$(MAKE) -C sites/mads-hartmann.com setup
 	$(MAKE) -C sites/blog.mads-hartmann.com setup
 	$(MAKE) -C sites/uses.mads-hartmann.com setup
 

@@ -1,0 +1,14 @@
+# Uses — Mads Hartmann
+
+> The hardware, software, and equipment Mads Hartmann uses.
+
+Pages are available as Markdown using the links below, or by requesting their HTML URLs with `Accept: text/markdown`. Markdown and HTML are generated from the same published content.
+
+## Content
+
+- [Uses](https://uses.mads-hartmann.com/index.md): Hardware, software, and equipment.
+
+## Related sites
+
+- [Mads Hartmann](https://www.mads-hartmann.com/llms.txt): Software engineer and tech lead focused on reliability. Biography, experience, education, and publications.
+- [Mads Hartmann's Blog](https://blog.mads-hartmann.com/llms.txt): Writing about software engineering, reliability, observability, and developer tools.
