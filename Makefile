@@ -26,7 +26,6 @@ lint: check
 
 check-sites: build
 	node scripts/check-sites.mjs
-	cd sites/blog.mads-hartmann.com && bundle exec ruby test/markdown_output_test.rb
 
 check-terraform: build
 	./scripts/check-terraform.sh

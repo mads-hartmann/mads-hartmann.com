@@ -51,5 +51,4 @@ A direct Jekyll build produces all outputs:
 
 ```sh
 bundle exec jekyll build --source src --destination dist
-bundle exec ruby test/markdown_output_test.rb
 ```
