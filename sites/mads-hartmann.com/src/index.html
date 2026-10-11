@@ -7,7 +7,7 @@
 <meta name="description" content="Mads Hartmann — software engineer and tech lead with a focus on reliability.">
 <link rel="canonical" href="https://www.mads-hartmann.com/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23375a42'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='sans-serif' font-size='40' fill='white'%3EM%3C/text%3E%3C/svg%3E">
-<style>:root{--mh-color-surface:#faf9f6;--mh-color-text:#292923;--mh-color-border:#e3e2db;--mh-color-accent:#375a42;--mh-color-accent-subtle:#e7ece5;--mh-color-on-accent-subtle:#375a42}*{box-sizing:border-box}html{color-scheme:light}body{margin:0;background:var(--mh-color-surface);color:var(--mh-color-text);font:18px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:680px;margin:0 auto;padding:40px 24px 48px}a{color:var(--mh-color-accent);text-underline-offset:4px}a:hover{color:#192b20}a:focus-visible{outline:2px solid var(--mh-color-accent);outline-offset:4px}h1{font-size:2rem;line-height:1.2;letter-spacing:-.04em;margin:0 0 24px}h2{font-size:1.1rem;margin:32px 0 8px}p{margin:0 0 20px}ul{padding-left:24px}li{margin:8px 0}/* Institution logos and entry markers share the same timeline column. */
+<style>:root{--mh-color-surface:#faf9f6;--mh-color-text:#292923;--mh-color-border:#e3e2db;--mh-color-accent:#375a42;--mh-color-accent-subtle:#e7ece5;--mh-color-on-accent-subtle:#375a42}*{box-sizing:border-box}html{color-scheme:light}body{margin:0;background:var(--mh-color-surface);color:var(--mh-color-text);font:18px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:680px;margin:0 auto;padding:40px 24px 0}a{color:var(--mh-color-accent);text-underline-offset:4px}a:hover{color:#192b20}a:focus-visible{outline:2px solid var(--mh-color-accent);outline-offset:4px}h1{font-size:2rem;line-height:1.2;letter-spacing:-.04em;margin:0 0 24px}h2{font-size:1.1rem;margin:32px 0 8px}p{margin:0 0 20px}ul{padding-left:24px}li{margin:8px 0}/* Institution logos and entry markers share the same timeline column. */
 .timeline{--logo-size:44px;--timeline-gap:18px;position:relative;list-style:none;padding:0;margin:20px 0 0}
 .timeline::before{content:"";position:absolute;left:calc(var(--logo-size)/2 - 1px);top:calc(var(--logo-size)/2);bottom:0;width:2px;background:var(--mh-color-border)}
 .timeline__entry{margin:0;padding:0 0 32px}
@@ -25,13 +25,13 @@
 .timeline__entry:last-child .timeline__items>li:last-child::after{content:"";position:absolute;left:calc(var(--logo-size)/2 - 1px);top:21px;bottom:0;width:2px;background:var(--mh-color-surface)}
 .timeline__title{display:block;font-size:.95rem;line-height:1.5;font-weight:600}
 @media(max-width:480px){.timeline{--logo-size:36px;--timeline-gap:14px}}
-.socials{list-style:none;padding:0;display:flex;gap:24px;flex-wrap:wrap}footer{margin-top:48px;font-size:.85rem;color:#626258}@media(max-width:480px){main{padding-top:32px}body{font-size:17px}}</style>
+.discovery{font-size:16px;margin:26px 0 38px}.discovery a{white-space:nowrap}.discovery span{margin:0 10px;color:#77776d}@media(max-width:480px){main{padding-top:32px}body{font-size:17px}}</style>
 </head>
 <body>
-<!-- shared-header -->
 <main>
 <h1>Mads Hartmann</h1>
 <p>I’m an experienced software engineer and tech lead with a focus on reliability. I love diving head first into production issues, especially the weird ones. When I’m not rummaging around in production I spend my energy making it easier to understand, and eventually more reliable.</p>
+<p class="discovery"><a href="https://blog.mads-hartmann.com/">Read my blog</a><span aria-hidden="true">/</span><a href="https://uses.mads-hartmann.com/">What I use</a></p>
 <section aria-labelledby="publications"><h2 id="publications">Publications</h2>
 <p><a href="https://increment.com/reliability/observability-distributed-tracing/">Increment Issue 16: Reliability — Tracing a path to observability</a></p></section>
 <section aria-labelledby="reviewing"><h2 id="reviewing">Technical reviewer</h2>
@@ -187,9 +187,7 @@
     </li>
 </ol>
 </section>
-<section aria-labelledby="elsewhere"><h2 id="elsewhere">Elsewhere</h2>
-<ul class="socials"><li><a rel="me" href="https://twitter.com/mads_hartmann">Twitter</a></li><li><a rel="me" href="https://github.com/mads-hartmann">GitHub</a></li><li><a rel="me" href="https://www.linkedin.com/in/mads-hartmann/">LinkedIn</a></li></ul></section>
-<footer><a href="mailto:hello@mads-hartmann.com">hello@mads-hartmann.com</a></footer>
 </main>
+<!-- shared-footer -->
 </body>
 </html>

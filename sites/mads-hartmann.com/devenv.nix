@@ -15,7 +15,7 @@
       scripts/build.sh homepage &&
         exec python3 -m http.server "$HOMEPAGE_PORT" --bind 127.0.0.1 --directory .build/homepage
     '';
-    watch.paths = [ ./src ../shared/header ../../routing ../../scripts/build-routing.mjs ../../scripts/build-homepage.mjs ];
+    watch.paths = [ ./src ../shared/footer ../../routing ../../scripts/build-routing.mjs ../../scripts/build-homepage.mjs ];
     ready.http.get.port = lib.toInt config.env.HOMEPAGE_PORT;
     ready.period = 1;
   };

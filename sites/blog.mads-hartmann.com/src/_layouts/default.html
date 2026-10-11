@@ -28,8 +28,6 @@
   </head>
 
   <body>
-    {{ site.data.shared_headers.blog }}
-
     <div class="container {{page.colors | default: 'default' }} {{page.class}}">
       {% unless page.disable_scroll_indicator %}
       <div class="scroll-indicator-container">
@@ -37,7 +35,14 @@
       </div>
       {% endunless %}
 
-      <div class="site">{{ content }}</div>
+      <div class="site">
+        {% unless page.url == "/" %}
+        <a class="back-to-blog" href="{{ site.url }}/">← Blog</a>
+        {% endunless %}
+        {{ content }}
+      </div>
+
+      {{ site.data.shared_footers.blog }}
     </div>
   </body>
 </html>

@@ -3,35 +3,44 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import { createContext, runInContext } from 'node:vm';
 const homepage = await readFile('.build/homepage/index.html', 'utf8');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:|theme-picker/i.test(homepage));
-assert(homepage.includes('data:image/jpeg;base64,'));
 assert(homepage.includes('https://blog.mads-hartmann.com/'));
 assert(homepage.includes('https://uses.mads-hartmann.com/'));
 assert.deepEqual(await readdir('.build/homepage'), ['index.html']);
 
-function checkHeader(html, current) {
-  assert.equal((html.match(/<mh-site-header /g) || []).length, 1);
-  assert(html.includes(`<mh-site-header data-current="${current}">`));
+function checkFooter(html, current) {
+  assert.equal((html.match(/<mh-site-footer /g) || []).length, 1);
+  assert(html.includes(`<mh-site-footer data-current="${current}">`));
   assert(html.includes('<template shadowrootmode="open">'));
-  assert(!html.includes('<!-- shared-header -->'));
-  const [shadow, fallback] = html.split('<mh-site-header ')[1].split('</template>');
+  assert(!html.includes('<!-- shared-footer -->'));
+  assert(!html.includes('mh-site-header'));
+  assert(!html.includes('shared_headers'));
+  assert.equal((html.match(/<footer\b/g) || []).length, 1);
+  const [shadow, fallback] = html.split('<mh-site-footer ')[1].split('</template>');
   const activeHref = {
     home: 'https://www.mads-hartmann.com/',
     blog: 'https://blog.mads-hartmann.com/',
     uses: 'https://uses.mads-hartmann.com/',
   }[current];
-  for (const content of [shadow, fallback.split('</mh-site-header>')[0]]) {
+  for (const content of [shadow, fallback.split('</mh-site-footer>')[0]]) {
     assert.equal((content.match(/aria-current=/g) || []).length, 1);
     assert(content.includes(`<a href="${activeHref}" aria-current=`));
-    assert(!content.includes('>About</a>'));
+    assert(content.includes('id="footer-explore"'));
+    assert(content.includes('id="footer-elsewhere"'));
+    for (const href of ['https://github.com/mads-hartmann', 'https://www.linkedin.com/in/mads-hartmann/', 'https://twitter.com/mads_hartmann', 'mailto:hello@mads-hartmann.com']) {
+      assert(content.includes(`href="${href}"`));
+    }
     for (const href of ['https://www.mads-hartmann.com/', 'https://blog.mads-hartmann.com/', 'https://uses.mads-hartmann.com/']) {
       assert(content.includes(`href="${href}"`));
     }
   }
 }
 
-checkHeader(homepage, 'home');
+checkFooter(homepage, 'home');
+assert(!homepage.includes('aria-labelledby="elsewhere"'));
+assert(homepage.includes('>Read my blog</a>'));
+assert(homepage.includes('>What I use</a>'));
 const uses = await readFile('.build/uses/index.html', 'utf8');
-checkHeader(uses, 'uses');
+checkFooter(uses, 'uses');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(uses));
 assert.deepEqual(await readdir('.build/uses'), ['index.html']);
 for (const content of ['id="experience"', 'id="education"', 'Ona', 'Glitch', 'Famly', 'Issuu', 'Masters degree in Computer Science', 'Bachelors degree in Computer Science']) {
@@ -39,13 +48,19 @@ for (const content of ['id="experience"', 'id="education"', 'Ona', 'Glitch', 'Fa
 }
 await assert.rejects(stat('.build/blog/about/index.html'), { code: 'ENOENT' });
 // Check every rendered blog page so layouts and collection pages cannot silently
-// lose the shared header; CSS, feeds and other static files are left alone.
+// lose the shared footer; CSS, feeds and other static files are left alone.
 let blogPages = 0;
 for (const file of await readdir('.build/blog', { recursive: true })) {
   if (!file.endsWith('.html')) continue;
   const html = await readFile(`.build/blog/${file}`, 'utf8');
   if (!html.includes('<html')) continue;
-  checkHeader(html, 'blog');
+  checkFooter(html, 'blog');
+  if (file === 'index.html') {
+    assert(/<h1 class="blog-title">Blog<\/h1>\s*<div class="featured posts">/.test(html), 'Blog title must lead directly into Highlights');
+    assert(!html.includes('class="back-to-blog"'));
+  } else {
+    assert(html.includes('<a class="back-to-blog" href="https://blog.mads-hartmann.com/">'), 'Nested blog pages must link to the blog root');
+  }
   blogPages++;
 }
 assert(blogPages > 0);
@@ -103,4 +118,4 @@ for (const site of ['uses','blog']) {
 }
 assert(uses.includes('Travel'));
 await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
-console.log(`Sites validated; shared header on homepage, Uses and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);
+console.log(`Sites validated; shared footer on homepage, Uses and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);
