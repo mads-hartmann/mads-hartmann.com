@@ -43,15 +43,18 @@ for (const [site, origin] of Object.entries(origins)) {
     if (!file.endsWith('.html')) continue;
     const html = await readFile(`.build/${site}/${file}`, 'utf8');
     if (!/<html[\s>]/i.test(html)) continue;
-    const markdownPath = file.replace(/\.html$/, '.md');
-    const alternates = [...html.matchAll(/<link\s+rel="alternate"\s+type="text\/markdown"\s+href="([^"]+)"/g)];
+    const markdownPath = site === 'blog' && file.endsWith('/index.html')
+      ? file.replace(/\/index\.html$/, '.md') : file.replace(/\.html$/, '.md');
+    const alternates = [...html.matchAll(/<link\b[^>]*>/g)].map(([tag]) => tag)
+      .filter(tag => /\brel="alternate"/.test(tag) && /\btype="text\/markdown"/.test(tag));
     assert.equal(alternates.length, 1);
-    assert.equal(alternates[0][1], `${origin}/${markdownPath}`);
+    const href = /\bhref="([^"]+)"/.exec(alternates[0])[1];
+    assert.equal(new URL(href, origin).href, `${origin}/${markdownPath}`);
     assert(html.includes(`rel="describedby" type="text/plain" href="${origin}/llms.txt"`));
     const markdown = await readFile(`.build/${site}/${markdownPath}`, 'utf8');
     assert(markdown.includes('Canonical page: ' + origin));
     assert(!markdown.includes('data:image/'), `${file}: embedded image bytes`);
-    assert(!/<script|<style|<mh-site-header/i.test(markdown), `${file}: page chrome leaked`);
+    assert(!/<script|<style|<mh-site-(?:header|footer)/i.test(markdown), `${file}: page chrome leaked`);
     for (const match of markdown.matchAll(/https:\/\/[^\s<>"\[\]()]+\.md/g)) {
       const url = new URL(match[0]);
       if (url.origin === origin) await stat(`.build/${site}${url.pathname}`);
@@ -59,6 +62,14 @@ for (const [site, origin] of Object.entries(origins)) {
     assert.equal(request('/' + file, 'text/markdown').uri, '/' + markdownPath);
     assert.equal(request('/' + file, 'text/html').uri, '/' + file);
     assert.equal(request('/' + markdownPath).uri, '/' + markdownPath);
+    if (site === 'blog' && file.endsWith('/index.html')) {
+      const directory = '/' + file.slice(0, -'index.html'.length);
+      for (const uri of [directory, directory.slice(0, -1)]) {
+        for (const [accept, wantsMarkdown] of acceptCases) {
+          assert.equal(request(uri, accept).uri, '/' + (wantsMarkdown ? markdownPath : file));
+        }
+      }
+    }
     count++;
   }
   const index = await readFile(`.build/${site}/llms.txt`, 'utf8');
@@ -72,7 +83,7 @@ for (const [site, origin] of Object.entries(origins)) {
     await stat(`.build/${targetSite}${url.pathname}`);
   }
   if (site === 'blog') {
-    for (const path of ['/series/observability', '/series/observability/']) assert.equal(request(path, 'text/markdown').uri, '/series/observability/index.md');
+    for (const path of ['/series/observability', '/series/observability/']) assert.equal(request(path, 'text/markdown').uri, '/series/observability.md');
     for (const path of ['/feed.xml', '/images/profile.png', '/css/index.css', '/llms.txt']) assert.equal(request(path, 'text/markdown').uri, path);
     assert.equal(request('/about', 'text/markdown').headers.location.value, origins.homepage + '/');
   } else {

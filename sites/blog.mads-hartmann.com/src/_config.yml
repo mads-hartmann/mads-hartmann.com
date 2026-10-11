@@ -3,11 +3,12 @@ description: Mads Hartmann's Blog
 url: https://blog.mads-hartmann.com
 author: Mads Hartmann
 
-# The local _plugins/markdown_output.rb plugin writes sibling .md files and
-# publishes the editable guide from the project directory, outside src/.
-markdown_output:
-  enabled: true
-  llms_txt: ../llms.txt
+# jekyll-md converts rendered article content and adds discovery links.
+md:
+  selector: .site
+  # Recordings also have ordinary links in the article text.
+  strip: [script, style, audio, iframe, "#disqus_thread", .back-to-blog]
+  layout: markdown
 
 highlighter: rouge
 
@@ -27,6 +28,7 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
   - jekyll-feed
+  - jekyll-md
 
 # Atom feed
 feed:

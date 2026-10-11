@@ -18,7 +18,7 @@ The Shift Shift Forward team interviewed the SREs and our manager at Glitch - as
 
 The question I liked the best was "What are you feeling during incident response" or something to that effect. I wasn't able to give a good answer in the moment but thought it was such a good question that it wrote down some quick notes after and did a quick recording.
 
-Here's the notes of what points I intended to make - it's a bit different from what I ended up saying, but that's usually how it goes for me 😅 I think I like the audio version better, so if you want to hear me clumsily work through the notes I've included the <a href="http://blog.mads-hartmann.com/uploads/feelings-during-incident-response.mp3">audio recording</a> as well 😉
+Here's the notes of what points I intended to make - it's a bit different from what I ended up saying, but that's usually how it goes for me 😅 I think I like the audio version better, so if you want to hear me clumsily work through the notes I've included the <a href="https://blog.mads-hartmann.com/uploads/feelings-during-incident-response.mp3">audio recording</a> as well 😉
 
 ---
 

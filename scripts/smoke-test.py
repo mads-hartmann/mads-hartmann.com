@@ -55,6 +55,8 @@ elif stack == 'blog':
     check('/2026/01/27/using-ai-to-do-your-best-work.html', accept='text/markdown', content_type='text/markdown', content='# Using AI')
     check('/2026/01/27/using-ai-to-do-your-best-work.md', content_type='text/markdown', content='# Using AI')
     check('/series/observability/', accept='text/markdown', content_type='text/markdown', content='# Journey into Observability')
+    check('/series/observability/index.html', accept='text/markdown', content_type='text/markdown', content='# Journey into Observability')
+    check('/series/observability.md', content_type='text/markdown', content='# Journey into Observability')
 if stack in ['homepage', 'blog', 'uses']:
     current = 'home' if stack == 'homepage' else stack
     check('/', content=f'<mh-site-footer data-current="{current}">')

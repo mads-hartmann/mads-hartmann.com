@@ -1,14 +1,19 @@
 require "jekyll"
+require "jekyll-md"
 require "tmpdir"
 require "fileutils"
-require_relative "../src/_plugins/markdown_output"
+require "yaml"
+require_relative "../src/_plugins/llms"
 
 def assert(condition, message)
   raise message unless condition
 end
 
-# Exercise Jekyll's normal render/write/clean lifecycle, without a post-build tool.
-Dir.mktmpdir("jekyll-markdown-") do |root|
+# Verify our configuration and layout against the released gem through normal
+# Jekyll builds/rebuilds; converter unit tests belong to jekyll-md upstream.
+blog_source = File.expand_path("../src", __dir__)
+md_config = YAML.safe_load_file(File.join(blog_source, "_config.yml")).fetch("md")
+Dir.mktmpdir("jekyll-md-") do |root|
   source = File.join(root, "src")
   destination = File.join(root, "output")
   write = lambda do |path, content|
@@ -19,17 +24,20 @@ Dir.mktmpdir("jekyll-markdown-") do |root|
   read = ->(path) { File.read(File.join(destination, path)) }
   exists = ->(path) { File.exist?(File.join(destination, path)) }
   guide = "# Fixture\n\nA manually maintained guide.\n"
+  FileUtils.mkdir_p(source)
   File.write(File.join(root, "llms.txt"), guide)
+  write.call("_layouts/markdown.liquid", File.read(File.join(blog_source, "_layouts/markdown.liquid")))
   write.call("_layouts/default.html", <<~HTML)
-    <!doctype html><html><head><title>{{ page.title }}</title>
-    <link rel="alternate" type="text/markdown" href="{{ page.markdown_url }}">
-    </head><body><nav>Not article content</nav><main>{{ content }}</main></body></html>
+    <!doctype html><html><head><title>{{ page.title }}</title></head>
+    <body><nav>Not article content</nav><div class="site"><a class="back-to-blog" href="/">Not article navigation</a>{{ content }}</div></body></html>
   HTML
   write.call("index.html", <<~HTML)
     ---
     title: Archive
     ---
-    <h1>Archive</h1>{% for post in site.posts %}<a href="{{ post.url | relative_url }}">{{ post.title }}</a>{% endfor %}
+    <h1>Archive</h1>
+    <h2>Posts</h2>
+    {% for post in site.posts %}<a href="{{ post.url }}">{{ post.title }}</a>{% endfor %}
   HTML
   write.call("_posts/2020-01-01-example.md", <<~'MARKDOWN')
     ---
@@ -40,23 +48,19 @@ Dir.mktmpdir("jekyll-markdown-") do |root|
 
     {{ site.description }}
 
-    [Archive]({{ '/' | relative_url }}) [Footnote](#note)
-
-    ````sh
+    ```sh
     echo '<tag> & value'
       indented
     ```
-    ````
 
     | Name | Value |
     | --- | --- |
     | One | Two |
 
-    <details><summary>More detail</summary><p>Still readable</p></details>
-    <img src="/images/example.png" alt="Useful diagram"><img src="data:image/png;base64,abc" alt="Portrait">
-    <audio controls><source src="/recording.mp3"></audio><iframe src="https://example.net/video" title="Conference talk"></iframe>
-    <a href="/café.html">Unicode URL</a>
+    ![Useful diagram](/images/example.png)
+    [Recording](https://example.com/recording.mp3)
     <script>Not article code</script>
+    <div id="disqus_thread">Not article comments</div>
   MARKDOWN
   write.call("_book_reviews/book.md", "---\ntitle: Book\n---\n# Book\n\nReview content.")
   write.call("_drafts/draft.md", "---\ntitle: Draft\npermalink: /draft.html\n---\nDraft content.")
@@ -65,38 +69,37 @@ Dir.mktmpdir("jekyll-markdown-") do |root|
   write.call("feed.xml", "---\nlayout: null\n---\n<feed />")
   config = Jekyll.configuration(
     "source" => source, "destination" => destination, "quiet" => true,
-    "url" => "https://example.com", "baseurl" => "/preview",
+    "url" => "https://example.com", "baseurl" => "",
     "description" => "Liquid was expanded.", "markdown" => "kramdown",
     "collections" => { "book_reviews" => { "output" => true } },
     "defaults" => [{ "scope" => { "path" => "" }, "values" => { "layout" => "default" } }],
-    "markdown_output" => { "enabled" => true, "llms_txt" => "../llms.txt" }
+    "md" => md_config
   )
   site = Jekyll::Site.new(config)
   site.process
   assert(read.call("llms.txt") == guide, "Publish the tracked guide unchanged")
-  assert(read.call("index.md").include?("https://example.com/preview/articles/example/index.md"), "Resolve Liquid archive links to Markdown")
-  assert(read.call("articles/example/index.html").include?('href="https://example.com/preview/articles/example/index.md"'), "Expose the sibling Markdown URL")
+  assert(!File.symlink?(File.join(destination, "llms.txt")), "Publish a regular guide file in development too")
+  assert(read.call("index.md").include?("# Archive") && read.call("index.md").include?("[Example](/articles/example/)"), "Render the Markdown layout and Liquid archive")
+  assert(read.call("index.md").scan(/^# /).length == 1, "Preserve a single archive heading")
+  assert(read.call("articles/example/index.html").include?('href="/articles/example.md" type="text/markdown" rel="alternate"'), "Discover the gem's directory-page URL")
   assert(read.call("book_reviews/book.md").include?("Review content."), "Render output collections")
-  markdown = read.call("articles/example/index.md")
-  ["# Example & code", "Liquid was expanded.", "[Archive](https://example.com/preview/index.md)",
-   "[Footnote](https://example.com/preview/articles/example/#note)",
-   "````sh\necho '<tag> & value'\n  indented\n```\n````", "| Name | Value |", "| One | Two |",
-   "More detail", "Still readable", "![Useful diagram](https://example.com/images/example.png)", "Portrait",
-   "(https://example.com/recording.mp3)", "[Conference talk](https://example.net/video)",
-   "https://example.com/caf%C3%A9.html"].each do |expected|
+  markdown = read.call("articles/example.md")
+  ["# Example & code", "Liquid was expanded.", "echo '<tag> & value'\n  indented", "| Name | Value |", "| One | Two |",
+   "![Useful diagram](/images/example.png)", "[Recording](https://example.com/recording.mp3)",
+   "Canonical page: https://example.com/articles/example/"].each do |expected|
     assert(markdown.include?(expected), "Missing #{expected.inspect} in:\n#{markdown}")
   end
-  assert(!markdown.match?(/Not article|data:image/), "Exclude page chrome and embedded image bytes")
+  assert(!markdown.include?("Not article"), "Exclude navigation, scripts, and comments")
   %w[draft.md future.md private.md feed.md].each { |path| assert(!exists.call(path), "Do not publish #{path}") }
 
   # The same site instance is reused by Jekyll serve on rebuild.
+  write.call("_book_reviews/book.md", "---\ntitle: Book\n---\n# Book\n\nUpdated review.")
   File.delete(File.join(source, "_posts/2020-01-01-example.md"))
   site.process
-  assert(!exists.call("articles/example/index.md") && !exists.call("articles/example/index.html"), "Remove both representations of a deleted post")
-  assert(exists.call("index.md") && exists.call("llms.txt"), "Retain live pages and the guide on rebuild")
+  assert(read.call("book_reviews/book.md").include?("Updated review."), "Refresh Markdown on rebuild")
+  assert(!exists.call("articles/example.md") && !exists.call("articles/example/index.html"), "Remove both representations of a deleted post")
+  assert(exists.call("index.md") && read.call("llms.txt") == guide, "Retain live pages and the guide on rebuild")
   Jekyll::Site.new(config.merge("show_drafts" => true)).process
   assert(exists.call("draft.md"), "Generate Markdown for the draft preview")
-  Jekyll::Site.new(config.merge("markdown_output" => { "enabled" => false })).process
-  assert(!exists.call("index.md") && !exists.call("llms.txt"), "Allow configuration to disable Markdown output")
 end
-puts "Jekyll Markdown verified: pages, posts, collections, Liquid, permalinks, content, drafts, and cleanup."
+puts "jekyll-md integration verified: configuration, layout, guides, pages, posts, collections, drafts, and rebuilds."

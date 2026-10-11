@@ -5,7 +5,7 @@ The source and AWS infrastructure for my three sites:
 | Site | Source | Build | LLM guide |
 | --- | --- | --- | --- |
 | [Homepage](https://www.mads-hartmann.com/) | `sites/mads-hartmann.com/src/index.html` | Site-local Node script → HTML and Markdown | [llms.txt](sites/mads-hartmann.com/llms.txt) |
-| [Blog](https://blog.mads-hartmann.com/) | `sites/blog.mads-hartmann.com/src` | Jekyll with a local Markdown output plugin | [llms.txt](sites/blog.mads-hartmann.com/llms.txt) |
+| [Blog](https://blog.mads-hartmann.com/) | `sites/blog.mads-hartmann.com/src` | Jekyll with jekyll-md | [llms.txt](sites/blog.mads-hartmann.com/llms.txt) |
 | [Uses](https://uses.mads-hartmann.com/) | `sites/uses.mads-hartmann.com/index.md` | Site-local Node script → HTML and source Markdown | [llms.txt](sites/uses.mads-hartmann.com/llms.txt) |
 
 All three sites share a static footer from [`sites/shared/footer`](sites/shared/footer/README.md),

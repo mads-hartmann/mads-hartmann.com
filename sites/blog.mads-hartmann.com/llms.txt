@@ -7,9 +7,9 @@ Pages are available as Markdown using the links below, or by requesting their HT
 ## Content
 
 - [All posts](https://blog.mads-hartmann.com/index.md): Chronological archive with links to every published post.
-- [Journey into Observability](https://blog.mads-hartmann.com/series/observability/index.md): A series on observability tools and practices.
-- [Book reviews](https://blog.mads-hartmann.com/book-reviews/index.md): Index of book reviews.
-- [Conference talks](https://blog.mads-hartmann.com/talks/index.md): Talk descriptions and recordings.
+- [Journey into Observability](https://blog.mads-hartmann.com/series/observability.md): A series on observability tools and practices.
+- [Book reviews](https://blog.mads-hartmann.com/book-reviews.md): Index of book reviews.
+- [Conference talks](https://blog.mads-hartmann.com/talks.md): Talk descriptions and recordings.
 
 ## Related sites
 

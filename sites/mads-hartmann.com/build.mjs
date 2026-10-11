@@ -28,10 +28,6 @@ for (const node of content.querySelectorAll('[href], [src]')) {
   }
 }
 const turndown = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-' });
-turndown.addRule('timelineLines', {
-  filter: node => /timeline__(?:title|duration|location)/.test(node.getAttribute?.('class') || ''),
-  replacement: content => `\n\n${content}\n\n`,
-});
 const markdown = `${turndown.turndown(content.innerHTML)}\n\n---\n\nCanonical page: ${origin}/\n`;
 const discovery = `<link rel="alternate" type="text/markdown" href="${origin}/index.md">\n<link rel="describedby" type="text/plain" href="${origin}/llms.txt">\n`;
 const html = source.replace(marker, renderFooter('home')).replace('</head>', `${discovery}</head>`);

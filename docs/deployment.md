@@ -123,18 +123,18 @@ and apply again to resume. Offline PR checks run while deployment is paused.
 Each site owns Markdown generation in its build tool. The root `scripts/build.sh`
 installs site-local dependencies and invokes those builds:
 
-- Home's `sites/mads-hartmann.com/build.mjs` inserts the shared header, extracts
+- Home's `sites/mads-hartmann.com/build.mjs` inserts the shared footer, extracts
   Markdown from the main content, adds discovery links, and copies `llms.txt`.
   Its Node dependencies are pinned in that site's `package-lock.json`.
 - Uses' `sites/uses.mads-hartmann.com/build.mjs` renders HTML and publishes its
   existing Markdown source, adding the canonical URL and copying `llms.txt`.
-- The blog's Jekyll plugin, `src/_plugins/markdown_output.rb`, is enabled by
-  `markdown_output` in `src/_config.yml`. It converts rendered article content
-  with the blog's locked Ruby dependencies, writes `.md` siblings through Jekyll's
-  file writer, and publishes the guide configured by `llms_txt`. Normal Jekyll
-  builds and development previews both include Markdown, with no separate pass.
-  Jekyll's cleanup removes sidecars when posts are deleted. Liquid, collections,
-  layouts, and HTML-authored archive pages are all supported.
+- The blog uses the released [jekyll-md](https://github.com/dblock/jekyll-md) gem,
+  pinned in its Gemfile/lockfile and enabled in `src/_config.yml`. It converts
+  rendered `.site` content, generates Markdown files, and injects discovery links
+  during normal Jekyll builds and previews. A Markdown layout adds the canonical
+  HTML URL. Jekyll rebuilds refresh the Markdown and remove deleted pages.
+  The small `src/_plugins/llms.rb` generator registers the editable guide in the
+  blog project folder as a static file so Jekyll publishes it unchanged.
 
 Each site owns an editable, tracked `llms.txt` in its project folder:
 `sites/mads-hartmann.com/llms.txt`, `sites/blog.mads-hartmann.com/llms.txt`, and
@@ -146,16 +146,19 @@ published copies match the tracked files and that their links resolve.
 Each generated HTML page has a `rel="alternate" type="text/markdown"` link and
 a `rel="describedby"` link to that site's `llms.txt`. The small `llms.txt` guides
 link to Markdown entry points and the other sites; the blog's Markdown archive
-links to every published post. Same-site page links in Markdown target generated
-Markdown versions when available. Fragment links retain their HTML targets so
-custom anchors and footnotes continue to resolve. Images retain URLs and alt
-text; inline base64 images retain only alt text. Audio/video embeds become links.
+links to every published post. The blog's Markdown keeps the source links and
+image URLs, including relative URLs; linked HTML pages advertise their Markdown
+alternatives. Recording links remain available in the article text. Home strips
+inline image bytes while retaining alt text, and Uses publishes its source.
 
 | HTML URL | Markdown URL |
 | --- | --- |
 | `/` or `/index.html` | `/index.md` |
-| `/series/observability/` | `/series/observability/index.md` |
+| `/series/observability/` | `/series/observability.md` |
 | `/2026/01/27/using-ai-to-do-your-best-work.html` | `/2026/01/27/using-ai-to-do-your-best-work.md` |
+
+The blog follows jekyll-md’s convention for directory pages: `/talks/` and
+`/talks/index.html` both negotiate to `/talks.md`. The root uses `/index.md`.
 
 Direct `.md` URLs work with any `Accept` header. The shared CloudFront
 viewer-request code also rewrites an HTML request to its Markdown object when
@@ -173,7 +176,7 @@ and `llms.txt` as `text/plain; charset=utf-8`. These changes use the existing
 site stacks, functions, policies, and private buckets; no kernel/IAM change is
 needed.
 
-Build and check locally with `devenv tasks run repo:check`. The plain local
+Build and check locally with `make check` inside the root devenv shell. The plain local
 static servers expose the generated files but do not emulate CloudFront's
 negotiation or headers. The blog preview also publishes Markdown for drafts. Routing
 tests run the generated functions in a JavaScript VM, and deployment smoke tests

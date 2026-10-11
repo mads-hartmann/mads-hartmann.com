@@ -26,18 +26,28 @@ first-time activation and tool versions.
 The development server also restarts after editing `sites/shared/footer`, which is
 outside Jekyll's watched source directory.
 
-Markdown output belongs to Jekyll. `markdown_output` in `src/_config.yml` enables
-`src/_plugins/markdown_output.rb`, which emits a `.md` sibling for every HTML
-page, post, and output collection document. It converts the rendered main content
-with `reverse_markdown`, preserving Liquid output, titles, dates, code, and media
-links. The default layout advertises the Markdown alternative. Jekyll writes and
-cleans up both representations, including in development previews with drafts.
+Markdown output is provided by [jekyll-md](https://github.com/dblock/jekyll-md),
+pinned to the 0.2 release series in the blog's Gemfile and lockfile. It is enabled
+in `src/_config.yml`; `md.selector` scopes conversion to `.site`, and `md.strip`
+removes scripts, comments, and media embeds (recordings have ordinary links in
+the text). The gem adds HTML discovery links and produces Markdown during normal
+Jekyll builds and development previews, including HTML pages and collections.
+`src/_layouts/markdown.liquid` adds the canonical HTML URL.
 
-The `llms_txt` setting points to this directory's tracked `llms.txt`, which Jekyll
-publishes unchanged at the site root. The devenv watcher includes it; restart a
-manually launched Jekyll server after editing this file outside `src/`.
+The gem follows its own URL convention: `/` becomes `/index.md`, a directory page
+such as `/talks/` becomes `/talks.md`, and dated `.html` permalinks become `.md`.
+CloudFront's blog routing and this directory's `llms.txt` use the same convention.
+Links inside the Markdown retain their source targets; the linked HTML pages
+advertise their own Markdown versions.
 
-A direct Jekyll build produces all three outputs without a root build step:
+The editable guide remains `llms.txt` in this directory. The small
+`src/_plugins/llms.rb` generator registers it as a normal Jekyll static file,
+so it is copied unchanged in production and development builds. It does not
+generate Markdown; that belongs entirely to the upstream gem. The
+`make dev` watcher includes the guide; restart a manually launched Jekyll server after
+editing the file outside `src/`.
+
+A direct Jekyll build produces all outputs:
 
 ```sh
 bundle exec jekyll build --source src --destination dist
