@@ -7,7 +7,12 @@ to HTML, and copies this directory’s editable `llms.txt` unchanged. Its depend
 and lockfile live here. Run `npm ci && npm run build` for a standalone build in
 `dist/`, or pass an output directory to `node build.mjs`.
 
-There is no framework, runtime JavaScript, font download or theme control.
+There is no framework, runtime JavaScript or font download. Nordic blue is the
+light palette; Midnight amber is enabled automatically by
+`prefers-color-scheme: dark`. The page, shared footer, favicon and browser theme
+color follow the system preference, including changes while the page is open.
+Print uses the light palette. Colors are defined by the `--mh-color-*` properties
+in `src/index.html`.
 
 Home includes the introduction, work history and education formerly split across
 Home and the blog's About page, followed by social and contact links.
