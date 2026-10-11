@@ -10,13 +10,15 @@ from a private S3 bucket through CloudFront with signed origin requests and
 Route 53 aliases.
 
 ```sh
+devenv shell # from the repository root
 cd terraform
-devenv shell
-devenv tasks run infra:check # builds site artifacts; no cloud credentials needed
+make fmt   # format Terraform
+make lint  # check formatting
+make check # builds site artifacts, validates and tests; no cloud credentials needed
 ```
 
-The environment includes the site build tools because Terraform tests load those
-artifacts. Site servers stay off here. See [development setup](../docs/development.md)
+The root environment includes the site build tools because Terraform tests load
+those artifacts. See [development setup](../docs/development.md)
 for first-time activation and tool updates.
 
 Manual plans/applies use a human AWS session. The kernel also needs `GITHUB_TOKEN`;

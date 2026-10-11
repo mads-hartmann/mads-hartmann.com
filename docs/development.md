@@ -1,8 +1,9 @@
 # Development
 
-The same devenv configuration supplies tools, dependency setup, builds, checks,
-and servers locally and in cloud workspaces. Supported platforms are Apple
-Silicon macOS and x86-64 Linux. CI keeps its independent installation steps.
+A single root [devenv](https://devenv.sh/) configuration supplies all tools, wherever
+in the repository you work. Makefiles handle dependency setup, builds, checks,
+and development servers. Supported platforms are Apple Silicon macOS and x86-64
+Linux. CI keeps its independent installation steps and existing script entry points.
 
 ## First-time setup
 
@@ -13,45 +14,32 @@ repository root:
 ```sh
 ./scripts/bootstrap-dev.sh
 devenv shell
+make setup
 ```
 
 The bootstrap installs pinned devenv 2.3.1, direnv, and modern Bash into your
 standard Nix user profile, following [devenv's installation guide](https://devenv.sh/getting-started/).
 It builds the tools before replacing their profile entries, so repeating setup
-updates these three tools without adding duplicate entries.
-Nix normally puts this profile on `PATH`; there is no activation command to
-repeat in each terminal. It does not edit shell startup files or Nix settings.
-If your shell does not yet see the tools, open a new terminal after installation.
-The first environment activation can take several minutes.
+updates these three tools without adding duplicate entries. Nix normally puts
+this profile on `PATH`. If your shell does not yet see the tools, open a new
+terminal. The first environment activation can take several minutes.
 
-[Ruby](https://devenv.sh/languages/ruby/) 3.3.11 uses devenv's built-in version
-selector with its documented `nixpkgs-ruby` input.
-[Terraform](https://devenv.sh/languages/terraform/) uses the pinned nixpkgs
-package (1.16.5). The optional `nixpkgs-terraform` version catalog does not yet
-provide a version satisfying this repository's `>= 1.16.4, < 1.17.0` contract.
-Node uses `languages.javascript` with the pinned Node 24 package.
-Bundler's version comes from the blog's existing `Gemfile.lock` (4.0.16).
+The environment provides Node 24, Ruby 3.3.11, Terraform 1.16.5, native gem build
+tools, Make, watchexec, actionlint, Bash, Git, GitHub CLI, AWS CLI, curl, Python,
+jq, gawk, direnv, kubectl, kubectx, and stern. Ruby uses devenv's built-in version
+selector with the pinned `nixpkgs-ruby` input. Bundler's version comes from the
+blog's `Gemfile.lock` (4.0.16). CI checks Terraform 1.16.4 and 1.16.5 separately.
 
 Determinate manages `/etc/nix/nix.conf`; any personal Nix settings belong in
-`/etc/nix/nix.custom.conf`. This setup needs no edits to either file. See
-[Determinate's development environment guide](https://zero-to-nix.com/concepts/dev-env/)
-and [devenv's monorepo guidance](https://devenv.sh/guides/monorepo/).
+`/etc/nix/nix.custom.conf`. This setup needs no edits to either file.
 
-## Project activation
+## Activate once
 
-| Directory | Tools | Build/check task | Default server |
-| --- | --- | --- | --- |
-| Repository root | All project tools | `repo:check` | All three |
-| `sites/mads-hartmann.com` | Node, Python | `homepage:build` | Port 8080 |
-| `sites/blog.mads-hartmann.com` | Ruby, Bundler, native gem build tools, Node | `blog:build` | Port 4000 |
-| `sites/uses.mads-hartmann.com` | Node, Python | `uses:build` | Port 8081 |
-| `terraform` | Terraform, actionlint, all site build tools | `infra:check` | None |
+Run `devenv shell` from the repository root, then change to any project directory
+inside that shell. All tools remain available. Entering the shell does not install
+application dependencies, build sites, or start servers.
 
-Every environment also provides Bash, Git, curl, Python, jq, gawk, and direnv.
-Enter a directory and run `devenv shell`. Blog and Uses dependencies install
-automatically using frozen lockfiles. Exiting that shell lets you activate
-another project. Use direnv for automatic switching between root and child
-environments:
+For automatic activation, add the appropriate direnv hook to your shell:
 
 ```sh
 # Bash: add to ~/.bashrc
@@ -60,87 +48,83 @@ eval "$(direnv hook bash)"
 eval "$(direnv hook zsh)"
 ```
 
-Run `direnv allow` once in each environment directory after reviewing its
-`.envrc`. Then `cd` activates the environment and restores the previous one when
-you leave. If you change an `.envrc`, review and allow it again. Avoid nesting
-`devenv shell` sessions when using direnv.
+Review the root `.envrc` and run `direnv allow` once at the root. The same
+root environment stays active in every subfolder. Avoid nesting `devenv shell`
+sessions when using direnv.
 
-## Build, test, and run
+## Build, check, and run
 
-From any environment, use its task from the table:
+Run `make` in the root or a project directory to see its targets.
+
+| Directory | Commands | Development server |
+| --- | --- | --- |
+| Repository root | `make setup`, `make build`, `make check`, `make lint` | `make dev` starts all three |
+| `sites/mads-hartmann.com` | `make build`, `make check`, `make lint` | `make dev`, port 8080 |
+| `sites/blog.mads-hartmann.com` | `make setup`, `make build`, `make check`, `make lint` | `make dev`, port 4000 |
+| `sites/uses.mads-hartmann.com` | `make setup`, `make build`, `make check`, `make lint` | `make dev`, port 8081 |
+| `terraform` | `make fmt`, `make lint`, `make check` | None |
+
+You can also invoke a project's Makefile from the root:
 
 ```sh
-devenv tasks run blog:build
+make -C sites/blog.mads-hartmann.com dev
+make -C terraform check
 ```
 
-At the root, `devenv tasks run repo:check` installs dependencies, builds all
-three sites, checks generated pages and routing, validates and tests Terraform,
-and checks workflows with actionlint. `devenv test` runs the same validation.
-The infrastructure checks need no AWS or GitHub credentials. Actual plans and
-applies use the authentication described in [deployment](deployment.md).
+`make check` installs locked dependencies, builds all sites, checks generated
+pages and routing, validates and tests Terraform, and checks workflows with
+actionlint. `make lint` at the root runs the same checks. Site `check` and `lint`
+targets build and check all three sites because shared footer and redirect
+assertions span their artifacts. Terraform `lint` checks formatting; `check`
+includes site builds, formatting, validation, and offline tests. These checks
+need no AWS or GitHub credentials. Actual plans and applies use the authentication
+described in [deployment](deployment.md).
 
-`devenv up` starts the current directory's servers with native HTTP readiness
-probes. Devenv's [file watching](https://devenv.sh/processes/#file-watching)
-rebuilds and restarts servers when their sources or the shared footer change.
-Jekyll includes drafts and disables its disk cache so cache writes do not trigger
-the source watcher. The production blog build remains separate from
-`.build/blog-preview`. Stop foreground servers with Ctrl-C. For background
-servers use `devenv up --detach` and `devenv processes down` from the same
-environment directory. Do not start root and leaf servers simultaneously on
-the same ports.
+`make dev` uses watchexec to rebuild and restart a foreground server when source,
+build scripts, or the shared footer change. Jekyll includes drafts and disables
+its disk cache. Its preview output is `.build/blog-preview`, separate from the
+production `.build/blog` output. `make serve` starts a server without the outer
+watcher. Stop servers with Ctrl-C. Avoid starting root and project servers
+simultaneously on the same ports.
 
-Set `env.HOMEPAGE_PORT`, `env.BLOG_PORT`, or `env.USES_PORT` in the environment's
-ignored `devenv.local.nix` to override ports, for example:
+Override ports with Make variables or environment variables:
 
-```nix
-{ env.BLOG_PORT = "4001"; }
+```sh
+make -C sites/blog.mads-hartmann.com dev BLOG_PORT=4001
+HOMEPAGE_PORT=8090 USES_PORT=8091 BLOG_PORT=4001 make dev
 ```
 
-For detached servers, `devenv processes wait --timeout 30` waits for the native
-readiness probes to pass. Existing repository checks validate generated content.
+## Configuration and updates
 
-## Shared configuration and updates
+`devenv.nix`, `devenv.yaml`, and the committed `devenv.lock` at the root are the
+only environment configuration. The YAML uses JSON syntax so the bootstrap can
+read pins directly with Nix. Devenv declares tools and cache settings; runnable
+commands live in Makefiles and repository scripts.
 
-`dev/shared/devenv.yaml` supplies shared pinned inputs for all five environments.
-Its JSON syntax is valid YAML and lets the bootstrap read pins directly with
-Nix. `/dev/shared` imports are relative to the Git root, as recommended for
-[devenv monorepos](https://devenv.sh/guides/monorepo/). Each project's `devenv.nix`
-declares its language options, tasks, and processes directly. The root composes
-the three site configurations and enables Terraform; the Terraform directory
-adds root tasks and disables servers by default.
-
-Each environment has a committed `devenv.lock`, generated by devenv. To update
-tools, edit the shared input revisions and language versions, bootstrap again
-when activation tools change, then run:
+To update tools, edit root input revisions and language versions, bootstrap again
+when activation tools change, then run from the root:
 
 ```sh
 scripts/lock-dev-env.sh
-devenv tasks run repo:check
+make check
 ```
 
-All five lockfiles should resolve the same shared inputs. Review and commit the
-resulting locks together. CI version pins remain a separate deliberate change.
-
-For the former Kubernetes utility tools, any project can use
-`devenv --profile kubernetes shell`. The common tools cover the former scripting
-environment. Historical demo environments, GitPod images/automations, and Dev
-Container definitions have been removed.
+Review and commit the resulting root lockfile. CI version pins remain a separate
+deliberate change. Kubernetes utilities are included in the normal environment.
 
 ## Local state and cloud workspaces
 
-`.devenv`, `.direnv`, `.devenv-state`, generated site output, and dependencies
-are ignored. Dependency setup uses [devenv tasks](https://devenv.sh/tasks/):
-Bundler checks the frozen gem bundle, and `execIfModified` tracks the Uses
-manifests and installed dependency directory before running `npm ci`.
-Gem caches are shared across environments and include the platform and Ruby
-derivation identity. The locked protobuf gem needs a build flag that keeps
-format warnings from being fatal; it applies only while compiling that gem.
-Delete `.devenv-state` and the Uses `node_modules` directory to reinstall
-dependencies. No setup task changes application lockfiles.
+`.devenv`, `.direnv`, `.devenv-state`, generated output, and dependencies are
+ignored. `make setup` installs frozen blog gems and Uses npm dependencies; builds
+and development servers also prepare their dependencies. Gem caches include the
+platform and Ruby derivation identity. The locked protobuf gem needs a build flag
+that keeps format warnings from being fatal; it applies only while compiling
+that gem. Delete `.devenv-state` and the Uses `node_modules` directory to reinstall
+dependencies. Setup does not change application lockfiles.
 
-Cloud startup uses this same bootstrap and `repo:setup` task. A host without
+Cloud startup uses the same bootstrap and root `make setup`. A host without
 native Nix can use the pinned workspace-local nix-portable launcher described
-in the saved environment settings; it only supplies Nix. All project tools and
-tasks still come from this checkout. Install scripts prepare retained tools and
-dependencies; startup instructions activate the environment and start servers
-for each new task. No separate cloud toolchain is maintained.
+in the saved environment settings; it only supplies Nix. Activate devenv from the
+root and use `make dev` or a project's `make dev` to start servers. Existing cloud
+instructions that invoke `devenv tasks run repo:setup` or `devenv up` must use
+`make setup` and `make dev` respectively.

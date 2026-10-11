@@ -1,5 +1,5 @@
 let
-  source = builtins.readFile ./shared/devenv.yaml;
+  source = builtins.readFile ../devenv.yaml;
   inputs = (builtins.fromJSON source).inputs;
 in {
   devenvRef = builtins.head (builtins.split "\\?" inputs.devenv.url);

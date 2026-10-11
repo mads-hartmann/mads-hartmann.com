@@ -17,14 +17,14 @@ and Linux (x86-64). With Nix installed, install the pinned environment tools:
 ```sh
 ./scripts/bootstrap-dev.sh
 devenv shell
-devenv tasks run repo:check
-devenv up
+make check
+make dev
 ```
 
-Run these from the root for all tools and sites, or enter a project directory
-and use `devenv shell` and `devenv up` there. Dependencies install automatically
-on activation. [Development instructions](docs/development.md) cover direnv,
-project tasks, ports, tool updates, and cloud setup. CI retains its own installation
+The single root devenv supplies all tools. Makefiles handle dependency setup,
+builds, checks, and servers: use `make` at the root or in a project directory to
+see its targets. [Development instructions](docs/development.md) cover direnv,
+Makefile commands, ports, tool updates, and cloud setup. CI retains its own installation
 steps and checks Terraform 1.16.4 and 1.16.5; development and deployment use 1.16.5.
 The Terraform check matrix runs only when `terraform/`, its check script, or CI
 workflows change (and on manual runs). PR plans likewise run only for Terraform,

@@ -1,8 +1,9 @@
 # Uses
 
-Edit `index.md`. From this directory, run `devenv shell` to activate tools and
-install locked dependencies, `devenv tasks run uses:build` to build, or `devenv up`
-to watch and serve on port 8081. See [development setup](../../docs/development.md)
+Edit `index.md`. Activate tools with `devenv shell` at the repository root, then
+from this directory run `make setup` to install locked dependencies, `make build`
+to build, or `make dev` to watch and serve on port 8081. `make check` (also
+`make lint`) checks site content and routing. See [development setup](../../docs/development.md)
 for first-time activation.
 
 `build.mjs` renders the Markdown into one HTML file with inline styles; there is

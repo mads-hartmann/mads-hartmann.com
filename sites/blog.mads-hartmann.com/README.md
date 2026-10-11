@@ -11,15 +11,17 @@ Redirects for Home and Blog are grouped by site in `routing/redirects.json` and
 embedded into their CloudFront functions by `scripts/build-routing.mjs`.
 
 ```sh
+devenv shell # from the repository root
 cd sites/blog.mads-hartmann.com
-devenv shell
-devenv up
+make dev
 ```
 
-Activation installs the locked gems automatically. The server watches changes,
-includes drafts, and listens on port 4000. `devenv tasks run blog:build` produces
-the production artifact. See [development setup](../../docs/development.md) for
+`make setup`, `make build`, and `make dev` install the locked gems as needed.
+The server watches changes, includes drafts, and listens on port 4000.
+`make build` produces the production artifact. See [development setup](../../docs/development.md) for
 first-time activation and tool versions.
 
-The devenv server also restarts after editing `sites/shared/footer`, which is
+`make check` (also `make lint`) checks site content and routing.
+
+The development server also restarts after editing `sites/shared/footer`, which is
 outside Jekyll's watched source directory.
