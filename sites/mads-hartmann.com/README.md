@@ -1,7 +1,7 @@
 # Homepage
 
 Edit `src/index.html` for the page content, CSS and favicon. The build replaces
-`<!-- shared-header -->` with the header from `sites/shared/header`.
+`<!-- shared-footer -->` with the footer from `sites/shared/footer`.
 There is no framework, runtime JavaScript, font download or theme control.
 
 Home includes the introduction, work history and education formerly split across

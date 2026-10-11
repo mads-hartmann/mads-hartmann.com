@@ -4,11 +4,11 @@ The source and AWS infrastructure for my three sites:
 
 | Site | Source | Build |
 | --- | --- | --- |
-| [Homepage](https://www.mads-hartmann.com/) | `sites/mads-hartmann.com/src/index.html` | Insert shared header into one self-contained HTML file |
+| [Homepage](https://www.mads-hartmann.com/) | `sites/mads-hartmann.com/src/index.html` | Insert shared footer into one self-contained HTML file |
 | [Blog](https://blog.mads-hartmann.com/) | `sites/blog.mads-hartmann.com/src` | Jekyll |
 | [Uses](https://uses.mads-hartmann.com/) | `sites/uses.mads-hartmann.com/index.md` | Markdown → HTML with a small Node script |
 
-All three sites share a static header from [`sites/shared/header`](sites/shared/header/README.md),
+All three sites share a static footer from [`sites/shared/footer`](sites/shared/footer/README.md),
 using Declarative Shadow DOM for style isolation and requiring no browser JavaScript.
 
 Development uses [devenv](https://devenv.sh/) and Nix on macOS (Apple Silicon)

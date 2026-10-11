@@ -1,7 +1,7 @@
 # blog.mads-hartmann.com
 
 Requires Node 24 as well as Ruby and Bundler. The Jekyll plugin invokes the shared
-header renderer once per build; the default layout selects the Blog version.
+footer renderer once per build; the default layout selects the Blog version.
 It works with both `scripts/build.sh blog` and Jekyll's development server.
 
 The former About content lives on Home. CloudFront redirects `/about`, `/about/`
@@ -21,5 +21,5 @@ includes drafts, and listens on port 4000. `devenv tasks run blog:build` produce
 the production artifact. See [development setup](../../docs/development.md) for
 first-time activation and tool versions.
 
-The devenv server also restarts after editing `sites/shared/header`, which is
+The devenv server also restarts after editing `sites/shared/footer`, which is
 outside Jekyll's watched source directory.

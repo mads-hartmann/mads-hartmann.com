@@ -37,6 +37,6 @@ elif stack == 'blog':
     check('/2026/01/27/using-ai-to-do-your-best-work.html',content='Using AI')
 if stack in ['homepage', 'blog', 'uses']:
     current = 'home' if stack == 'homepage' else stack
-    check('/', content=f'<mh-site-header data-current="{current}">')
+    check('/', content=f'<mh-site-footer data-current="{current}">')
 check('/this-page-does-not-exist',404)
 print(f'{stack} deployment verified at {base}')

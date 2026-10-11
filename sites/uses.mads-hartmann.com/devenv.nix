@@ -26,7 +26,7 @@ in
       scripts/build.sh uses &&
         exec python3 -m http.server "$USES_PORT" --bind 127.0.0.1 --directory .build/uses
     '';
-    watch.paths = [ ./index.md ../shared/header ./build.mjs ./package.json ./package-lock.json ];
+    watch.paths = [ ./index.md ../shared/footer ./build.mjs ./package.json ./package-lock.json ];
     ready.http.get.port = lib.toInt config.env.USES_PORT;
     ready.period = 1;
   };

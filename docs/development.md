@@ -81,7 +81,7 @@ applies use the authentication described in [deployment](deployment.md).
 
 `devenv up` starts the current directory's servers with native HTTP readiness
 probes. Devenv's [file watching](https://devenv.sh/processes/#file-watching)
-rebuilds and restarts servers when their sources or the shared header change.
+rebuilds and restarts servers when their sources or the shared footer change.
 Jekyll includes drafts and disables its disk cache so cache writes do not trigger
 the source watcher. The production blog build remains separate from
 `.build/blog-preview`. Stop foreground servers with Ctrl-C. For background

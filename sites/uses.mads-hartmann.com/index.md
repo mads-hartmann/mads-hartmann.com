@@ -1,6 +1,6 @@
 # Uses
 
-All the stuff I use. Explore [uses.tech](https://uses.tech) for other peoples setup.
+The hardware, software, and everyday things I use for work, travel, and photography. Explore [uses.tech](https://uses.tech) for more setups.
 
 ## Hardware
 

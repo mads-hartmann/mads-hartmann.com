@@ -41,7 +41,7 @@
       bundle exec jekyll serve --no-watch --disable-disk-cache --drafts --source src \
         --destination "$DEV_REPO_ROOT/.build/blog-preview" --host 127.0.0.1 --port "$BLOG_PORT"
     '';
-    watch.paths = [ ./src ../shared/header ];
+    watch.paths = [ ./src ../shared/footer ];
     ready.http.get.port = lib.toInt config.env.BLOG_PORT;
     ready.period = 1;
   };
