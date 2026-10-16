@@ -9,15 +9,22 @@ $scroll-indicator-height: 10px;
 $scroll-indicator-heigght: 10px;
 
 :root {
+  color-scheme: light;
   --mh-color-surface: #fff;
   --mh-color-text: rgba(46, 48, 58, 0.96);
   --mh-color-border: #e0dedd;
   --mh-color-accent: #ad141e;
   --mh-color-accent-subtle: #f8e5e7;
   --mh-color-on-accent-subtle: #ad141e;
+  --color-muted: rgba(46, 48, 58, 0.6);
+  --color-panel: #f9f9f9;
+  --color-panel-border: #ccc;
+  --color-code: rgba(0, 0, 0, 0.05);
+  --color-code-output: rgba(191, 239, 206, 0.5);
 }
 
 body {
+  background-color: var(--mh-color-surface);
   --background: #edeceb;
   --foreground: #000;
   --link-color: var(--mh-color-accent);
@@ -64,7 +71,7 @@ body {
   font-size: 1.2em;
   line-height: 1.3em;
   font-weight: 200;
-  color: rgba(46, 48, 58, 0.6);
+  color: var(--color-muted);
 }
 
 /*****************************/
@@ -137,8 +144,8 @@ body {
 /* Landing page */
 
 .featured {
-  background: #f9f9f9;
-  border: 2px solid #ccc;
+  background: var(--color-panel);
+  border: 2px solid var(--color-panel-border);
   margin: 1.5em 0;
   padding: 1em 20px;
   font-size: 0.9em;
@@ -190,8 +197,8 @@ body {
 }
 
 .sidenote {
-  background: #f9f9f9;
-  border-left: 10px solid #ccc;
+  background: var(--color-panel);
+  border-left: 10px solid var(--color-panel-border);
   margin: 1.5em 0px;
   padding: 1em 20px;
   font-size: 0.9em;
@@ -200,7 +207,7 @@ body {
   &:before {
     display: block;
     margin: 0 0 1em 0;
-    color: #ccc;
+    color: var(--color-muted);
     font-weight: 700;
     content: "sidenote   ";
   }
@@ -212,8 +219,8 @@ body {
 }
 
 .emphasis_block {
-  background: #f9f9f9;
-  border-left: 10px solid #ccc;
+  background: var(--color-panel);
+  border-left: 10px solid var(--color-panel-border);
   margin: 1.5em 0px;
   padding: 1em 20px;
   font-size: 0.9em;
@@ -227,8 +234,8 @@ body {
 }
 
 .note-box {
-  background: #f9f9f9;
-  border: 2px solid #ccc;
+  background: var(--color-panel);
+  border: 2px solid var(--color-panel-border);
   margin: 1.5em 0px;
   padding: 1em 20px;
   font-size: 0.9em;
@@ -292,7 +299,7 @@ pre.highlight {
 
 .highlighter-rouge + .highlighter-rouge pre {
   margin-top: -0.5em;
-  background: rgba(191, 239, 206, 0.5);
+  background: var(--color-code-output);
   margin-bottom: 20px;
 }
 
@@ -328,6 +335,8 @@ pre.highlight {
     line-height: 3rem;
   }
 }
+
+@import "dark-mode";
 
 // Import last so it overrides everything. Sort of hacky, I know.
 @import "print";

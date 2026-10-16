@@ -1,0 +1,60 @@
+// Follow the reader's system preference. Screen-only keeps printed pages light.
+@media screen and (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --mh-color-surface: #191b20;
+    --mh-color-text: #e4e4e7;
+    --mh-color-muted: #b1b3bd;
+    --mh-color-border: #42454f;
+    --mh-color-accent: #ff929c;
+    --mh-color-accent-subtle: #45252d;
+    --mh-color-on-accent-subtle: #ffadb4;
+    --color-muted: #b1b3bd;
+    --color-panel: #24272e;
+    --color-panel-border: #555966;
+    --color-code: #24272e;
+    --color-code-output: #243b30;
+  }
+
+  body {
+    --background: #30333c;
+    --foreground: #e4e4e7;
+  }
+
+  // Preserve post title palettes, but use readable links on the dark page.
+  .container[class] {
+    --link-color: var(--mh-color-accent);
+  }
+
+  .highlight {
+    .c, .cm, .cp, .c1, .cs, .gh, .go, .gp, .gu, .nn, .bp, .w {
+      color: #b1b3bd;
+    }
+    .err, .gr, .gt, .ne, .nf {
+      color: #ff929c;
+    }
+    .err, .gd, .gd .x {
+      color: #ffb4bb;
+      background-color: #522b34;
+    }
+    .gi, .gi .x {
+      color: #b0e4bf;
+      background-color: #284333;
+    }
+    .kt, .nc, .nb, .nt {
+      color: #9fcfff;
+    }
+    .m, .mf, .mh, .mi, .mo, .il, .na, .no, .nv, .vc, .vg, .vi {
+      color: #83d9d0;
+    }
+    .s, .sb, .sc, .sd, .s2, .se, .sh, .si, .sx, .s1 {
+      color: #ffadb4;
+    }
+    .ni, .ss {
+      color: #dfb1f4;
+    }
+    .sr {
+      color: #b0e4bf;
+    }
+  }
+}
