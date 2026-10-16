@@ -5,9 +5,7 @@ date: 2014-01-05 14:08:52
 categories: ocaml
 ---
 
-<a href="/images/ocaml-utop-session.png" target="_blank">
-    <img src="/images/ocaml-utop-session.png" width="100%" />
-</a>
+{% include image.html src="/images/ocaml-utop-session.png" alt="An OCaml utop session running inside Emacs" link=true %}
 
 > utop is an improved toplevel for OCaml. It can run in a terminal or in
 > Emacs. It supports line edition, history, real-time and context

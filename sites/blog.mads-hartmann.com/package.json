@@ -1,0 +1,7 @@
+{
+  "name": "mads-hartmann-blog-images",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "dependencies": { "sharp": "0.34.5" }
+}

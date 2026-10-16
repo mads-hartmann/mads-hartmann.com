@@ -116,6 +116,12 @@ body {
 
 .post { overflow-wrap: anywhere; }
 
+.responsive-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
 @media (max-width: 1440px) {
   .container {
     width: 60%;

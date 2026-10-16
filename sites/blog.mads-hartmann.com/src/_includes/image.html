@@ -1,0 +1,2 @@
+{%- assign image = site.data.responsive_images[include.src] -%}
+{% if include.link %}<a href="{{ include.src }}" target="_blank" rel="noopener">{% endif %}<img class="responsive-image" src="{{ image.src }}" srcset="{{ image.srcset }}" sizes="(max-width: 960px) 80vw, (max-width: 1024px) 768px, (max-width: 1280px) 60vw, (max-width: 1440px) 768px, (max-width: 1706px) 45vw, 768px" width="{{ image.width }}" height="{{ image.height }}" alt="{{ include.alt | escape }}" loading="{{ include.loading | default: 'eager' }}" decoding="async">{% if include.link %}</a>{% endif %}

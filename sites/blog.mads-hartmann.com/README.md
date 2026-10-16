@@ -54,3 +54,29 @@ unchanged. Restart a manually launched Jekyll server after editing that guide;
 
 See [Markdown and agent discovery](../../docs/deployment.md#markdown-and-agent-discovery)
 for URL conventions, discovery links and content negotiation.
+
+## Article images
+
+Use a literal source path as the first argument to the image include:
+
+```liquid
+{% include image.html src="/images/example.png" alt="Describe the screenshot" %}
+{% include image.html src="/images/example-detail.png" alt="Describe the detail" loading="lazy" %}
+```
+
+The Jekyll generator finds these includes in pages and posts and invokes the locked
+Sharp dependency to generate high-quality WebP variants from 320 to 1536 pixels wide
+(without upscaling). This covers the article's 768px maximum width at 2x density.
+The include supplies intrinsic dimensions, responsive `srcset`/`sizes`, and async
+decoding. Its `sizes` mirrors the container breakpoints in `src/css/index.scss`;
+update both together if the article layout changes. Keep the first visible image
+eager (the default), and explicitly mark images well below the fold as lazy.
+Browsers choose how far ahead to fetch lazy images; it is not an exact fold cutoff.
+
+Use `link=true` to link a screenshot to its original full-resolution file.
+Original images and existing links to them remain unchanged. Generated images live
+in ignored `.build/blog-images` and are copied by Jekyll into the site artifact.
+`make setup` and production builds install the locked Node dependency as well as
+the gems. Run `make setup` before invoking Jekyll directly. Development watches the
+image builder and Node manifests too. `make check` validates the generated image
+files, dimension descriptors, aspect ratios, and first-image loading policy.

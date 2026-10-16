@@ -127,3 +127,4 @@ assert(uses.includes('Travel'));
 await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
 console.log(`Sites validated; shared footer on homepage, Uses and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);
 await import('./check-markdown.mjs');
+await import('../sites/blog.mads-hartmann.com/check-images.mjs');

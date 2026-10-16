@@ -22,6 +22,7 @@ if [[ "$site" == all || "$site" == blog ]]; then
   build_time="$(git log -1 --format=%cI -- sites/blog.mads-hartmann.com scripts/build.sh)"
   printf 'time: %s\n' "$build_time" > .build/jekyll.yml
   cd sites/blog.mads-hartmann.com
+  npm ci --ignore-scripts
   bundle check || bundle install
   bundle exec jekyll build --source src --destination "$root/.build/blog" --config "src/_config.yml,$root/.build/jekyll.yml" --strict_front_matter
 fi
