@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/../sites/blog.mads-hartmann.com"
+npm ci --ignore-scripts
 bundle check && exit 0
 gem install bundler --version "$(awk '/^BUNDLED WITH$/{getline; print $1}' Gemfile.lock)" --no-document
 # This gem has both mkmf and Rake extensions; Rake rejects Bundler's build flags.

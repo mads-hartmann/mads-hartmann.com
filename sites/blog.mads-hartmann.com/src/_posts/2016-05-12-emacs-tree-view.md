@@ -16,9 +16,7 @@ examples being
 [emacs-neotree](https://github.com/jaypei/emacs-neotree)) but none of
 them really seem to cut it for me so I sat down and did a bit of elisp.
 
-<a href="/images/emacs-tree-viewer.png" target="_blank">
-  <img src="/images/emacs-tree-viewer.png" width="100%" />
-</a>
+{% include image.html src="/images/emacs-tree-viewer.png" alt="Emacs tree viewer displaying expandable directories" link=true %}
 
 Here are a couple of the features I was looking for
 

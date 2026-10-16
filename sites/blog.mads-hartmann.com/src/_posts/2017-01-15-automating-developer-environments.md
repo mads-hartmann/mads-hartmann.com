@@ -85,9 +85,7 @@ code related to managing the developer environment. This repository is
 the main entrypoint for developers and it takes care of setting up the
 developer environment, as well as managing it once it's running.
 
-<a href="/images/famlydev.png" target="_blank">
-    <img src="/images/famlydev.png" width="100%"/>
-</a>
+{% include image.html src="/images/famlydev.png" alt="The famlydev command-line developer environment" loading="lazy" link=true %}
 
 It consists of a rather small
 [Makefile](http://blog.mads-hartmann.com/2016/08/20/make.html), a collection

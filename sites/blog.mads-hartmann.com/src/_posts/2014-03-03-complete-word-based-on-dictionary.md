@@ -5,9 +5,7 @@ date: 2014-03-03 20:19:00
 categories: Emacs
 ---
 
-<a href="/images/dictionary-completion.png" target="_blank">
-  <img src="/images/dictionary-completion.png" />
-</a>
+{% include image.html src="/images/dictionary-completion.png" alt="Dictionary word completion inside Emacs" link=true %}
 
 I have an ever-growing document where I keep track of all the small (and
 sometimes major) changes I want to make to Emacs. Today I picked a random item

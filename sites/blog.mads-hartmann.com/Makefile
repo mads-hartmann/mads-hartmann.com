@@ -15,7 +15,7 @@ build: setup
 
 dev:
 	watchexec --restart --stop-signal SIGINT \
-		--watch src --watch llms.txt --watch Gemfile --watch Gemfile.lock --watch ../shared/footer --watch ../../scripts --watch Makefile \
+		--watch src --watch llms.txt --watch Gemfile --watch Gemfile.lock --watch package.json --watch package-lock.json --watch build-images.mjs --watch ../shared/footer --watch ../../scripts --watch Makefile \
 		-- '$(MAKE) setup && exec bundle exec jekyll serve --no-watch --disable-disk-cache --drafts --source src --destination ../../.build/blog-preview --host 127.0.0.1 --port "$(BLOG_PORT)"'
 
 # Shared footer and redirect checks need artifacts from all three sites.
