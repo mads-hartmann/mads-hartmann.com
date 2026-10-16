@@ -44,6 +44,36 @@ Production output goes to `.build/blog` at the repository root and excludes draf
 [validation](../../docs/development.md#validation) for check scope and
 [routing](../../docs/deployment.md#routing) for production redirects.
 
+## Fonts
+
+The blog self-hosts Muli 2.100, preserving the original Google Fonts design and
+the six requested faces: weights 200, 400, and 700, upright and italic. Three
+weight declarations share one variable font per style, so browsers download at
+most two font files per page; only upright is preloaded. The discrete face
+declarations preserve the original weight matching (including 300 mapping to
+200), rather than introducing new intermediate weights.
+`font-display: swap` keeps text visible during the first download. Production
+builds fingerprint both the CSS font URLs and the preload through the shared
+asset pipeline, enabling immutable caching without duplicate font downloads.
+
+The checked-in WOFF2 files retain outlines, kerning, and layout features; legacy
+TrueType hinting instructions are removed to reduce size. Small text may rasterize
+slightly differently on systems that use these instructions. Their
+Western Latin subset includes Danish letters, common accented letters,
+combining accents, punctuation, arrows, and comparison symbols. Characters
+outside this coverage use the existing sans-serif fallback. If a new language
+needs additional Muli glyphs, regenerate the font files with broader coverage
+and update the `unicode-range` declarations in `src/_sass/fonts.scss`. The subset covers
+all Muli-supported non-code characters in the current published pages.
+
+The font files were generated once from the upright and italic variable TTFs in
+[Google Fonts revision 1afe120](https://github.com/google/fonts/tree/1afe12072a7fff0c8eaacb36fa4c8c722192d5e7/ofl/muli),
+before the Mulish redesign, using FontTools 4.61.1 and Brotli 1.2.0. Subsetting
+used the Unicode ranges in `src/_sass/fonts.scss`, removed hinting, and retained
+the original variation axis. The SIL Open Font License is distributed alongside
+the fonts in `src/fonts/OFL.txt`. Builds use the committed WOFF2 files directly;
+no font generation tooling or access to Google Fonts is required.
+
 ## Markdown output
 
 [jekyll-md](https://github.com/dblock/jekyll-md) generates Markdown during builds
