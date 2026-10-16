@@ -9,8 +9,13 @@ manual kernel updates and recovery. The `static-site` module serves each site
 from a private S3 bucket through CloudFront with signed origin requests and
 Route 53 aliases.
 
+## Format and check
+
+Complete [first-time setup](../docs/development.md#first-time-setup), then run
+from the repository root:
+
 ```sh
-devenv shell # from the repository root
+devenv shell
 cd terraform
 make fmt   # format Terraform
 make lint  # check formatting
@@ -21,5 +26,8 @@ The root environment includes the site build tools because Terraform tests load
 those artifacts. See [development setup](../docs/development.md)
 for first-time activation and tool updates.
 
+## Plan and deploy
+
+Follow [Deployment](../docs/deployment.md) for authentication and procedures.
 Manual plans/applies use a human AWS session. The kernel also needs `GITHUB_TOKEN`;
 Actions obtains short-lived AWS credentials through OIDC.

@@ -62,8 +62,11 @@ explicit rather than claiming complete account isolation for those APIs.
 
 ## Automatic apply
 
-`.github/workflows/sites.yml` builds all sites and checks routes, Terraform and
-workflows on every PR and merge. No path filters can skip a required check.
+`.github/workflows/sites.yml` builds all sites and checks routes and workflows on
+every PR and merge. The Terraform check matrix runs for changes to `terraform/`,
+its check script or CI workflows, and on manual runs. PR cloud plans run for
+Terraform, Terraform script or workflow changes. The required `Checks` job
+accounts for these conditional jobs; site-only changes still deploy on `main`.
 On `main`, with `TERRAFORM_DEPLOY_ENABLED=true`, it applies shared then the three
 sites using `.github/workflows/apply-stack.yml`. A manual run can choose a site;
 shared still runs first to provide the certificate and zone outputs.
@@ -89,6 +92,17 @@ The homepage has no external styles, fonts, scripts or image requests. Uses has
 one pinned Markdown dependency. Markdown is trusted author-controlled source and
 can include HTML; it is not an untrusted-input renderer. The blog keeps Jekyll,
 posts, book reviews, drafts, media, feed and existing permalink behavior.
+
+## Routing
+
+Edit `routing/redirects.json` for Homepage and Blog redirects.
+`scripts/build-routing.mjs` embeds them in the CloudFront functions during builds.
+The local preview servers do not run these functions; use the
+[site checks](development.md#validation) to verify routing locally.
+
+The blog's former `/about`, `/about/` and `/about/index.html` URLs redirect to
+`https://www.mads-hartmann.com/` with HTTP 301 responses.
+Biography, work history and education live on the homepage.
 
 ## Updating the kernel
 
