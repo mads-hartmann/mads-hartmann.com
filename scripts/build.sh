@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
+root="$PWD"
 site="${1:-all}"
 case "$site" in all|homepage|blog|uses) ;; *) echo 'Usage: scripts/build.sh [all|homepage|blog|uses]' >&2; exit 2;; esac
 mkdir -p .build
@@ -25,3 +26,12 @@ if [[ "$site" == all || "$site" == blog ]]; then
   bundle check || bundle install
   bundle exec jekyll build --source src --destination "$root/.build/blog" --config "src/_config.yml,$root/.build/jekyll.yml" --strict_front_matter
 fi
+
+# Run after all generators (including Jekyll) have written their final output.
+cd "$root"
+npm --prefix scripts ci --ignore-scripts
+for built_site in homepage blog uses; do
+  if [[ "$site" == all || "$site" == "$built_site" ]]; then
+    node scripts/fingerprint-assets.mjs ".build/$built_site"
+  fi
+done

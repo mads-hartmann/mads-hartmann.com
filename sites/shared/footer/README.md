@@ -4,6 +4,8 @@ Home, Blog and Uses render the same footer at build time. Edit `footer.html` for
 its structure, `footer.css` for its appearance, and the site/social link arrays in
 `render.mjs` for navigation. There is no browser JavaScript or image dependency.
 
+## Integration
+
 `renderFooter('home' | 'blog' | 'uses')` returns a semantic `<footer>` containing
 `<mh-site-footer>` with a Declarative Shadow DOM template. The browser creates the
 shadow tree and scopes the CSS while parsing. Identical light-DOM content provides
@@ -19,6 +21,8 @@ Home and Uses use `aria-current="page"`; Blog uses `aria-current="location"` for
 its entire section. Explore and Elsewhere are separately labelled navigation
 landmarks, links have visible keyboard focus, and the footer is hidden for print.
 
+## Styling
+
 The footer inherits semantic palette properties across the shadow boundary:
 
 | Property | Default | Use |
@@ -33,10 +37,16 @@ side. The blog places its footer inside the content container and overrides thes
 with `100%` and `0px` so the divider aligns with the articles. Below 600px the name
 and email occupy a full row above the two navigation groups.
 
-Home starts with its introduction and links to Blog and Uses. Blog starts with its
-title and Highlights, with a small blog-root link on other pages. Uses starts with
-its title and description. Site switching and social/contact links live here,
-replacing the former shared header and separate Elsewhere/contact sections.
+## Preview and check
 
-Run `scripts/build.sh` and `node scripts/check-sites.mjs` from the repository root.
-Footer changes are included in all three builds, so deploy all affected sites.
+Inside the root devenv shell, run from the repository root:
+
+```sh
+make check-sites
+make dev
+```
+
+Footer changes affect all three sites. Preview each at desktop and mobile widths,
+in light and dark modes. See [Development](../../../docs/development.md#validation)
+for validation details. All three sites receive the updated footer through the normal
+[deployment workflow](../../../docs/deployment.md#automatic-apply).

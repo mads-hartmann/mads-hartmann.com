@@ -1,26 +1,43 @@
 # Homepage
 
-Edit `src/index.html` for the page content, CSS and favicon. The build replaces
-`<!-- shared-footer -->` with the footer from `sites/shared/footer`.
-`build.mjs` also generates `index.md` from the main content, adds discovery links
-to HTML, and copies this directory’s editable `llms.txt` unchanged. Its dependencies
-and lockfile live here. Run `npm ci && npm run build` for a standalone build in
-`dist/`, or pass an output directory to `node build.mjs`.
+A single HTML page with inline styles and no browser JavaScript.
 
-There is no framework, runtime JavaScript or font download. Nordic blue is the
-light palette; Midnight amber is enabled automatically by
-`prefers-color-scheme: dark`. The page, shared footer, favicon and browser theme
-color follow the system preference, including changes while the page is open.
-Print uses the light palette. Colors are defined by the `--mh-color-*` properties
-in `src/index.html`.
+## Edit
 
-Home includes the introduction, work history and education formerly split across
-Home and the blog's About page, followed by social and contact links.
+Edit `src/index.html` for content, styles and the favicon. The `--mh-color-*`
+properties define the palette; dark mode follows the system preference, and print
+uses the light palette. The build inserts the [shared footer](../shared/footer/README.md)
+at `<!-- shared-footer -->`.
 
-Activate tools with `devenv shell` at the repository root, then from this
-directory run `make build` to build, `make dev` to watch and serve on port 8080,
-or `make check` (also `make lint`) to check site content and routing.
-See [development setup](../../docs/development.md) for first-time activation.
+Edit `llms.txt` for the published guide to the site's content.
 
-Terraform uploads `.build/homepage/index.html`, its generated `index.md`, and
-`llms.txt`. CloudFront handles content negotiation, redirects, and HTTP errors.
+## Preview
+
+Complete [first-time setup](../../docs/development.md#first-time-setup), then run
+from the repository root:
+
+```sh
+devenv shell
+cd sites/mads-hartmann.com
+make dev
+```
+
+Open http://localhost:8080. The server rebuilds when source files or the shared
+footer change. Stop it with Ctrl-C.
+
+## Build and check
+
+From this directory, inside the root devenv shell:
+
+```sh
+make build
+make check
+```
+
+`build.mjs` produces `index.html`, generates `index.md` from the main content,
+and copies `llms.txt` unchanged into `.build/homepage` at the repository root.
+For a standalone build into local `dist/`, run `npm ci && npm run build`.
+
+`make check` builds and checks all three sites. See
+[validation](../../docs/development.md#validation) for check scope and
+[deployment](../../docs/deployment.md) for production routing and Markdown negotiation.

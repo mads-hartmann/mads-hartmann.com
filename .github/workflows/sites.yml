@@ -19,8 +19,14 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
     outputs:
       terraform_changed: ${{ steps.changes.outputs.terraform_changed }}
+      homepage_changed: ${{ steps.deployments.outputs.homepage_changed }}
+      blog_changed: ${{ steps.deployments.outputs.blog_changed }}
+      uses_changed: ${{ steps.deployments.outputs.uses_changed }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -53,6 +59,15 @@ jobs:
             if [ "$status" -ne 1 ]; then exit "$status"; fi
           fi
           echo "terraform_changed=$changed" >> "$GITHUB_OUTPUT"
+      - name: Select site deployments
+        id: deployments
+        if: >-
+          github.ref == 'refs/heads/main' && github.event_name != 'pull_request' &&
+          vars.TERRAFORM_DEPLOY_ENABLED == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_STACK: ${{ inputs.stack }}
+        run: python3 scripts/deployment-changes.py
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
@@ -125,8 +140,9 @@ jobs:
   homepage:
     if: >-
       !cancelled() && needs.shared.result == 'success' &&
-      (github.event_name != 'workflow_dispatch' || inputs.stack == 'all' || inputs.stack == 'homepage')
-    needs: [shared]
+      (needs.build.outputs.homepage_changed == 'true' ||
+       (github.event_name == 'push' && needs.shared.outputs.changed == 'true'))
+    needs: [build, shared]
     uses: ./.github/workflows/apply-stack.yml
     permissions:
       contents: read
@@ -139,8 +155,9 @@ jobs:
   blog:
     if: >-
       !cancelled() && needs.shared.result == 'success' &&
-      (github.event_name != 'workflow_dispatch' || inputs.stack == 'all' || inputs.stack == 'blog')
-    needs: [shared]
+      (needs.build.outputs.blog_changed == 'true' ||
+       (github.event_name == 'push' && needs.shared.outputs.changed == 'true'))
+    needs: [build, shared]
     uses: ./.github/workflows/apply-stack.yml
     permissions:
       contents: read
@@ -153,8 +170,9 @@ jobs:
   uses:
     if: >-
       !cancelled() && needs.shared.result == 'success' &&
-      (github.event_name != 'workflow_dispatch' || inputs.stack == 'all' || inputs.stack == 'uses')
-    needs: [shared]
+      (needs.build.outputs.uses_changed == 'true' ||
+       (github.event_name == 'push' && needs.shared.outputs.changed == 'true'))
+    needs: [build, shared]
     uses: ./.github/workflows/apply-stack.yml
     permissions:
       contents: read
