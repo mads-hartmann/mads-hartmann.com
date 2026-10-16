@@ -61,21 +61,18 @@ TrueType hinting instructions are removed to reduce size. Small text may rasteri
 slightly differently on systems that use these instructions. Their
 Western Latin subset includes Danish letters, common accented letters,
 combining accents, punctuation, arrows, and comparison symbols. Characters
-outside this coverage use the existing sans-serif fallback; expand `UNICODES`
-in the script if a new language needs additional Muli glyphs. The subset covers
+outside this coverage use the existing sans-serif fallback. If a new language
+needs additional Muli glyphs, regenerate the font files with broader coverage
+and update the `unicode-range` declarations in `src/_sass/fonts.scss`. The subset covers
 all Muli-supported non-code characters in the current published pages.
 
-Sources are pinned to the last Google Fonts revision containing Muli, before
-the Mulish redesign, and checked with SHA-256. The SIL Open Font License is
-distributed alongside the fonts in `src/fonts/OFL.txt`. Normal builds require
-neither Python font tooling nor access to Google Fonts. To regenerate from the
-repository root:
-
-```sh
-python3 -m venv .build/font-tools
-.build/font-tools/bin/pip install fonttools==4.61.1 brotli==1.2.0
-.build/font-tools/bin/python scripts/subset-blog-fonts.py
-```
+The font files were generated once from the upright and italic variable TTFs in
+[Google Fonts revision 1afe120](https://github.com/google/fonts/tree/1afe12072a7fff0c8eaacb36fa4c8c722192d5e7/ofl/muli),
+before the Mulish redesign, using FontTools 4.61.1 and Brotli 1.2.0. Subsetting
+used the Unicode ranges in `src/_sass/fonts.scss`, removed hinting, and retained
+the original variation axis. The SIL Open Font License is distributed alongside
+the fonts in `src/fonts/OFL.txt`. Builds use the committed WOFF2 files directly;
+no font generation tooling or access to Google Fonts is required.
 
 ## Markdown output
 
