@@ -12,6 +12,11 @@ SITES = {
     "blog": "sites/blog.mads-hartmann.com",
     "uses": "sites/uses.mads-hartmann.com",
 }
+SITE_JOB_NAMES = {
+    "homepage": "Deploy homepage",
+    "blog": "Deploy blog",
+    "uses": "Deploy Uses",
+}
 
 
 def github(path):
@@ -42,7 +47,7 @@ def deployment_base(env):
     if results.get("Deploy shared DNS and TLS", results.get("shared / apply")) != "success":
         return None
     if any(
-        results.get(f"{site} / apply") not in ("success", "skipped")
+        results.get(SITE_JOB_NAMES[site], results.get(f"{site} / apply")) not in ("success", "skipped")
         and results.get(site) != "skipped"
         for site in SITES
     ):

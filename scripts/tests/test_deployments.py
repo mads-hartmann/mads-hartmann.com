@@ -118,6 +118,19 @@ class SelectionTests(unittest.TestCase):
                     expected = self.base if result == "success" else None
                     self.assertEqual(self.baseline(jobs=jobs), expected)
 
+    def test_site_deployment_names_require_success_or_skip(self):
+        names = {"homepage": "Deploy homepage", "blog": "Deploy blog", "uses": "Deploy Uses"}
+        for site, name in names.items():
+            for job_name in [name, f"{site} / apply"]:
+                for result in ["success", "skipped", "failure", "cancelled", None]:
+                    with self.subTest(site=site, name=job_name, result=result):
+                        jobs = [{"name": "Deploy shared DNS and TLS", "conclusion": "success"}]
+                        jobs.extend({"name": job_name if other == site else other_name,
+                                     "conclusion": result if other == site else "success"}
+                                    for other, other_name in names.items())
+                        expected = self.base if result in ("success", "skipped") else None
+                        self.assertEqual(self.baseline(jobs=jobs), expected)
+
     def test_failed_or_incomplete_runs_force_all(self):
         for result in ["failure", "cancelled", "timed_out", None]:
             with self.subTest(result=result):
