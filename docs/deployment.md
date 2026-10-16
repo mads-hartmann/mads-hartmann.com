@@ -29,7 +29,7 @@ roles. Plan gets infrastructure reads, its state read, and its lock-file writes.
 Apply gets its own state writes and component resource permissions. Both are
 explicitly denied IAM administration, backend administration and kernel state.
 State access is limited to the role's own root. Sites receive the zone/certificate
-through workflow outputs, without reading shared state. They cannot assume other
+through job outputs, without reading shared state. They cannot assume other
 component roles.
 
 Site apply roles can delete object versions only in their own content bucket.
@@ -62,15 +62,19 @@ explicit rather than claiming complete account isolation for those APIs.
 
 ## Automatic apply
 
-`.github/workflows/sites.yml` builds all sites and checks routes and workflows on
-every PR and merge. The Terraform check matrix runs for changes to `terraform/`,
-its check script or CI workflows, and on manual runs. PR cloud plans run for
-Terraform, Terraform script or workflow changes. The required `Checks` job
-accounts for these conditional jobs; site-only changes still deploy on `main`.
-On `main`, with `TERRAFORM_DEPLOY_ENABLED=true`, it plans shared then the affected
-sites using `.github/workflows/apply-stack.yml`. Shared always runs first to provide
-the certificate and zone outputs. A manual run can choose a site or all sites and
-bypasses source filtering.
+`.github/workflows/sites.yml` builds all sites and checks routes and workflows
+on every branch push and PR. The Terraform check matrix runs for changes to
+`terraform/`, its check script, CI workflows or local actions, and on manual
+runs. PR cloud plans run for Terraform, Terraform script, workflow or local
+action changes, reusing the checked site artifact in the same workflow. The
+required `Checks` job accounts for these conditional jobs; site-only changes
+still deploy on `main`. On `main`, with `TERRAFORM_DEPLOY_ENABLED=true`, it
+plans shared then the affected sites using the local `.github/actions/apply-
+stack` action. Each stack keeps its own Production job and apply role. Feature
+branch builds and PRs never apply infrastructure, invalidate CloudFront or run
+deployment smoke tests. Shared always runs first to provide the certificate and
+zone outputs. A manual run on `main` can choose a site or all sites and bypasses
+source filtering.
 
 `scripts/deployment-changes.py` compares each site's inputs with the preceding
 successful automatic production run, rather than the previous commit. The baseline
@@ -82,8 +86,8 @@ covers a partial deployment followed by a revert whose net source diff is empty.
 
 Each site's source directory (including dependencies and build configuration),
 routing function and Terraform stack select that site. Shared footer files,
-Markdown routing, redirects, Terraform modules/shared stack, scripts and workflow
-changes select all sites. Unrelated documentation and manual kernel changes do not
+Markdown routing, redirects, Terraform modules/shared stack, scripts, workflows
+and local action changes select all sites. Unrelated documentation and manual kernel changes do not
 select site deployments. Build and required checks still run; site jobs alone are
 skipped. Manual runs remain available to reconcile infrastructure drift even when
 source files have not changed. On automatic runs, actual changes applied to shared
@@ -95,7 +99,8 @@ outputs are published even when nothing changed. Selected site jobs still run
 smoke tests and HTTP cache checks on a no-change plan so a failed verification can be retried. Saved
 plans are removed on both success and failure.
 
-Production runs queue without cancellation. Each apply job checks that its commit
+Newer branch/PR runs cancel unfinished checks. Production runs queue without
+cancellation. Each apply job checks that its commit
 is still the current `main`, creates a fresh plan, and applies that saved plan in
 the same job with the same built files. If a newer commit arrives before a queued
 run starts applying, the old run fails the freshness check; the newer run deploys.

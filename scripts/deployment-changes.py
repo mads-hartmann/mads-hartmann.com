@@ -61,7 +61,7 @@ def affected_sites(base, head):
         ["git", "diff", "--name-only", "--no-renames", "-z", base, head, "--"],
     ).decode().split("\0")
     # Shared build/runtime inputs and deployment tooling affect every site.
-    common = ("sites/shared/", "scripts/", ".github/workflows/", "terraform/modules/",
+    common = ("sites/shared/", "scripts/", ".github/workflows/", ".github/actions/", "terraform/modules/",
               "terraform/stacks/shared/")
     all_changed = any(
         path.startswith(common) or path in ("routing/markdown.js", "routing/redirects.json")
