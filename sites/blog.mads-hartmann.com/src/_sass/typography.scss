@@ -11,7 +11,7 @@ body {
 
 h1,
 h2 {
-  color: rgba(46, 48, 58, 0.96);
+  color: var(--mh-color-text);
 }
 
 h1 {
@@ -66,8 +66,8 @@ table {
 }
 
 blockquote {
-  background: #f9f9f9;
-  border-left: 10px solid #ccc;
+  background: var(--color-panel);
+  border-left: 10px solid var(--color-panel-border);
   margin: 1.5em 0px;
   padding: 1em 20px;
   quotes: "\201C""\201D""\2018""\2019";
