@@ -153,7 +153,7 @@ resource "github_repository_ruleset" "main" {
     pull_request { required_approving_review_count = 0 }
     required_status_checks {
       strict_required_status_checks_policy = true
-      required_check { context = "Checks" }
+      required_check { context = "Ready to merge" }
     }
   }
   depends_on = [github_branch_default.main]

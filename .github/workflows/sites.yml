@@ -124,7 +124,7 @@ jobs:
       - run: scripts/check-terraform.sh
   checks:
     # Only PR runs publish the required status; branch checks cannot satisfy it.
-    name: ${{ github.event_name == 'pull_request' && 'Checks' || 'Branch checks' }}
+    name: ${{ github.event_name == 'pull_request' && 'Ready to merge' || 'Validation complete' }}
     if: always()
     needs: [build, terraform, plan]
     runs-on: ubuntu-24.04
