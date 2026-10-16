@@ -186,10 +186,20 @@ published copies match the tracked files and that their links resolve.
 Each generated HTML page has a `rel="alternate" type="text/markdown"` link and
 a `rel="describedby"` link to that site's `llms.txt`. The small `llms.txt` guides
 link to Markdown entry points and the other sites; the blog's Markdown archive
-links to every published post. The blog's Markdown keeps the source links and
-image URLs, including relative URLs; linked HTML pages advertise their Markdown
-alternatives. Recording links remain available in the article text. Home strips
-inline image bytes while retaining alt text, and Uses publishes its source.
+links directly to the Markdown for every published post. The shared footer also
+has a visible **For agents** link for readers that don't expose metadata.
+The blog resolves links and image URLs against each canonical page and rewrites
+links to published blog pages to their Markdown alternatives. Fragment links keep
+their canonical HTML targets; footnotes use native Markdown references and
+definitions. Recording links remain available in the article text. Home strips
+inline image bytes while retaining alt text, and Uses publishes its source,
+including its explicitly maintained content update date.
+
+All three domains serve `robots.txt` and a canonical-HTML sitemap at `sitemap.xml`.
+Home and Uses copy their small tracked files during their builds, and their
+viewer-request functions allow both paths without Markdown negotiation. The blog
+continues to use Jekyll's generated crawler files. Sitemap entries omit a synthetic
+deployment-time `lastmod` on the single-page sites.
 
 | HTML URL | Markdown URL |
 | --- | --- |

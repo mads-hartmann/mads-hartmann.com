@@ -73,6 +73,7 @@ a:focus-visible { outline: 2px solid var(--mh-color-accent); outline-offset: 4px
 .intro { margin-bottom: 32px; }
 h1 { font-size: 2rem; line-height: 1.2; letter-spacing: -.04em; margin: 0 0 24px; }
 .intro p { max-width: 650px; }
+.intro p + p { font-size: 14px; color: var(--mh-color-muted); }
 p { margin: 0 0 20px; }
 .contents { display: flex; flex-wrap: wrap; gap: 4px 26px; border-block: 1px solid var(--mh-color-border); padding: 8px 0; margin-bottom: 40px; }
 .contents a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; text-decoration: none; }
@@ -105,3 +106,6 @@ ul + p { margin-top: 24px; }
 `);
 await writeFile(`${destination}/index.md`, `${markdown.trimEnd()}\n\n---\n\nCanonical page: https://uses.mads-hartmann.com/\n`);
 await copyFile(`${root}llms.txt`, `${destination}/llms.txt`);
+for (const file of ['robots.txt', 'sitemap.xml']) {
+  await copyFile(`${root}${file}`, `${destination}/${file}`);
+}

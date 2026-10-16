@@ -35,3 +35,6 @@ await mkdir(destination, { recursive: true });
 await writeFile(`${destination}/index.html`, html);
 await writeFile(`${destination}/index.md`, markdown);
 await copyFile(`${root}llms.txt`, `${destination}/llms.txt`);
+for (const file of ['robots.txt', 'sitemap.xml']) {
+  await copyFile(`${root}${file}`, `${destination}/${file}`);
+}

@@ -25,7 +25,9 @@ export function renderFooter(current) {
     return `<a href="${href}"${active}>${label}</a>`;
   }).join('\n');
   const elsewhere = socials.map(({ label, href }) => `<a rel="me" href="${href}">${label}</a>`).join('\n');
-  const content = template.replace('{{sites}}', navigation).replace('{{socials}}', elsewhere);
+  const origin = sites.find(site => site.id === current).href;
+  const content = template.replace('{{sites}}', navigation).replace('{{socials}}', elsewhere)
+    .replace('{{agent-guide}}', `${origin}llms.txt`);
 
   // The shadow tree scopes styles without browser JavaScript. Browsers without
   // Declarative Shadow DOM show the same semantic content in light DOM instead.

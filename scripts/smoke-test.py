@@ -28,6 +28,8 @@ check('/', content='Mads Hartmann' if stack != 'uses' else 'Uses')
 # Alternate formats must work directly and through negotiation. Alternate
 # requests also catch HTML/Markdown cache contamination after deployment.
 check('/llms.txt', content='## Content', content_type='text/plain')
+check('/robots.txt', content='Sitemap:', content_type='text/plain')
+check('/sitemap.xml', content='<urlset', content_type='application/xml')
 check('/index.md', content='Canonical page:', content_type='text/markdown')
 for accept, content_type, content in [
     ('text/markdown', 'text/markdown', 'Canonical page:'),

@@ -19,6 +19,7 @@
 }
 
 .name { margin: 0; font-weight: 550; }
+.agent-guide { margin: 4px 0 0; font-size: 13px; color: var(--mh-color-muted, #626258); }
 
 h2 {
   margin: 0 0 10px;

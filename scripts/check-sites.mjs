@@ -8,7 +8,7 @@ const homepage = await readFile('.build/homepage/index.html', 'utf8');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:|theme-picker/i.test(homepage));
 assert(homepage.includes('https://blog.mads-hartmann.com/'));
 assert(homepage.includes('https://uses.mads-hartmann.com/'));
-assert.deepEqual((await readdir('.build/homepage')).sort(), ['index.html', 'index.md', 'llms.txt']);
+assert.deepEqual((await readdir('.build/homepage')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
 
 function checkFooter(html, current) {
   assert.equal((html.match(/<mh-site-footer /g) || []).length, 1);
@@ -29,6 +29,7 @@ function checkFooter(html, current) {
     assert(content.includes(`<a href="${activeHref}" aria-current=`));
     assert(content.includes('id="footer-explore"'));
     assert(content.includes('id="footer-elsewhere"'));
+    assert(content.includes(`href="${activeHref}llms.txt" type="text/plain">For agents</a>`));
     for (const href of ['https://github.com/mads-hartmann', 'https://www.linkedin.com/in/mads-hartmann/', 'https://twitter.com/mads_hartmann', 'mailto:hello@mads-hartmann.com']) {
       assert(content.includes(`href="${href}"`));
     }
@@ -45,7 +46,7 @@ assert(homepage.includes('>What I use</a>'));
 const uses = await readFile('.build/uses/index.html', 'utf8');
 checkFooter(uses, 'uses');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(uses));
-assert.deepEqual((await readdir('.build/uses')).sort(), ['index.html', 'index.md', 'llms.txt']);
+assert.deepEqual((await readdir('.build/uses')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
 for (const content of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'master’s degree in Computer Science', 'University of Copenhagen', 'bachelor’s degree in Computer Science', 'IT University of Copenhagen']) {
   assert(homepage.includes(content), `Homepage is missing About content: ${content}`);
 }

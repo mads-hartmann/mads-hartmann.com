@@ -10,6 +10,8 @@ uses the light palette. The build inserts the [shared footer](../shared/footer/R
 at `<!-- shared-footer -->`.
 
 Edit `llms.txt` for the published guide to the site's content.
+`robots.txt` permits crawling and points to `sitemap.xml`, which lists the canonical
+homepage. Keep those files in sync if the site gains more pages.
 
 ## Preview
 
@@ -35,7 +37,8 @@ make check
 ```
 
 `build.mjs` produces `index.html`, generates `index.md` from the main content,
-and copies `llms.txt` unchanged into `.build/homepage` at the repository root.
+and copies `llms.txt`, `robots.txt`, and `sitemap.xml` unchanged into `.build/homepage`
+at the repository root.
 For a standalone build into local `dist/`, run `npm ci && npm run build`.
 
 `make check` builds and checks all three sites. See

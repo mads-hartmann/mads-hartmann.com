@@ -52,6 +52,15 @@ adds the canonical HTML URL. The `src/_plugins/llms.rb` plugin copies `llms.txt`
 unchanged. Restart a manually launched Jekyll server after editing that guide;
 `make dev` watches it automatically.
 
+`src/_plugins/agent_markdown.rb` extends jekyll-md's converter to separate archive
+titles from dates, resolve links and image URLs against the canonical page, and
+link directly to Markdown for published blog pages. It builds the link map from
+Jekyll's eligible pages, so assets and external URLs aren't given invented `.md`
+paths. Fragment links retain canonical HTML targets because custom heading IDs
+aren't portable between Markdown renderers. Footnotes become native Markdown
+references and definitions, including formatted or multi-paragraph notes. These
+changes apply only to Markdown; HTML and code sample contents are preserved.
+
 See [Markdown and agent discovery](../../docs/deployment.md#markdown-and-agent-discovery)
 for URL conventions, discovery links and content negotiation.
 

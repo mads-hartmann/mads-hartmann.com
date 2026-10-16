@@ -2,6 +2,8 @@
 
 The hardware, software, and everyday things I use for work, travel, and photography. Explore [uses.tech](https://uses.tech) for more setups.
 
+Content updated: 2026-10-11.
+
 ## Hardware
 
 - 14" M1 MacBook Pro from 2021 running Tahoe
