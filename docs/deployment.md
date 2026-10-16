@@ -67,9 +67,33 @@ every PR and merge. The Terraform check matrix runs for changes to `terraform/`,
 its check script or CI workflows, and on manual runs. PR cloud plans run for
 Terraform, Terraform script or workflow changes. The required `Checks` job
 accounts for these conditional jobs; site-only changes still deploy on `main`.
-On `main`, with `TERRAFORM_DEPLOY_ENABLED=true`, it applies shared then the three
-sites using `.github/workflows/apply-stack.yml`. A manual run can choose a site;
-shared still runs first to provide the certificate and zone outputs.
+On `main`, with `TERRAFORM_DEPLOY_ENABLED=true`, it plans shared then the affected
+sites using `.github/workflows/apply-stack.yml`. Shared always runs first to provide
+the certificate and zone outputs. A manual run can choose a site or all sites and
+bypasses source filtering.
+
+`scripts/deployment-changes.py` compares each site's inputs with the preceding
+successful automatic production run, rather than the previous commit. The baseline
+must have completed shared successfully and either deployed or intentionally skipped
+every site. Manual runs and green runs with deployment disabled cannot become the
+baseline. If the preceding automatic run failed or is incomplete, the workflow is
+being rerun, or history/API access is unavailable, all sites are selected. This also
+covers a partial deployment followed by a revert whose net source diff is empty.
+
+Each site's source directory (including dependencies and build configuration),
+routing function and Terraform stack select that site. Shared footer files,
+Markdown routing, redirects, Terraform modules/shared stack, scripts and workflow
+changes select all sites. Unrelated documentation and manual kernel changes do not
+select site deployments. Build and required checks still run; site jobs alone are
+skipped. Manual runs remain available to reconcile infrastructure drift even when
+source files have not changed. On automatic runs, actual changes applied to shared
+also select all sites so new certificate/zone outputs propagate without a source edit.
+
+Terraform plans use `-detailed-exitcode`: exit code 2 applies the saved plan, exit
+code 0 skips apply and CloudFront invalidation, and errors fail the job. Shared
+outputs are published even when nothing changed. Selected site jobs still run
+smoke tests and HTTP cache checks on a no-change plan so a failed verification can be retried. Saved
+plans are removed on both success and failure.
 
 Production runs queue without cancellation. Each apply job checks that its commit
 is still the current `main`, creates a fresh plan, and applies that saved plan in
