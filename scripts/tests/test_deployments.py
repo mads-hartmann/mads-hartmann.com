@@ -186,7 +186,9 @@ if command == "terraform":
     if args[1] == "output": print("test-" + args[-1])
 elif command == "aws":
     if "create-invalidation" in args: print("invalidation-id")
-elif command == "python3": sys.exit(int(os.environ.get("SMOKE_STATUS", "0")))
+elif command == "python3":
+    status = "CACHE_STATUS" if args[0] == "scripts/check-http-cache.py" else "SMOKE_STATUS"
+    sys.exit(int(os.environ.get(status, "0")))
 '''.replace("#!/usr/bin/env python3", f"#!{os.sys.executable}", 1))
         fake.chmod(0o755)
         for command in ["terraform", "aws", "python3"]:
@@ -211,7 +213,8 @@ elif command == "python3": sys.exit(int(os.environ.get("SMOKE_STATUS", "0")))
         result, calls, _ = self.deploy("uses", 0)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse(any("apply" in call or call[0] == "aws" for call in calls))
-        self.assertEqual(calls[-1], ["python3", "scripts/smoke-test.py", "uses", "https://test-distribution_domain"])
+        self.assertIn(["python3", "scripts/smoke-test.py", "uses", "https://test-distribution_domain"], calls)
+        self.assertIn(["python3", "scripts/check-http-cache.py", "https://test-distribution_domain"], calls)
 
     def test_no_changes_still_exports_shared_outputs(self):
         result, calls, output = self.deploy("shared", 0)
@@ -237,7 +240,12 @@ elif command == "python3": sys.exit(int(os.environ.get("SMOKE_STATUS", "0")))
         wait = next(call for call in calls if "wait" in call)
         self.assertLess(calls.index(apply), calls.index(invalidation))
         self.assertLess(calls.index(invalidation), calls.index(wait))
-        self.assertEqual(calls[-1][0], "python3")
+        smoke = ["python3", "scripts/smoke-test.py", "homepage", "https://test-distribution_domain"]
+        cache = ["python3", "scripts/check-http-cache.py", "https://test-distribution_domain"]
+        self.assertIn(smoke, calls)
+        self.assertIn(cache, calls)
+        self.assertLess(calls.index(wait), calls.index(smoke))
+        self.assertLess(calls.index(wait), calls.index(cache))
 
     def test_plan_failure_never_applies_invalidates_or_smoke_tests(self):
         for status in [1, 17]:
@@ -255,6 +263,13 @@ elif command == "python3": sys.exit(int(os.environ.get("SMOKE_STATUS", "0")))
     def test_no_change_smoke_failure_is_reported(self):
         result, _, _ = self.deploy("homepage", 0, SMOKE_STATUS="1")
         self.assertEqual(result.returncode, 1)
+
+    def test_cache_failure_is_reported_with_or_without_changes(self):
+        for status in [0, 2]:
+            with self.subTest(plan_status=status):
+                result, calls, _ = self.deploy("homepage", status, CACHE_STATUS="1")
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(["python3", "scripts/check-http-cache.py", "https://test-distribution_domain"], calls)
 
 
 if __name__ == "__main__":

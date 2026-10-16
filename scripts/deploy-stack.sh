@@ -31,4 +31,5 @@ else
   # Keep verification on no-op retries (for example after a failed smoke test).
   host="$(terraform -chdir="$root" output -raw distribution_domain)"
   python3 scripts/smoke-test.py "$stack" "https://$host"
+  python3 scripts/check-http-cache.py "https://$host"
 fi

@@ -5,6 +5,7 @@ function redirect(url) {
 }
 function handler(event) {
   var request = event.request;
+  if (/^\/_assets\/[a-f0-9]{64}\/.+/.test(request.uri)) return request;
   var path = request.uri.replace(/\/$/, '') || '/';
   if (redirects[path]) return redirect(redirects[path]);
   if (path === '/blog' || path === '/writings') return redirect('https://blog.mads-hartmann.com/');

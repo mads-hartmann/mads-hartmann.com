@@ -62,8 +62,11 @@ explicit rather than claiming complete account isolation for those APIs.
 
 ## Automatic apply
 
-`.github/workflows/sites.yml` builds all sites and checks routes, Terraform and
-workflows on every PR and merge. No path filters can skip a required check.
+`.github/workflows/sites.yml` builds all sites and checks routes and workflows on
+every PR and merge. The Terraform check matrix runs for changes to `terraform/`,
+its check script or CI workflows, and on manual runs. PR cloud plans run for
+Terraform, Terraform script or workflow changes. The required `Checks` job
+accounts for these conditional jobs; site-only changes still deploy on `main`.
 On `main`, with `TERRAFORM_DEPLOY_ENABLED=true`, it plans shared then the affected
 sites using `.github/workflows/apply-stack.yml`. Shared always runs first to provide
 the certificate and zone outputs. A manual run can choose a site or all sites and
@@ -89,7 +92,7 @@ also select all sites so new certificate/zone outputs propagate without a source
 Terraform plans use `-detailed-exitcode`: exit code 2 applies the saved plan, exit
 code 0 skips apply and CloudFront invalidation, and errors fail the job. Shared
 outputs are published even when nothing changed. Selected site jobs still run
-smoke tests on a no-change plan so a failed verification can be retried. Saved
+smoke tests and HTTP cache checks on a no-change plan so a failed verification can be retried. Saved
 plans are removed on both success and failure.
 
 Production runs queue without cancellation. Each apply job checks that its commit
@@ -100,17 +103,30 @@ A commit arriving during an apply does not interrupt it. Terraform locking handl
 manual/Actions overlap. There is no `-target`, uploaded plan artifact, S3 sync job,
 or long-lived AWS secret.
 
-Terraform manages every generated object. Assets are uploaded before HTML;
-removed tracked files are deleted by Terraform. Untracked objects require separate
-review and removal. Cache lifetime is 60 seconds, capped at five minutes;
-successful deployments invalidate and wait, then smoke-test the
-CloudFront hostname. Homepage/uses functions return actual 404/410 responses.
+Terraform manages mutable objects and coordinates immutable publication. Assets are uploaded before HTML;
+removed tracked mutable files are deleted by Terraform. Content-addressed assets
+under `/_assets/<sha256>/` are published append-only and retained when they leave
+the current build, so already-open/cached HTML keeps working.
+Untracked objects require separate review and removal. Successful deployments
+invalidate `/*` and wait, then smoke-test the CloudFront hostname and HTTP cache
+contract. Homepage/uses functions return actual 404/410 responses.
 Blog missing objects use the generated 404 page; access errors remain 403.
 
 The homepage has no external styles, fonts, scripts or image requests. Uses has
 one pinned Markdown dependency. Markdown is trusted author-controlled source and
 can include HTML; it is not an untrusted-input renderer. The blog keeps Jekyll,
 posts, book reviews, drafts, media, feed and existing permalink behavior.
+
+## Routing
+
+Edit `routing/redirects.json` for Homepage and Blog redirects.
+`scripts/build-routing.mjs` embeds them in the CloudFront functions during builds.
+The local preview servers do not run these functions; use the
+[site checks](development.md#validation) to verify routing locally.
+
+The blog's former `/about`, `/about/` and `/about/index.html` URLs redirect to
+`https://www.mads-hartmann.com/` with HTTP 301 responses.
+Biography, work history and education live on the homepage.
 
 ## Updating the kernel
 
@@ -223,3 +239,82 @@ do not push raw states or plans.
 Mock tests and validation check configuration and dependency graphs. Authenticated
 plans and applies check AWS service permissions against the account. See
 [Terraform's S3 backend documentation](https://developer.hashicorp.com/terraform/language/backend/s3).
+
+## HTTP caching and asset versions
+
+| Representation | Browser | CloudFront |
+| --- | --- | --- |
+| HTML, Markdown, feeds, discovery files and original asset URLs | `max-age=0,must-revalidate` | `s-maxage=3600` |
+| `/_assets/<sha256>/...` | `max-age=31536000,immutable` | Up to one year |
+
+The build's final `scripts/fingerprint-assets.mjs` pass creates SHA-256-addressed
+copies of static assets and rewrites HTML URLs (including `srcset`, posters,
+inline CSS, and stylesheet/script links). CSS dependencies are rewritten before
+the stylesheet is hashed: changing a font or background image also changes its
+parent stylesheet URL. Circular stylesheet dependencies fail the build. Existing
+original URLs remain available for Markdown, feeds and external links with the
+mutable policy. Current JavaScript is self-contained; if module imports or
+runtime asset loading are introduced, integrate their dependency graph into this
+step or use a bundler before enabling immutable URLs for those dependencies.
+
+HTML deliberately revalidates on each navigation instead of keeping the previous
+60-second browser TTL. That costs a conditional network round trip for the small
+document, but makes deployment invalidation effective immediately for new
+navigations; browsers cannot be invalidated by CloudFront. Reused assets need no
+network requests for a year. The edge retains mutable objects for one hour
+between deployments, bounding stale content if deployment or invalidation fails.
+The existing full invalidation clears canonical and
+rewritten HTML/Markdown paths, mutable aliases and any previously uncompressed
+cached responses. It does not evict browser caches or delete retained S3 assets.
+
+The AWS-managed `CachingOptimized` policy enables normalized `Accept-Encoding`
+cache keys and both Brotli and gzip; legacy `forwarded_values` cannot enable
+Brotli. It excludes cookies and query strings. HTML/Markdown negotiation remains
+safe because the viewer-request function rewrites the URI before cache lookup.
+This policy has a one-second minimum and a one-year maximum TTL; the minimum is
+acceptable for this entirely public static content, but do not reuse it for
+private or `no-store` responses. Using its published ID avoids creating a new
+policy or requiring kernel IAM changes. `compress=true` permits edge compression
+for eligible types and sizes; AWS can skip compression under load, so deployment
+checks report the actual encoding instead of treating an occasional identity
+response as a configuration failure.
+
+S3 already supplies `ETag` and `Last-Modified`; do not synthesize or override them.
+CloudFront forwards conditional revalidation and can return bodyless `304`
+responses to `If-None-Match` / `If-Modified-Since`. Compression changes a strong
+S3 ETag to a weak ETag (`W/`) when appropriate, which remains valid for cache
+revalidation. Terraform `source_hash` is a deployment change detector, not the
+HTTP ETag. The post-deploy check exercises identity/gzip/Brotli requests,
+matching ETags, date validators, and the precedence of `If-None-Match` over dates.
+Those live assertions run only after deployment; offline tests cannot prove AWS
+edge behavior.
+
+Old fingerprinted objects are intentionally retained indefinitely, including
+across rollbacks. A single `terraform_data.immutable_assets` resource triggers
+`scripts/upload-immutable-assets.py` whenever the full asset manifest or publisher
+changes. The publisher validates every content hash before writing, uses explicit
+MIME types (including WebP, AVIF and WOFF2), and uploads with the immutable policy.
+It requires Python 3 and the AWS CLI, already installed in Actions and the devenv
+shell. Bucket ownership and access policy precede it; HTML depends on successful
+publication. Failed uploads fail the apply; retries safely write identical bytes.
+There is no destroy provisioner and no asset deletion command. Individual
+immutable objects are deliberately outside Terraform object ownership; mutable
+objects stay under `aws_s3_object`. Site Terraform tests use mocked plans (never apply) so the publisher
+never runs. Separate unit tests exercise upload arguments and failure handling. If retained objects are deleted outside this workflow,
+repair the current release with `terraform apply -replace=module.site.terraform_data.immutable_assets`
+using the normal reviewed plan workflow. Reintroducing a prior fingerprint writes
+identical bytes to its key.
+This trades modest storage growth for valid old references. Do not add a simple
+age-based lifecycle rule: an old object may still be referenced by current HTML.
+Future garbage collection must identify references from retained releases and
+respect the one-year cache promise. Sensitive-content removal requires explicit
+S3 deletion and CDN invalidation; no infrastructure operation can recall bytes
+already cached in a browser.
+
+Primary references checked for this strategy:
+
+- [AWS managed cache policies](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html)
+- [CloudFront compression and ETag conversion](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/ServingCompressedFiles.html)
+- [S3 origin conditional requests](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/RequestAndResponseBehaviorS3Origin.html)
+- [HTTP caching, RFC 9111](https://www.rfc-editor.org/rfc/rfc9111.html)
+- [Immutable caching, RFC 8246](https://www.rfc-editor.org/rfc/rfc8246.html)
