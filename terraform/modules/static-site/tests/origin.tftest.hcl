@@ -1,6 +1,24 @@
 mock_provider "aws" {
+  override_during = plan
+  mock_resource "aws_s3_bucket" {
+    override_during = plan
+    defaults = {
+      id                          = "test-site"
+      arn                         = "arn:aws:s3:::test-site"
+      bucket_regional_domain_name = "test-site.s3.eu-central-1.amazonaws.com"
+    }
+  }
+  mock_resource "aws_cloudfront_origin_access_control" {
+    override_during = plan
+    defaults        = { id = "test-oac" }
+  }
+  mock_resource "aws_cloudfront_distribution" {
+    override_during = plan
+    defaults        = { arn = "arn:aws:cloudfront::790804032123:distribution/test" }
+  }
   mock_resource "aws_cloudfront_function" {
-    defaults = { arn = "arn:aws:cloudfront::790804032123:function/mads-sites-test" }
+    override_during = plan
+    defaults        = { arn = "arn:aws:cloudfront::790804032123:function/mads-sites-test" }
   }
 }
 variables {
@@ -13,7 +31,7 @@ variables {
   routing_file    = "../../../.build/routing/homepage.js"
 }
 run "private_origin" {
-  command = apply
+  command = plan
   assert {
     condition     = aws_s3_bucket_public_access_block.public_access_block.block_public_acls && aws_s3_bucket_public_access_block.public_access_block.block_public_policy && aws_s3_bucket_public_access_block.public_access_block.ignore_public_acls && aws_s3_bucket_public_access_block.public_access_block.restrict_public_buckets
     error_message = "The origin must block every form of public S3 access."
@@ -49,6 +67,26 @@ run "private_origin" {
   assert {
     condition     = jsondecode(aws_s3_bucket_policy.policy.policy).Statement[2].Effect == "Deny" && jsondecode(aws_s3_bucket_policy.policy.policy).Statement[2].Condition.Bool["aws:SecureTransport"] == "false"
     error_message = "The bucket must deny insecure transport."
+  }
+}
+run "cache_contract" {
+  command = plan
+  variables {
+    stack        = "blog"
+    content_dir  = "../../../.build/blog"
+    routing_file = "../../../.build/routing/blog.js"
+  }
+  assert {
+    condition     = one(aws_cloudfront_distribution.distribution.default_cache_behavior).cache_policy_id == "658327ea-f89d-4fab-a63d-7e88639e58f6" && one(aws_cloudfront_distribution.distribution.default_cache_behavior).compress
+    error_message = "Use the Brotli/gzip managed policy with compression enabled."
+  }
+  assert {
+    condition     = alltrue([for object in aws_s3_object.pages : object.cache_control == "public,max-age=0,s-maxage=3600,must-revalidate"]) && alltrue([for object in aws_s3_object.assets : object.cache_control == "public,max-age=0,s-maxage=3600,must-revalidate"])
+    error_message = "Mutable URLs must revalidate in browsers and have bounded CDN freshness."
+  }
+  assert {
+    condition     = length(terraform_data.immutable_assets.input.files) > 0 && alltrue([for key, digest in terraform_data.immutable_assets.input.files : startswith(key, "_assets/${digest}/")]) && terraform_data.immutable_assets.input.cache_control == "public,max-age=31536000,immutable"
+    error_message = "Only byte-verified fingerprinted assets can be published as immutable."
   }
 }
 run "reject_missing_build" {

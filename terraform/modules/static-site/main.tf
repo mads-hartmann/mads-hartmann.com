@@ -1,6 +1,8 @@
 locals {
-  files      = fileset(var.content_dir, "**")
-  mime_types = { html = "text/html; charset=utf-8", md = "text/markdown; charset=utf-8", css = "text/css; charset=utf-8", js = "text/javascript; charset=utf-8", json = "application/json", xml = "application/xml; charset=utf-8", txt = "text/plain; charset=utf-8", png = "image/png", jpg = "image/jpeg", jpeg = "image/jpeg", gif = "image/gif", svg = "image/svg+xml", ico = "image/x-icon", webp = "image/webp", mp3 = "audio/mpeg", m4a = "audio/mp4", pdf = "application/pdf", woff = "font/woff", woff2 = "font/woff2" }
+  files                   = fileset(var.content_dir, "**")
+  immutable_cache_control = "public,max-age=31536000,immutable"
+  immutable_files         = { for file in local.files : file => filesha256("${var.content_dir}/${file}") if startswith(file, "_assets/") }
+  mime_types              = { html = "text/html; charset=utf-8", md = "text/markdown; charset=utf-8", css = "text/css; charset=utf-8", js = "text/javascript; charset=utf-8", json = "application/json", xml = "application/xml; charset=utf-8", txt = "text/plain; charset=utf-8", png = "image/png", jpg = "image/jpeg", jpeg = "image/jpeg", gif = "image/gif", svg = "image/svg+xml", ico = "image/x-icon", webp = "image/webp", avif = "image/avif", ttf = "font/ttf", otf = "font/otf", mp4 = "video/mp4", mp3 = "audio/mpeg", m4a = "audio/mp4", pdf = "application/pdf", woff = "font/woff", woff2 = "font/woff2" }
 }
 resource "aws_s3_bucket" "bucket" {
   bucket        = var.bucket_name
@@ -92,19 +94,15 @@ resource "aws_cloudfront_distribution" "distribution" {
     origin_access_control_id = aws_cloudfront_origin_access_control.site.id
   }
   default_cache_behavior {
-    target_origin_id           = "site-${var.bucket_name}"
-    viewer_protocol_policy     = "redirect-to-https"
-    allowed_methods            = ["GET", "HEAD"]
-    cached_methods             = ["GET", "HEAD"]
-    compress                   = true
-    min_ttl                    = 0
-    default_ttl                = 60
-    max_ttl                    = 300
+    target_origin_id       = "site-${var.bucket_name}"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
+    # Managed CachingOptimized: normalized Accept-Encoding, Brotli + gzip,
+    # no cookies/query strings, one-second minimum and one-year maximum TTL.
+    cache_policy_id            = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     response_headers_policy_id = aws_cloudfront_response_headers_policy.site.id
-    forwarded_values {
-      query_string = false
-      cookies { forward = "none" }
-    }
     function_association {
       event_type   = "viewer-request"
       function_arn = aws_cloudfront_function.routing.arn
@@ -143,14 +141,46 @@ resource "aws_s3_bucket_policy" "policy" {
   depends_on = [aws_s3_bucket_public_access_block.public_access_block]
 }
 resource "aws_s3_object" "assets" {
-  for_each      = { for file in local.files : file => file if !endswith(file, ".html") }
+  for_each      = { for file in local.files : file => file if !endswith(file, ".html") && !startswith(file, "_assets/") }
   bucket        = aws_s3_bucket.bucket.id
   key           = each.key
   source        = "${var.content_dir}/${each.key}"
   source_hash   = filemd5("${var.content_dir}/${each.key}")
   content_type  = lookup(local.mime_types, element(reverse(split(".", each.key)), 0), "application/octet-stream")
-  cache_control = "public,max-age=60,must-revalidate"
+  cache_control = "public,max-age=0,s-maxage=3600,must-revalidate"
   depends_on    = [aws_s3_bucket_ownership_controls.ownership, aws_s3_bucket_policy.policy]
+}
+# S3 object resources delete removed keys. Publish only the immutable namespace
+# append-only, after the bucket exists and before any HTML references it.
+resource "terraform_data" "immutable_assets" {
+  input = {
+    files         = local.immutable_files
+    cache_control = local.immutable_cache_control
+    mime_types    = local.mime_types
+  }
+  triggers_replace = [
+    local.immutable_files,
+    local.immutable_cache_control,
+    aws_s3_bucket.bucket.id,
+    filesha256("${path.module}/../../../scripts/upload-immutable-assets.py"),
+    local.mime_types,
+  ]
+  provisioner "local-exec" {
+    command = "python3 \"${path.module}/../../../scripts/upload-immutable-assets.py\""
+    environment = {
+      CONTENT_DIRECTORY = abspath(var.content_dir)
+      BUCKET_NAME       = aws_s3_bucket.bucket.id
+      MIME_TYPES        = jsonencode(local.mime_types)
+      CACHE_CONTROL     = self.input.cache_control
+    }
+  }
+  lifecycle {
+    precondition {
+      condition     = alltrue([for key, digest in local.immutable_files : startswith(key, "_assets/${digest}/")])
+      error_message = "Immutable asset URLs must match the SHA-256 of their published bytes."
+    }
+  }
+  depends_on = [aws_s3_bucket_ownership_controls.ownership, aws_s3_bucket_policy.policy]
 }
 resource "aws_s3_object" "pages" {
   for_each      = { for file in local.files : file => file if endswith(file, ".html") }
@@ -159,8 +189,8 @@ resource "aws_s3_object" "pages" {
   source        = "${var.content_dir}/${each.key}"
   source_hash   = filemd5("${var.content_dir}/${each.key}")
   content_type  = "text/html; charset=utf-8"
-  cache_control = "public,max-age=60,must-revalidate"
-  depends_on    = [aws_s3_object.assets, aws_s3_bucket_ownership_controls.ownership, aws_s3_bucket_policy.policy]
+  cache_control = "public,max-age=0,s-maxage=3600,must-revalidate"
+  depends_on    = [terraform_data.immutable_assets, aws_s3_object.assets, aws_s3_bucket_ownership_controls.ownership, aws_s3_bucket_policy.policy]
 }
 resource "aws_route53_record" "records" {
   for_each = { for pair in setproduct(var.domains, ["A", "AAAA"]) : "${pair[0]}-${pair[1]}" => pair }

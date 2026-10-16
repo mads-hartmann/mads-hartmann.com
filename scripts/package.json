@@ -1,0 +1,6 @@
+{
+  "name": "static-site-build-tools",
+  "private": true,
+  "type": "module",
+  "dependencies": { "linkedom": "0.18.13" }
+}

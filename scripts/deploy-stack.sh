@@ -19,4 +19,5 @@ else
   aws cloudfront wait invalidation-completed --distribution-id "$distribution" --id "$invalidation"
   host="$(terraform -chdir="$root" output -raw distribution_domain)"
   python3 scripts/smoke-test.py "$stack" "https://$host"
+  python3 scripts/check-http-cache.py "https://$host"
 fi
