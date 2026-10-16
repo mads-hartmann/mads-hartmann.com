@@ -6,6 +6,7 @@ const origins = {
   homepage: 'https://www.mads-hartmann.com',
   blog: 'https://blog.mads-hartmann.com',
   uses: 'https://uses.mads-hartmann.com',
+  computer: 'https://computer.mads-hartmann.com',
 };
 let count = 0;
 for (const [site, origin] of Object.entries(origins)) {
@@ -134,4 +135,4 @@ assert((await readFile('.build/uses/index.html', 'utf8')).includes(contentUpdate
 assert((await readFile('.build/blog/sre/2020/05/07/feelings-during-incident-response.md', 'utf8')).includes('https://blog.mads-hartmann.com/uploads/feelings-during-incident-response.mp3'));
 const homepage = await readFile('.build/homepage/index.md', 'utf8');
 for (const value of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'University of Copenhagen', 'IT University of Copenhagen']) assert(homepage.includes(value));
-console.log(`Markdown validated: ${count} pages, three llms.txt indexes, discovery links, content preservation, and negotiated routes.`);
+console.log(`Markdown validated: ${count} pages, four llms.txt indexes, discovery links, content preservation, and negotiated routes.`);

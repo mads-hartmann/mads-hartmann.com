@@ -1,7 +1,7 @@
 SHELL := bash
 .DEFAULT_GOAL := help
 
-.PHONY: help setup build build-routing check check-sites check-terraform check-workflows lint dev dev-homepage dev-blog dev-uses
+.PHONY: help setup build build-routing check check-sites check-terraform check-workflows lint dev dev-homepage dev-blog dev-uses dev-computer
 
 help:
 	@echo 'Targets: setup, build, check (or lint), dev'
@@ -12,6 +12,7 @@ setup:
 	$(MAKE) -C sites/mads-hartmann.com setup
 	$(MAKE) -C sites/blog.mads-hartmann.com setup
 	$(MAKE) -C sites/uses.mads-hartmann.com setup
+	$(MAKE) -C sites/computer.mads-hartmann.com setup
 
 build:
 	$(MAKE) -C sites/blog.mads-hartmann.com setup
@@ -34,7 +35,7 @@ check-workflows:
 	./scripts/check-workflows.sh
 
 dev:
-	$(MAKE) -j3 dev-homepage dev-blog dev-uses
+	$(MAKE) -j4 dev-homepage dev-blog dev-uses dev-computer
 
 dev-homepage:
 	$(MAKE) -C sites/mads-hartmann.com dev
@@ -44,3 +45,6 @@ dev-blog:
 
 dev-uses:
 	$(MAKE) -C sites/uses.mads-hartmann.com dev
+
+dev-computer:
+	$(MAKE) -C sites/computer.mads-hartmann.com dev

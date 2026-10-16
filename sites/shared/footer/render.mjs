@@ -5,6 +5,7 @@ const sites = [
   { id: 'home', label: 'Home', href: 'https://www.mads-hartmann.com/' },
   { id: 'blog', label: 'Blog', href: 'https://blog.mads-hartmann.com/' },
   { id: 'uses', label: 'Uses', href: 'https://uses.mads-hartmann.com/' },
+  { id: 'computer', label: 'Computer', href: 'https://computer.mads-hartmann.com/' },
 ];
 const socials = [
   { label: 'GitHub', href: 'https://github.com/mads-hartmann' },
@@ -21,7 +22,7 @@ export function renderFooter(current) {
     throw new Error(`Unknown footer location: ${current}`);
   }
   const navigation = sites.map(({ id, label, href }) => {
-    const active = id === current ? ` aria-current="${id === 'blog' ? 'location' : 'page'}"` : '';
+    const active = id === current ? ` aria-current="${['blog', 'computer'].includes(id) ? 'location' : 'page'}"` : '';
     return `<a href="${href}"${active}>${label}</a>`;
   }).join('\n');
   const elsewhere = socials.map(({ label, href }) => `<a rel="me" href="${href}">${label}</a>`).join('\n');

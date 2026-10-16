@@ -23,6 +23,7 @@ function checkFooter(html, current) {
     home: 'https://www.mads-hartmann.com/',
     blog: 'https://blog.mads-hartmann.com/',
     uses: 'https://uses.mads-hartmann.com/',
+    computer: 'https://computer.mads-hartmann.com/',
   }[current];
   for (const content of [shadow, fallback.split('</mh-site-footer>')[0]]) {
     assert.equal((content.match(/aria-current=/g) || []).length, 1);
@@ -33,7 +34,7 @@ function checkFooter(html, current) {
     for (const href of ['https://github.com/mads-hartmann', 'https://www.linkedin.com/in/mads-hartmann/', 'https://twitter.com/mads_hartmann', 'mailto:hello@mads-hartmann.com']) {
       assert(content.includes(`href="${href}"`));
     }
-    for (const href of ['https://www.mads-hartmann.com/', 'https://blog.mads-hartmann.com/', 'https://uses.mads-hartmann.com/']) {
+    for (const href of ['https://www.mads-hartmann.com/', 'https://blog.mads-hartmann.com/', 'https://uses.mads-hartmann.com/', 'https://computer.mads-hartmann.com/']) {
       assert(content.includes(`href="${href}"`));
     }
   }
@@ -47,6 +48,40 @@ const uses = await readFile('.build/uses/index.html', 'utf8');
 checkFooter(uses, 'uses');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(uses));
 assert.deepEqual((await readdir('.build/uses')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
+assert.deepEqual((await readdir('.build/computer')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml', 'v1.html', 'v1.md', 'v2.html', 'v2.md', 'v3.html', 'v3.md']);
+for (const name of ['index', 'v1', 'v2', 'v3']) {
+  const html = await readFile(`.build/computer/${name}.html`, 'utf8');
+  checkFooter(html, 'computer');
+  assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(html));
+  assert(html.includes('<h1>Computer'));
+  assert(html.includes(`href="https://computer.mads-hartmann.com${name === 'index' ? '/' : `/${name}.html`}"`));
+  assert(!html.includes('DO NOT EDIT'));
+  assert(!html.includes('9c3cf9a818da426f9be44d838395396c'));
+  for (const link of html.matchAll(/href="(\/[^"#]*)(?:#[^"]*)?"/g)) {
+    await stat(`.build/computer${link[1] === '/' ? '/index.html' : link[1]}`);
+  }
+  if (name === 'v3') {
+    for (const id of ['heading-gitpod', 'heading-vscode', 'heading-keybindings', 'heading-raycast', 'heading-setting-up-a-new-mac', 'heading-changelog']) {
+      assert(html.includes(`id="${id}"`), `Missing historical heading: ${id}`);
+    }
+    assert(html.includes('<details>'));
+  }
+}
+const computerRouting = createContext({});
+runInContext(await readFile('.build/routing/computer.js', 'utf8'), computerRouting);
+for (const [uri, target] of Object.entries({
+  '/': '/index.html', '/index.html': '/index.html',
+  '/v1': '/v1.html', '/v1/': '/v1.html', '/v1.html': '/v1.html',
+  '/v2': '/v2.html', '/v2/': '/v2.html', '/v2.html': '/v2.html',
+  '/v3': '/v3.html', '/v3/': '/v3.html', '/v3.html': '/v3.html',
+})) {
+  const result = computerRouting.handler({ request: { uri, querystring: { source: { value: 'archive' } } } });
+  assert.equal(result.uri, target);
+  await stat(`.build/computer${target}`);
+}
+for (const uri of ['/unknown', '/v4', '/v1/unknown', '/css/main.css']) {
+  assert.equal(computerRouting.handler({ request: { uri } }).statusCode, 404);
+}
 for (const content of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'master’s degree in Computer Science', 'University of Copenhagen', 'bachelor’s degree in Computer Science', 'IT University of Copenhagen']) {
   assert(homepage.includes(content), `Homepage is missing About content: ${content}`);
 }
@@ -126,6 +161,6 @@ for (const site of ['uses','blog']) {
 }
 assert(uses.includes('Travel'));
 await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
-console.log(`Sites validated; shared footer on homepage, Uses and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);
+console.log(`Sites validated; shared footer on homepage, Uses, Computer and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);
 await import('./check-markdown.mjs');
 await import('../sites/blog.mads-hartmann.com/check-images.mjs');

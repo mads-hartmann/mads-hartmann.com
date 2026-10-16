@@ -1,7 +1,7 @@
 # Terraform
 
 The manual `kernel` owns backend storage, GitHub OIDC/IAM and repository controls.
-The independent `stacks/shared`, `stacks/homepage`, `stacks/blog` and `stacks/uses`
+The independent `stacks/shared`, `stacks/homepage`, `stacks/blog`, `stacks/uses` and `stacks/computer`
 roots deploy through GitHub Actions after merges to `main`.
 
 See [deployment](../docs/deployment.md) for state ownership, authentication,
