@@ -12,6 +12,10 @@ md:
 
 highlighter: rouge
 
+# Fingerprinted stylesheets do not have adjacent Sass source maps.
+sass:
+  sourcemap: never
+
 collections:
   book_reviews:
     output: true
