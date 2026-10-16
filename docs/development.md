@@ -71,15 +71,6 @@ make -C sites/blog.mads-hartmann.com dev
 make -C terraform check
 ```
 
-`make check` installs locked dependencies, builds all sites, checks generated
-pages, Markdown output, and routing, validates and tests Terraform, and checks workflows with
-actionlint. `make lint` at the root runs the same checks. Site `check` and `lint`
-targets build and check all three sites because shared footer and redirect
-assertions span their artifacts. Terraform `lint` checks formatting; `check`
-includes site builds, formatting, validation, and offline tests. These checks
-need no AWS or GitHub credentials. Actual plans and applies use the authentication
-described in [deployment](deployment.md).
-
 Each site's own build produces its Markdown alternatives and publishes its
 committed `llms.txt`. `scripts/build.sh` installs site-local dependencies and
 invokes those builds; there is no root npm package or shared Markdown generator.
@@ -97,6 +88,32 @@ Override ports with Make variables or environment variables:
 make -C sites/blog.mads-hartmann.com dev BLOG_PORT=4001
 HOMEPAGE_PORT=8090 USES_PORT=8091 BLOG_PORT=4001 make dev
 ```
+
+## Validation
+
+Inside the root devenv shell, choose the check for your change:
+
+| Change | Command from the repository root |
+| --- | --- |
+| Site content, styles, shared footer or routing | `make check-sites` |
+| Terraform | `make -C terraform check` |
+| GitHub Actions workflows | `make check-workflows` |
+| Full repository | `make check` |
+
+Site checks install locked dependencies, build all three sites, and check generated
+pages, Markdown output and routing. A site's `make check` (or `make lint`) runs
+these same checks because footer and redirect assertions span all three artifacts.
+Building only one site is not sufficient before running `scripts/check-sites.mjs`.
+Preview changed pages at desktop and mobile widths, including light and dark modes.
+
+Terraform checks build the sites, check formatting, validate configuration and run
+offline tests. The full repository check also runs workflow linting with actionlint;
+root `make lint` runs the same checks as root `make check`.
+These checks need no AWS or GitHub credentials. Actual plans and applies use the
+authentication described in [Deployment](deployment.md).
+
+For documentation-only changes, check that links, paths and commands match the
+repository. Site builds and screenshots are unnecessary unless rendered pages change.
 
 ## Configuration and updates
 

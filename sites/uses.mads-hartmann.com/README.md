@@ -1,24 +1,43 @@
 # Uses
 
-Edit `index.md`. Activate tools with `devenv shell` at the repository root, then
-from this directory run `make setup` to install locked dependencies, `make build`
-to build, or `make dev` to watch and serve on port 8081. `make check` (also
-`make lint`) checks site content and routing. See [development setup](../../docs/development.md)
-for first-time activation.
+A Markdown page rendered as HTML with inline styles and no browser JavaScript.
 
-`build.mjs` renders the Markdown into one HTML file with inline styles; there is
-no application server or client JavaScript. The same build publishes `index.md`
-from the source (with its canonical URL), adds discovery links to HTML, and copies
-this directory’s editable `llms.txt` unchanged. Run `npm ci && npm run build` for
-a standalone build in `dist/`, or pass an output directory to `node build.mjs`.
-Generated files are ignored by Git.
+## Edit
 
-The build uses the shared footer from `sites/shared/footer`, with Uses selected in
-navigation. The inline styles in `build.mjs` match the homepage's system typography
-and Nordic blue light palette. A `prefers-color-scheme: dark` media query applies
-the homepage's dark surface and amber accents automatically, including the shared
-footer, link states, and list markers. Print retains the light palette.
+Edit `index.md` for content. Level-two headings create sections and category
+navigation. Edit `build.mjs` for the HTML template and styles; dark mode follows
+the system preference, and print uses the light palette.
+Site navigation and contact links come from the [shared footer](../shared/footer/README.md).
 
-Level-two Markdown headings create sections and the category navigation.
-Section labels sit beside their content on desktop and stack above it on mobile.
-The layout supports light and dark system preferences, with no client JavaScript.
+Edit `llms.txt` for the published guide to the site's content.
+
+## Preview
+
+Complete [first-time setup](../../docs/development.md#first-time-setup), then run
+from the repository root:
+
+```sh
+devenv shell
+cd sites/uses.mads-hartmann.com
+make dev
+```
+
+Open http://localhost:8081. The server installs locked dependencies as needed and
+rebuilds when source files or the shared footer change. Stop it with Ctrl-C.
+
+## Build and check
+
+From this directory, inside the root devenv shell:
+
+```sh
+make build
+make check
+```
+
+`build.mjs` produces `index.html`, publishes `index.md` with its canonical URL,
+and copies `llms.txt` unchanged into `.build/uses` at the repository root.
+For a standalone build into local `dist/`, run `npm ci && npm run build`.
+
+`make check` builds and checks all three sites. See
+[validation](../../docs/development.md#validation) for check scope and
+[deployment](../../docs/deployment.md) for production routing and Markdown negotiation.
