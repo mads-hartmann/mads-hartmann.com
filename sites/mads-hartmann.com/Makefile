@@ -15,7 +15,7 @@ build:
 
 dev:
 	watchexec --restart --stop-signal SIGINT \
-		--watch src --watch llms.txt --watch build.mjs --watch package.json --watch package-lock.json \
+		--watch src --watch llms.txt --watch robots.txt --watch sitemap.xml --watch build.mjs --watch package.json --watch package-lock.json \
 		--watch ../shared/footer --watch ../../routing --watch ../../scripts --watch Makefile \
 		-- '$(MAKE) build && exec python3 -m http.server "$(HOMEPAGE_PORT)" --bind 127.0.0.1 --directory ../../.build/homepage'
 

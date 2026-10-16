@@ -17,6 +17,8 @@ as a CLI, reads its JSON output, and exposes `site.data.shared_footers.blog` to 
 default layout. Every blog layout inherits that footer.
 
 Site links are absolute so they work across domains and from nested articles.
+The visible **For agents** link points to the current site's `llms.txt`, making
+Markdown entry points discoverable even when a reader omits HTTP and HTML metadata.
 Home and Uses use `aria-current="page"`; Blog uses `aria-current="location"` for
 its entire section. Explore and Elsewhere are separately labelled navigation
 landmarks, links have visible keyboard focus, and the footer is hidden for print.

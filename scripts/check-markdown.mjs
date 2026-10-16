@@ -34,7 +34,7 @@ for (const [site, origin] of Object.entries(origins)) {
   for (const [accept, markdown] of acceptCases) {
     for (const uri of ['/', '/index.html']) assert.equal(request(uri, accept).uri, markdown ? '/index.md' : '/index.html', `${site}: ${JSON.stringify(accept)}`);
   }
-  for (const path of ['/index.md', '/llms.txt']) {
+  for (const path of ['/index.md', '/llms.txt', '/robots.txt', '/sitemap.xml']) {
     assert.equal(request(path).uri, path);
     assert.equal(request(path, 'text/html').uri, path);
     assert.equal(request(path, 'text/markdown').uri, path);
@@ -55,6 +55,13 @@ for (const [site, origin] of Object.entries(origins)) {
     assert(markdown.includes('Canonical page: ' + origin));
     assert(!markdown.includes('data:image/'), `${file}: embedded image bytes`);
     assert(!/<script|<style|<mh-site-(?:header|footer)/i.test(markdown), `${file}: page chrome leaked`);
+    if (site === 'blog') {
+      const references = [...markdown.matchAll(/\[\^(\d+)\](?!:)/g)].map(match => match[1]);
+      const definitions = [...markdown.matchAll(/^\[\^(\d+)\]:/gm)].map(match => match[1]);
+      assert.deepEqual(new Set(references), new Set(definitions), `${file}: unresolved footnotes`);
+      assert.equal(definitions.length, new Set(definitions).size, `${file}: duplicate footnote definitions`);
+      assert(!/\]\((?:\/|#fn:|#fnref:)/.test(markdown), `${file}: relative or broken footnote link`);
+    }
     for (const match of markdown.matchAll(/https:\/\/[^\s<>"\[\]()]+\.md/g)) {
       const url = new URL(match[0]);
       if (url.origin === origin) await stat(`.build/${site}${url.pathname}`);
@@ -87,11 +94,17 @@ for (const [site, origin] of Object.entries(origins)) {
     for (const path of ['/feed.xml', '/images/profile.png', '/css/index.css', '/llms.txt']) assert.equal(request(path, 'text/markdown').uri, path);
     assert.equal(request('/about', 'text/markdown').headers.location.value, origins.homepage + '/');
   } else {
+    const robots = await readFile(`.build/${site}/robots.txt`, 'utf8');
+    assert(robots.includes(`Sitemap: ${origin}/sitemap.xml`));
+    assert(robots.includes('User-agent: *\nAllow: /'));
+    const sitemap = await readFile(`.build/${site}/sitemap.xml`, 'utf8');
+    assert(sitemap.includes('xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'));
+    assert(sitemap.includes(`<loc>${origin}/</loc>`));
     assert.equal(request('/unknown', 'text/markdown').statusCode, 404);
     assert.equal(request('/unknown.md', 'text/markdown').statusCode, 404);
   }
   if (site === 'homepage') {
-    for (const path of ['/index.md', '/llms.txt']) assert.equal(request(path, 'text/markdown', 'mads-hartmann.com').headers.location.value, origin + path);
+    for (const path of ['/index.md', '/llms.txt', '/robots.txt', '/sitemap.xml']) assert.equal(request(path, 'text/markdown', 'mads-hartmann.com').headers.location.value, origin + path);
     assert.equal(request('/tools/ascii-art', 'text/markdown').statusCode, 410);
   }
 }
@@ -103,6 +116,21 @@ assert(article.includes('# Using AI to do your best work'));
 assert(article.includes('27 Jan 2026'));
 assert(article.includes('## A worthy bug'));
 assert(article.includes('jsonl'));
+assert(article.includes('[^1]'));
+assert(article.includes('\n[^1]: This prompt'));
+assert(!article.includes('#fn:') && !article.includes('#fnref:'));
+const archive = await readFile('.build/blog/index.md', 'utf8');
+assert(archive.includes('](https://blog.mads-hartmann.com/2026/01/27/using-ai-to-do-your-best-work.md) — 27 Jan 2026'));
+assert(archive.includes('](https://blog.mads-hartmann.com/series/observability.md) — 2019 - 2020'));
+const awk = await readFile('.build/blog/2018/09/29/enough-awk-to-get-by.md', 'utf8');
+assert(awk.includes('[^3]'));
+assert(awk.includes('\n[^3]: [The A-Z of Programming Languages: AWK]'));
+assert(awk.includes('https://blog.mads-hartmann.com/2018/09/29/enough-awk-to-get-by.html#explaining-the-example'));
+assert(awk.includes("grep -R TRIGGER . | awk '{gsub(/:.*/,\" \")}1'"));
+const usesSource = await readFile('sites/uses.mads-hartmann.com/index.md', 'utf8');
+const contentUpdated = usesSource.match(/^Content updated: (\d{4}-\d{2}-\d{2})\.$/m);
+assert(contentUpdated, 'Uses must carry an explicit content update date');
+assert((await readFile('.build/uses/index.html', 'utf8')).includes(contentUpdated[0]));
 assert((await readFile('.build/blog/sre/2020/05/07/feelings-during-incident-response.md', 'utf8')).includes('https://blog.mads-hartmann.com/uploads/feelings-during-incident-response.mp3'));
 const homepage = await readFile('.build/homepage/index.md', 'utf8');
 for (const value of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'University of Copenhagen', 'IT University of Copenhagen']) assert(homepage.includes(value));
