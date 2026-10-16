@@ -1,7 +1,9 @@
+@import "fonts";
+
 body {
   font-size: 1.2rem;
   line-height: 1.7rem;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Muli", sans-serif;
   -webkit-font-smoothing: antialiased;
   color: var(--mh-color-text);
   margin: 0px;

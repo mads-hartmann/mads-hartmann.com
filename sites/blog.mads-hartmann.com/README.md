@@ -44,6 +44,39 @@ Production output goes to `.build/blog` at the repository root and excludes draf
 [validation](../../docs/development.md#validation) for check scope and
 [routing](../../docs/deployment.md#routing) for production redirects.
 
+## Fonts
+
+The blog self-hosts Muli 2.100, preserving the original Google Fonts design and
+the six requested faces: weights 200, 400, and 700, upright and italic. Three
+weight declarations share one variable font per style, so browsers download at
+most two font files per page; only upright is preloaded. The discrete face
+declarations preserve the original weight matching (including 300 mapping to
+200), rather than introducing new intermediate weights.
+`font-display: swap` keeps text visible during the first download. Production
+builds fingerprint both the CSS font URLs and the preload through the shared
+asset pipeline, enabling immutable caching without duplicate font downloads.
+
+The checked-in WOFF2 files retain outlines, kerning, and layout features; legacy
+TrueType hinting instructions are removed to reduce size. Small text may rasterize
+slightly differently on systems that use these instructions. Their
+Western Latin subset includes Danish letters, common accented letters,
+combining accents, punctuation, arrows, and comparison symbols. Characters
+outside this coverage use the existing sans-serif fallback; expand `UNICODES`
+in the script if a new language needs additional Muli glyphs. The subset covers
+all Muli-supported non-code characters in the current published pages.
+
+Sources are pinned to the last Google Fonts revision containing Muli, before
+the Mulish redesign, and checked with SHA-256. The SIL Open Font License is
+distributed alongside the fonts in `src/fonts/OFL.txt`. Normal builds require
+neither Python font tooling nor access to Google Fonts. To regenerate from the
+repository root:
+
+```sh
+python3 -m venv .build/font-tools
+.build/font-tools/bin/pip install fonttools==4.61.1 brotli==1.2.0
+.build/font-tools/bin/python scripts/subset-blog-fonts.py
+```
+
 ## Markdown output
 
 [jekyll-md](https://github.com/dblock/jekyll-md) generates Markdown during builds
