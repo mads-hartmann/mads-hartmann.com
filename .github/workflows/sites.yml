@@ -2,7 +2,7 @@ name: Sites
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: ['**']
   workflow_dispatch:
     inputs:
       stack:
@@ -12,10 +12,10 @@ on:
         default: all
 permissions:
   contents: read
-# Queue production changes; never interrupt an apply or invalidate a saved plan.
+# Queue production changes; newer branch/PR runs can replace unfinished checks.
 concurrency:
-  group: sites-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'production' }}
-  cancel-in-progress: false
+  group: sites-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.ref == 'refs/heads/main' && 'production' || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.ref != 'refs/heads/main' }}
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -23,6 +23,7 @@ jobs:
       contents: read
       actions: read
     outputs:
+      terraform_plan_changed: ${{ steps.changes.outputs.terraform_plan_changed }}
       terraform_changed: ${{ steps.changes.outputs.terraform_changed }}
       homepage_changed: ${{ steps.deployments.outputs.homepage_changed }}
       blog_changed: ${{ steps.deployments.outputs.blog_changed }}
@@ -49,16 +50,25 @@ jobs:
             base="$PUSH_BASE"
             head="$GITHUB_SHA"
           else
+            echo "terraform_plan_changed=$changed" >> "$GITHUB_OUTPUT"
             echo "terraform_changed=$changed" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if git diff --quiet "$base" "$head" -- terraform/ scripts/check-terraform.sh .github/workflows/; then
+          if git diff --quiet "$base" "$head" -- terraform/ scripts/check-terraform.sh .github/workflows/ .github/actions/; then
             changed=false
           else
             status=$?
             if [ "$status" -ne 1 ]; then exit "$status"; fi
           fi
           echo "terraform_changed=$changed" >> "$GITHUB_OUTPUT"
+          plan_changed=true
+          if git diff --quiet "$base" "$head" -- terraform/ scripts/check-terraform.sh scripts/plan-stack.sh scripts/deploy-stack.sh .github/workflows/ .github/actions/; then
+            plan_changed=false
+          else
+            status=$?
+            if [ "$status" -ne 1 ]; then exit "$status"; fi
+          fi
+          echo "terraform_plan_changed=$plan_changed" >> "$GITHUB_OUTPUT"
       - name: Select site deployments
         id: deployments
         if: >-
@@ -124,61 +134,157 @@ jobs:
           else
             test "$TERRAFORM_RESULT" = success
           fi
+  plan:
+    needs: [build, checks]
+    if: >-
+      !cancelled() && needs.checks.result == 'success' &&
+      needs.build.outputs.terraform_plan_changed == 'true' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor == github.repository_owner && vars.TERRAFORM_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sites
+      - run: tar -xzf sites.tar.gz
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.16.5
+          terraform_wrapper: false
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_SHARED_PLAN }}
+          aws-region: eu-central-1
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+      - name: Plan shared and read public outputs
+        run: |
+          terraform -chdir=terraform/stacks/shared init -input=false -lockfile=readonly -backend-config=backend.hcl
+          terraform -chdir=terraform/stacks/shared plan -input=false -lock-timeout=5m -no-color
+          echo "TF_VAR_zone_id=$(terraform -chdir=terraform/stacks/shared output -raw zone_id)" >> "$GITHUB_ENV"
+          echo "TF_VAR_certificate_arn=$(terraform -chdir=terraform/stacks/shared output -raw certificate_arn)" >> "$GITHUB_ENV"
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_HOMEPAGE_PLAN }}
+          aws-region: eu-central-1
+          unset-current-credentials: true
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+      - run: scripts/plan-stack.sh homepage
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_BLOG_PLAN }}
+          aws-region: eu-central-1
+          unset-current-credentials: true
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+      - run: scripts/plan-stack.sh blog
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_USES_PLAN }}
+          aws-region: eu-central-1
+          unset-current-credentials: true
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+      - run: scripts/plan-stack.sh uses
   shared:
+    name: shared / apply
     if: >-
       !cancelled() && needs.checks.result == 'success' &&
       github.ref == 'refs/heads/main' && github.event_name != 'pull_request' &&
       vars.TERRAFORM_DEPLOY_ENABLED == 'true'
     needs: [checks]
-    uses: ./.github/workflows/apply-stack.yml
+    runs-on: ubuntu-24.04
+    environment: Production
     permissions:
       contents: read
       id-token: write
-    with:
-      stack: shared
-      role_arn: ${{ vars.AWS_ROLE_SHARED_APPLY }}
+    outputs:
+      changed: ${{ steps.deploy.outputs.changed }}
+      zone_id: ${{ steps.deploy.outputs.zone_id }}
+      certificate_arn: ${{ steps.deploy.outputs.certificate_arn }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/apply-stack
+        id: deploy
+        with:
+          account_id: ${{ vars.AWS_ACCOUNT_ID }}
+          stack: shared
+          role_arn: ${{ vars.AWS_ROLE_SHARED_APPLY }}
   homepage:
+    name: homepage / apply
     if: >-
       !cancelled() && needs.shared.result == 'success' &&
       (needs.build.outputs.homepage_changed == 'true' ||
        (github.event_name == 'push' && needs.shared.outputs.changed == 'true'))
     needs: [build, shared]
-    uses: ./.github/workflows/apply-stack.yml
+    runs-on: ubuntu-24.04
+    environment: Production
     permissions:
       contents: read
       id-token: write
-    with:
-      stack: homepage
-      role_arn: ${{ vars.AWS_ROLE_HOMEPAGE_APPLY }}
-      zone_id: ${{ needs.shared.outputs.zone_id }}
-      certificate_arn: ${{ needs.shared.outputs.certificate_arn }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/apply-stack
+        id: deploy
+        with:
+          account_id: ${{ vars.AWS_ACCOUNT_ID }}
+          stack: homepage
+          role_arn: ${{ vars.AWS_ROLE_HOMEPAGE_APPLY }}
+          zone_id: ${{ needs.shared.outputs.zone_id }}
+          certificate_arn: ${{ needs.shared.outputs.certificate_arn }}
   blog:
+    name: blog / apply
     if: >-
       !cancelled() && needs.shared.result == 'success' &&
       (needs.build.outputs.blog_changed == 'true' ||
        (github.event_name == 'push' && needs.shared.outputs.changed == 'true'))
     needs: [build, shared]
-    uses: ./.github/workflows/apply-stack.yml
+    runs-on: ubuntu-24.04
+    environment: Production
     permissions:
       contents: read
       id-token: write
-    with:
-      stack: blog
-      role_arn: ${{ vars.AWS_ROLE_BLOG_APPLY }}
-      zone_id: ${{ needs.shared.outputs.zone_id }}
-      certificate_arn: ${{ needs.shared.outputs.certificate_arn }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/apply-stack
+        id: deploy
+        with:
+          account_id: ${{ vars.AWS_ACCOUNT_ID }}
+          stack: blog
+          role_arn: ${{ vars.AWS_ROLE_BLOG_APPLY }}
+          zone_id: ${{ needs.shared.outputs.zone_id }}
+          certificate_arn: ${{ needs.shared.outputs.certificate_arn }}
   uses:
+    name: uses / apply
     if: >-
       !cancelled() && needs.shared.result == 'success' &&
       (needs.build.outputs.uses_changed == 'true' ||
        (github.event_name == 'push' && needs.shared.outputs.changed == 'true'))
     needs: [build, shared]
-    uses: ./.github/workflows/apply-stack.yml
+    runs-on: ubuntu-24.04
+    environment: Production
     permissions:
       contents: read
       id-token: write
-    with:
-      stack: uses
-      role_arn: ${{ vars.AWS_ROLE_USES_APPLY }}
-      zone_id: ${{ needs.shared.outputs.zone_id }}
-      certificate_arn: ${{ needs.shared.outputs.certificate_arn }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/apply-stack
+        id: deploy
+        with:
+          account_id: ${{ vars.AWS_ACCOUNT_ID }}
+          stack: uses
+          role_arn: ${{ vars.AWS_ROLE_USES_APPLY }}
+          zone_id: ${{ needs.shared.outputs.zone_id }}
+          certificate_arn: ${{ needs.shared.outputs.certificate_arn }}

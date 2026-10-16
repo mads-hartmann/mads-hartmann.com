@@ -53,8 +53,17 @@ run "private_origin" {
     error_message = "Every site domain must have both IPv4 and IPv6 aliases."
   }
   assert {
-    condition     = length(aws_s3_object.pages) == 1 && length(aws_s3_object.assets) == 2 && aws_s3_object.assets["index.md"].content_type == "text/markdown; charset=utf-8" && aws_s3_object.assets["llms.txt"].content_type == "text/plain; charset=utf-8"
-    error_message = "Upload the homepage and its Markdown and llms.txt representations with correct content types."
+    condition     = aws_s3_object.pages["index.html"].content_type == "text/html; charset=utf-8"
+    error_message = "Upload the homepage as HTML."
+  }
+  assert {
+    condition = alltrue([for file, content_type in {
+      "index.md"    = "text/markdown; charset=utf-8"
+      "llms.txt"    = "text/plain; charset=utf-8"
+      "robots.txt"  = "text/plain; charset=utf-8"
+      "sitemap.xml" = "application/xml; charset=utf-8"
+    } : aws_s3_object.assets[file].content_type == content_type])
+    error_message = "Upload the homepage's Markdown and discovery files with correct content types."
   }
   assert {
     condition     = alltrue([for header in one(aws_cloudfront_response_headers_policy.site.custom_headers_config).items : header.override && (header.header == "Vary" ? header.value == "Accept, Accept-Encoding" : header.header == "Link" && header.value == "</llms.txt>; rel=\"describedby\"; type=\"text/plain\"")])

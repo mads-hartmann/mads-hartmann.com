@@ -74,7 +74,8 @@ class SelectionTests(unittest.TestCase):
             "terraform/stacks/shared/main.tf": all_sites,
             "scripts/build.sh": all_sites,
             "scripts/smoke-test.py": all_sites,
-            ".github/workflows/apply-stack.yml": all_sites,
+            ".github/workflows/sites.yml": all_sites,
+            ".github/actions/apply-stack/action.yml": all_sites,
             "docs/deployment.md": set(),
             "terraform/kernel/main.tf": set(),
         }
