@@ -24,7 +24,11 @@ jobs:
       contents: read
       actions: read
     outputs:
-      terraform_plan_changed: ${{ steps.changes.outputs.terraform_plan_changed }}
+      plan_required: >-
+        ${{ github.event_name == 'pull_request' &&
+            steps.changes.outputs.terraform_plan_changed == 'true' &&
+            github.event.pull_request.head.repo.full_name == github.repository &&
+            github.actor == github.repository_owner && vars.TERRAFORM_DEPLOY_ENABLED == 'true' }}
       terraform_changed: ${{ steps.changes.outputs.terraform_changed }}
       homepage_changed: ${{ steps.deployments.outputs.homepage_changed }}
       blog_changed: ${{ steps.deployments.outputs.blog_changed }}
@@ -119,32 +123,31 @@ jobs:
           terraform_wrapper: false
       - run: scripts/check-terraform.sh
   checks:
-    name: Checks
+    # Only PR runs publish the required status; branch checks cannot satisfy it.
+    name: ${{ github.event_name == 'pull_request' && 'Checks' || 'Branch checks' }}
     if: always()
-    needs: [build, terraform]
+    needs: [build, terraform, plan]
     runs-on: ubuntu-24.04
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Require every check
         env:
           BUILD_RESULT: ${{ needs.build.result }}
-          TERRAFORM_CHANGED: ${{ needs.build.outputs.terraform_changed }}
+          TERRAFORM_REQUIRED: ${{ needs.build.outputs.terraform_changed }}
           TERRAFORM_RESULT: ${{ needs.terraform.result }}
-        run: |
-          test "$BUILD_RESULT" = success
-          if [ "$TERRAFORM_CHANGED" = false ]; then
-            test "$TERRAFORM_RESULT" = skipped
-          else
-            test "$TERRAFORM_RESULT" = success
-          fi
+          PLAN_REQUIRED: ${{ needs.build.outputs.plan_required }}
+          PLAN_RESULT: ${{ needs.plan.result }}
+        run: bash scripts/check-ci-results.sh
   plan:
     name: Plan
-    needs: [build, checks]
+    needs: [build, terraform]
     if: >-
-      !cancelled() && needs.checks.result == 'success' &&
-      needs.build.outputs.terraform_plan_changed == 'true' &&
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.actor == github.repository_owner && vars.TERRAFORM_DEPLOY_ENABLED == 'true'
+      !cancelled() && needs.build.result == 'success' &&
+      (needs.terraform.result == 'success' ||
+       (needs.build.outputs.terraform_changed == 'false' && needs.terraform.result == 'skipped')) &&
+      needs.build.outputs.plan_required == 'true'
     runs-on: ubuntu-24.04
     permissions:
       contents: read

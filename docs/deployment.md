@@ -67,10 +67,15 @@ on every branch push and PR. The Terraform check matrix runs for changes to
 `terraform/`, its check script, CI workflows or local actions, and on manual
 runs. PR cloud plans run for Terraform, Terraform script, workflow or local
 action changes, reusing the checked site artifact in the same workflow. The
-required `Checks` job accounts for these conditional jobs; site-only changes
-still deploy on `main`. On `main`, with `TERRAFORM_DEPLOY_ENABLED=true`, it
-plans shared then the affected sites using the local `.github/actions/apply-
-stack` action. Each stack keeps its own Production job and apply role. Feature
+required `Checks` job waits for the build, Terraform validation and PR plan.
+An eligible plan must succeed before merging; failed, cancelled or unexpectedly
+skipped plans fail the gate. Plans remain intentionally skipped for unrelated
+changes, untrusted PRs and when cloud deployment is disabled. Branch pushes and
+manual runs publish `Branch checks`, so they cannot satisfy the PR's required
+`Checks` status. Site-only changes still deploy on `main`.
+On `main`, with `TERRAFORM_DEPLOY_ENABLED=true`, it plans shared then the affected
+sites using the local `.github/actions/apply-stack` action. Each stack keeps its
+own Production job and apply role. Feature
 branch builds and PRs never apply infrastructure, invalidate CloudFront or run
 deployment smoke tests. Shared always runs first to provide the certificate and
 zone outputs. A manual run on `main` can choose a site or all sites and bypasses
