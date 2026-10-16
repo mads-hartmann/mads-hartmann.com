@@ -110,6 +110,14 @@ class SelectionTests(unittest.TestCase):
                 {"name": "uses / apply", "conclusion": "skipped"}]
         self.assertEqual(self.baseline(jobs=jobs), self.base)
 
+    def test_shared_deployment_names_require_success(self):
+        for name in ["Deploy shared DNS and TLS", "shared / apply"]:
+            for result in ["success", "skipped", "failure", "cancelled", None]:
+                with self.subTest(name=name, result=result):
+                    jobs = [{"name": name, "conclusion": result}, *self.jobs[1:]]
+                    expected = self.base if result == "success" else None
+                    self.assertEqual(self.baseline(jobs=jobs), expected)
+
     def test_failed_or_incomplete_runs_force_all(self):
         for result in ["failure", "cancelled", "timed_out", None]:
             with self.subTest(result=result):

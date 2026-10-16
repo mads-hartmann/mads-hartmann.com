@@ -97,6 +97,7 @@ jobs:
           path: sites.tar.gz
           retention-days: 7
   terraform:
+    name: Validate and test Terraform (${{ matrix.terraform_version }})
     needs: build
     if: needs.build.outputs.terraform_changed == 'true'
     runs-on: ubuntu-24.04
@@ -191,7 +192,7 @@ jobs:
           allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
       - run: scripts/plan-stack.sh uses
   shared:
-    name: shared / apply
+    name: Deploy shared DNS and TLS
     if: >-
       !cancelled() && needs.checks.result == 'success' &&
       github.ref == 'refs/heads/main' && github.event_name != 'pull_request' &&

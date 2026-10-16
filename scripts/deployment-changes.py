@@ -38,7 +38,8 @@ def deployment_base(env):
     jobs = github(f"repos/{repo}/actions/runs/{run['id']}/jobs?per_page=100")["jobs"]
     results = {job["name"]: job["conclusion"] for job in jobs}
     # A green workflow with deployment disabled is not a deployed baseline.
-    if results.get("shared / apply") != "success":
+    # Accept the previous display name when inspecting older production runs.
+    if results.get("Deploy shared DNS and TLS", results.get("shared / apply")) != "success":
         return None
     if any(
         results.get(f"{site} / apply") not in ("success", "skipped")
