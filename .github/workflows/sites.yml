@@ -18,6 +18,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' || github.ref != 'refs/heads/main' }}
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -136,6 +137,7 @@ jobs:
             test "$TERRAFORM_RESULT" = success
           fi
   plan:
+    name: Plan
     needs: [build, checks]
     if: >-
       !cancelled() && needs.checks.result == 'success' &&
@@ -218,7 +220,7 @@ jobs:
           stack: shared
           role_arn: ${{ vars.AWS_ROLE_SHARED_APPLY }}
   homepage:
-    name: homepage / apply
+    name: Deploy homepage
     if: >-
       !cancelled() && needs.shared.result == 'success' &&
       (needs.build.outputs.homepage_changed == 'true' ||
@@ -242,7 +244,7 @@ jobs:
           zone_id: ${{ needs.shared.outputs.zone_id }}
           certificate_arn: ${{ needs.shared.outputs.certificate_arn }}
   blog:
-    name: blog / apply
+    name: Deploy blog
     if: >-
       !cancelled() && needs.shared.result == 'success' &&
       (needs.build.outputs.blog_changed == 'true' ||
@@ -266,7 +268,7 @@ jobs:
           zone_id: ${{ needs.shared.outputs.zone_id }}
           certificate_arn: ${{ needs.shared.outputs.certificate_arn }}
   uses:
-    name: uses / apply
+    name: Deploy Uses
     if: >-
       !cancelled() && needs.shared.result == 'success' &&
       (needs.build.outputs.uses_changed == 'true' ||
