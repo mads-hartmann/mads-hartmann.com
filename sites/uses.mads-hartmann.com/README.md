@@ -14,9 +14,11 @@ a standalone build in `dist/`, or pass an output directory to `node build.mjs`.
 Generated files are ignored by Git.
 
 The build uses the shared footer from `sites/shared/footer`, with Uses selected in
-navigation. Its semantic color palette is defined in the inline `:root` styles in
-`build.mjs`, matching the homepage's green palette.
+navigation. The inline styles in `build.mjs` match the homepage's system typography
+and Nordic blue light palette. A `prefers-color-scheme: dark` media query applies
+the homepage's dark surface and amber accents automatically, including the shared
+footer, link states, and list markers. Print retains the light palette.
 
 Level-two Markdown headings create sections and the category navigation.
 Section labels sit beside their content on desktop and stack above it on mobile.
-The layout uses a light background and system typography, with no client JavaScript.
+The layout supports light and dark system preferences, with no client JavaScript.
