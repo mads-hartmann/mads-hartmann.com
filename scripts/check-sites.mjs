@@ -1,3 +1,6 @@
+import { execFileSync } from 'node:child_process';
+execFileSync('python3', ['scripts/test_upload_immutable_assets.py'], { stdio: 'inherit' });
+execFileSync(process.execPath, ['--test', 'scripts/fingerprint-assets.test.mjs'], { stdio: 'inherit' });
 import assert from 'node:assert/strict';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { createContext, runInContext } from 'node:vm';
@@ -92,10 +95,14 @@ for (const uri of [...Object.keys(routes), '/blog', '/writings', '/blog/feed.xml
 assert.equal(request('/tools/ascii-art').statusCode,410);
 assert.equal(request('/photography').statusCode,410);
 assert.equal(request('/unknown').statusCode,404);
+const immutablePath = '/_assets/' + 'a'.repeat(64) + '/css/site.css';
+assert.equal(request(immutablePath).uri, immutablePath);
+assert.equal(request('/_assets/not-a-hash/site.css').statusCode, 404);
 for (const site of ['uses','blog']) {
   const ctx = createContext({});
   runInContext(await readFile(`.build/routing/${site}.js`, 'utf8'),ctx);
   assert.equal(ctx.handler({ request:{uri:'/'} }).uri,'/index.html');
+  assert.equal(ctx.handler({ request:{uri:immutablePath} }).uri, immutablePath);
   if(site==='uses') assert.equal(ctx.handler({ request:{uri:'/unknown'} }).statusCode,404);
   else {
     for (const [uri, target] of Object.entries(redirects.blog)) {
