@@ -1,7 +1,7 @@
 # Agent instructions
 
 - Start with [README.md](README.md) for the repository overview and links to each component's README.
-- Read the relevant component README before making changes. For shared footer changes, read [its README](sites/shared/footer/README.md); all three sites are affected.
+- Read the relevant component README before making changes. For shared footer changes, read [its README](sites/shared/footer/README.md); all four sites are affected.
 - Use [Development](docs/development.md) for setup and validation, and [Deployment](docs/deployment.md) for infrastructure or deployment changes.
 - Keep shared instructions in these human-readable documents and link to them here instead of duplicating them.
 

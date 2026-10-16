@@ -1,6 +1,6 @@
 locals {
   stack      = "kernel"
-  stacks     = toset(["shared", "homepage", "blog", "uses"])
+  stacks     = toset(["shared", "homepage", "blog", "uses", "computer"])
   identities = { for item in setproduct(local.stacks, ["plan", "apply"]) : "${item[0]}-${item[1]}" => { stack = item[0], mode = item[1] } }
 }
 resource "aws_s3_bucket" "state" {

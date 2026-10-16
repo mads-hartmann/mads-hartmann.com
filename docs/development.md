@@ -58,10 +58,11 @@ Run `make` in the root or a project directory to see its targets.
 
 | Directory | Commands | Development server |
 | --- | --- | --- |
-| Repository root | `make setup`, `make build`, `make check`, `make lint` | `make dev` starts all three |
+| Repository root | `make setup`, `make build`, `make check`, `make lint` | `make dev` starts all four |
 | `sites/mads-hartmann.com` | `make setup`, `make build`, `make check`, `make lint` | `make dev`, port 8080 |
 | `sites/blog.mads-hartmann.com` | `make setup`, `make build`, `make check`, `make lint` | `make dev`, port 4000 |
 | `sites/uses.mads-hartmann.com` | `make setup`, `make build`, `make check`, `make lint` | `make dev`, port 8081 |
+| `sites/computer.mads-hartmann.com` | `make setup`, `make build`, `make check`, `make lint` | `make dev`, port 8082 |
 | `terraform` | `make fmt`, `make lint`, `make check` | None |
 
 You can also invoke a project's Makefile from the root:
@@ -100,9 +101,9 @@ Inside the root devenv shell, choose the check for your change:
 | GitHub Actions workflows | `make check-workflows` |
 | Full repository | `make check` |
 
-Site checks install locked dependencies, build all three sites, and check generated
+Site checks install locked dependencies, build all four sites, and check generated
 pages, Markdown output and routing. A site's `make check` (or `make lint`) runs
-these same checks because footer and redirect assertions span all three artifacts.
+these same checks because footer and redirect assertions span all four artifacts.
 Building only one site is not sufficient before running `scripts/check-sites.mjs`.
 Preview changed pages at desktop and mobile widths, including light and dark modes.
 
@@ -136,11 +137,11 @@ deliberate change. Kubernetes utilities are included in the normal environment.
 ## Local state and cloud workspaces
 
 `.devenv`, `.direnv`, `.devenv-state`, generated output, and dependencies are
-ignored. `make setup` installs frozen blog gems and Home and Uses npm dependencies; builds
+ignored. `make setup` installs frozen blog gems and Home, Uses and Computer npm dependencies; builds
 and development servers also prepare their dependencies. Gem caches include the
 platform and Ruby derivation identity. The locked protobuf gem needs a build flag
 that keeps format warnings from being fatal; it applies only while compiling
-that gem. Delete `.devenv-state` and the Home and Uses `node_modules` directories to reinstall
+that gem. Delete `.devenv-state` and the Home, Uses and Computer `node_modules` directories to reinstall
 dependencies. Setup does not change application lockfiles.
 
 Cloud startup uses the same bootstrap and root `make setup`. A host without

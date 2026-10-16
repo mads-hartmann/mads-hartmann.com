@@ -3,6 +3,10 @@ mock_provider "github" {}
 run "kernel_boundaries" {
   command = apply
   assert {
+    condition     = github_actions_variable.deployment["AWS_ROLE_COMPUTER_APPLY"].value == aws_iam_role.github["computer-apply"].arn && github_actions_variable.deployment["AWS_ROLE_COMPUTER_PLAN"].value == aws_iam_role.github["computer-plan"].arn
+    error_message = "The restored Computer stack must expose its separate plan/apply identities to Actions."
+  }
+  assert {
     condition     = jsondecode(aws_iam_role.github["homepage-apply"].assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:mads-hartmann/mads-hartmann.com:environment:Production"
     error_message = "Apply must use the protected Production environment."
   }

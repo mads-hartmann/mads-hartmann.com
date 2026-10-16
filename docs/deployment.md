@@ -9,6 +9,7 @@
 | Homepage | `stacks/homepage.tfstate` | Homepage S3/CloudFront, apex and www DNS, URL redirects |
 | Blog | `stacks/blog.tfstate` | Blog S3/CloudFront/DNS, generated posts and assets |
 | Uses | `stacks/uses.tfstate` | Uses S3/CloudFront/DNS, generated HTML |
+| Computer | `stacks/computer.tfstate` | Computer S3/CloudFront/DNS, macOS baseline and archives |
 
 All states use the `terraform-state-cloud-mads-hartmann-com` bucket in
 `eu-central-1`, with native S3 lock files. Versioning protects previous states.
@@ -119,10 +120,10 @@ under `/_assets/<sha256>/` are published append-only and retained when they leav
 the current build, so already-open/cached HTML keeps working.
 Untracked objects require separate review and removal. Successful deployments
 invalidate `/*` and wait, then smoke-test the CloudFront hostname and HTTP cache
-contract. Homepage/uses functions return actual 404/410 responses.
+contract. Homepage/Uses/Computer functions return actual 404/410 responses.
 Blog missing objects use the generated 404 page; access errors remain 403.
 
-The homepage has no external styles, fonts, scripts or image requests. Uses has
+The homepage has no external styles, fonts, scripts or image requests. Uses and Computer each have
 one pinned Markdown dependency. Markdown is trusted author-controlled source and
 can include HTML; it is not an untrusted-input renderer. The blog keeps Jekyll,
 posts, book reviews, drafts, media, feed and existing permalink behavior.
@@ -137,6 +138,21 @@ The local preview servers do not run these functions; use the
 The blog's former `/about`, `/about/` and `/about/index.html` URLs redirect to
 `https://www.mads-hartmann.com/` with HTTP 301 responses.
 Biography, work history and education live on the homepage.
+
+## Restoring Computer
+
+Before merging the Computer restoration, apply the reviewed manual kernel change
+using the process below. It adds the `computer` stack, its bucket-scoped policies,
+`mads-sites-computer-plan` / `mads-sites-computer-apply` roles, and the
+`AWS_ROLE_COMPUTER_PLAN` / `AWS_ROLE_COMPUTER_APPLY` repository variables. Actions
+cannot create these identities itself. The existing wildcard certificate covers
+`computer.mads-hartmann.com`. The required PR plan needs the new plan role too.
+
+After that prerequisite, the normal Sites workflow creates the private bucket,
+CloudFront distribution and DNS aliases and uploads the current setup guide and
+v1/v2/v3 archives. Existing `.html`, extensionless and trailing-slash archive links
+resolve, including Markdown negotiation. The former GitHub Pages and Notion-sync
+workflows remain retired; edit the restored Markdown files in Git.
 
 ## Updating the kernel
 
@@ -178,6 +194,8 @@ installs site-local dependencies and invokes those builds:
   Its Node dependencies are pinned in that site's `package-lock.json`.
 - Uses' `sites/uses.mads-hartmann.com/build.mjs` renders HTML and publishes its
   existing Markdown source, adding the canonical URL and copying `llms.txt`.
+- Computer's `sites/computer.mads-hartmann.com/build.mjs` does the same for its
+  current setup page and three historical archives.
 - The blog uses the released [jekyll-md](https://github.com/dblock/jekyll-md) gem,
   pinned in its Gemfile/lockfile and enabled in `src/_config.yml`. It converts
   rendered `.site` content, generates Markdown files, and injects discovery links
@@ -187,8 +205,9 @@ installs site-local dependencies and invokes those builds:
   blog project folder as a static file so Jekyll publishes it unchanged.
 
 Each site owns an editable, tracked `llms.txt` in its project folder:
-`sites/mads-hartmann.com/llms.txt`, `sites/blog.mads-hartmann.com/llms.txt`, and
-`sites/uses.mads-hartmann.com/llms.txt`. The build copies these files unchanged to
+`sites/mads-hartmann.com/llms.txt`, `sites/blog.mads-hartmann.com/llms.txt`,
+`sites/uses.mads-hartmann.com/llms.txt`, and `sites/computer.mads-hartmann.com/llms.txt`.
+The build copies these files unchanged to
 the corresponding site's root. Edit those files directly to change the guides;
 their contents are not generated. The site checks verify that the
 published copies match the tracked files and that their links resolve.
@@ -205,8 +224,8 @@ definitions. Recording links remain available in the article text. Home strips
 inline image bytes while retaining alt text, and Uses publishes its source,
 including its explicitly maintained content update date.
 
-All three domains serve `robots.txt` and a canonical-HTML sitemap at `sitemap.xml`.
-Home and Uses copy their small tracked files during their builds, and their
+All four domains serve `robots.txt` and a canonical-HTML sitemap at `sitemap.xml`.
+Home, Uses and Computer copy their small tracked files during their builds, and their
 viewer-request functions allow both paths without Markdown negotiation. The blog
 continues to use Jekyll's generated crawler files. Sitemap entries omit a synthetic
 deployment-time `lastmod` on the single-page sites.

@@ -66,6 +66,9 @@ class SelectionTests(unittest.TestCase):
             "sites/uses.mads-hartmann.com/build.mjs": {"uses"},
             "sites/uses.mads-hartmann.com/package-lock.json": {"uses"},
             "routing/blog.js": {"blog"},
+            "sites/computer.mads-hartmann.com/index.md": {"computer"},
+            "routing/computer.js": {"computer"},
+            "terraform/stacks/computer/main.tf": {"computer"},
             "terraform/stacks/homepage/.terraform.lock.hcl": {"homepage"},
             "sites/shared/footer/footer.html": all_sites,
             "routing/markdown.js": all_sites,
@@ -93,7 +96,7 @@ class SelectionTests(unittest.TestCase):
         (self.repo / "sites/mads-hartmann.com/src/old.html").rename(target)
         head = self.commit("docs/note.md")
         self.assertEqual(changes.affected_sites(base, head),
-                         {"homepage": True, "blog": False, "uses": True})
+                         {"homepage": True, "blog": False, "uses": True, "computer": False})
         target.unlink()
         deleted = self.commit("docs/note.md")
         self.assertTrue(changes.affected_sites(head, deleted)["uses"])
@@ -107,7 +110,8 @@ class SelectionTests(unittest.TestCase):
     def test_skipped_sites_remain_a_valid_baseline(self):
         # GitHub can represent a skipped reusable workflow by its caller name.
         jobs = [self.jobs[0], self.jobs[1], {"name": "blog", "conclusion": "skipped"},
-                {"name": "uses / apply", "conclusion": "skipped"}]
+                {"name": "uses / apply", "conclusion": "skipped"},
+                {"name": "Deploy Computer", "conclusion": "skipped"}]
         self.assertEqual(self.baseline(jobs=jobs), self.base)
 
     def test_shared_deployment_names_require_success(self):
@@ -119,7 +123,7 @@ class SelectionTests(unittest.TestCase):
                     self.assertEqual(self.baseline(jobs=jobs), expected)
 
     def test_site_deployment_names_require_success_or_skip(self):
-        names = {"homepage": "Deploy homepage", "blog": "Deploy blog", "uses": "Deploy Uses"}
+        names = {"homepage": "Deploy homepage", "blog": "Deploy blog", "uses": "Deploy Uses", "computer": "Deploy Computer"}
         for site, name in names.items():
             for job_name in [name, f"{site} / apply"]:
                 for result in ["success", "skipped", "failure", "cancelled", None]:
@@ -163,6 +167,7 @@ class SelectionTests(unittest.TestCase):
     def test_outputs_manual_selection_and_api_failure(self):
         for event, stack, expected in [
             ("workflow_dispatch", "uses", {"uses"}),
+            ("workflow_dispatch", "computer", {"computer"}),
             ("workflow_dispatch", "shared", set()),
             ("workflow_dispatch", "all", set(changes.SITES)),
             ("push", "", set(changes.SITES)),
