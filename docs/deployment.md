@@ -16,9 +16,9 @@ All states use the `terraform-state-cloud-mads-hartmann-com` bucket in
 Only the default Terraform workspace is supported. Homepage and uses buckets are
 in `eu-central-1`; the blog bucket is in `us-east-1`.
 
-Terraform Core supports `>= 1.16.4, < 1.17.0`. CI validates both 1.16.4 and 1.16.5;
-automatic cloud plans/applies use 1.16.5. Provider versions and their checksums
-are pinned independently of the Core version range.
+Terraform Core 1.16.5 is the only supported version. Development, CI validation
+and automatic cloud plans/applies all use 1.16.5. Provider versions and their
+checksums are pinned independently of the Core version.
 
 The kernel uses a human AWS session and a human GitHub token through `GITHUB_TOKEN`.
 The provider needs repository administration permissions. Neither credential is
@@ -64,7 +64,7 @@ explicit rather than claiming complete account isolation for those APIs.
 ## Automatic apply
 
 `.github/workflows/sites.yml` builds all sites and checks routes and workflows
-on every branch push and PR. The Terraform check matrix runs for changes to
+on every branch push and PR. The Terraform check runs for changes to
 `terraform/`, its check script, CI workflows or local actions, and on manual
 runs. PR cloud plans run for Terraform, Terraform script, workflow or local
 action changes, reusing the checked site artifact in the same workflow. The

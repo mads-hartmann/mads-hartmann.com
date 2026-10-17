@@ -29,7 +29,8 @@ make dev
 The root devenv supplies all tools. Makefiles handle dependency setup, builds,
 checks and servers. Run `make` at the root or in a project directory to see its
 targets. See [Development](docs/development.md) for first-time setup, ports,
-validation, tool updates and cloud workspaces.
+validation, tool updates and cloud workspaces. Terraform 1.16.5 is the only
+supported version, used in development, CI and deployment.
 
 ## Deployment
 

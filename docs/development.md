@@ -28,7 +28,8 @@ The environment provides Node 24, Ruby 3.3.11, Terraform 1.16.5, native gem buil
 tools, Make, watchexec, actionlint, Bash, Git, GitHub CLI, AWS CLI, curl, Python,
 jq, gawk, direnv, kubectl, kubectx, and stern. Ruby uses devenv's built-in version
 selector with the pinned `nixpkgs-ruby` input. Bundler's version comes from the
-blog's `Gemfile.lock` (4.0.16). CI checks Terraform 1.16.4 and 1.16.5 separately.
+blog's `Gemfile.lock` (4.0.16). Terraform 1.16.5 is the only
+supported version, used in development, CI and deployment.
 
 Determinate manages `/etc/nix/nix.conf`; any personal Nix settings belong in
 `/etc/nix/nix.custom.conf`. This setup needs no edits to either file.
