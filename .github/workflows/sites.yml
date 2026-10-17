@@ -8,7 +8,7 @@ on:
       stack:
         description: Stack to deploy (shared always runs first)
         type: choice
-        options: [all, shared, homepage, blog, uses]
+        options: [all, shared, homepage, blog, uses, computer]
         default: all
 permissions:
   contents: read
@@ -33,6 +33,7 @@ jobs:
       homepage_changed: ${{ steps.deployments.outputs.homepage_changed }}
       blog_changed: ${{ steps.deployments.outputs.blog_changed }}
       uses_changed: ${{ steps.deployments.outputs.uses_changed }}
+      computer_changed: ${{ steps.deployments.outputs.computer_changed }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -95,7 +96,7 @@ jobs:
       - run: scripts/build.sh
       - run: node scripts/check-sites.mjs
       - run: scripts/check-workflows.sh
-      - run: tar -czf sites.tar.gz .build/homepage .build/blog .build/uses .build/routing
+      - run: tar -czf sites.tar.gz .build/homepage .build/blog .build/uses .build/computer .build/routing
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sites
@@ -196,6 +197,13 @@ jobs:
           unset-current-credentials: true
           allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
       - run: scripts/plan-stack.sh uses
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_COMPUTER_PLAN }}
+          aws-region: eu-central-1
+          unset-current-credentials: true
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+      - run: scripts/plan-stack.sh computer
   shared:
     name: Deploy shared DNS and TLS
     if: >-
@@ -292,5 +300,29 @@ jobs:
           account_id: ${{ vars.AWS_ACCOUNT_ID }}
           stack: uses
           role_arn: ${{ vars.AWS_ROLE_USES_APPLY }}
+          zone_id: ${{ needs.shared.outputs.zone_id }}
+          certificate_arn: ${{ needs.shared.outputs.certificate_arn }}
+  computer:
+    name: Deploy Computer
+    if: >-
+      !cancelled() && needs.shared.result == 'success' &&
+      (needs.build.outputs.computer_changed == 'true' ||
+       (github.event_name == 'push' && needs.shared.outputs.changed == 'true'))
+    needs: [build, shared]
+    runs-on: ubuntu-24.04
+    environment: Production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/apply-stack
+        id: deploy
+        with:
+          account_id: ${{ vars.AWS_ACCOUNT_ID }}
+          stack: computer
+          role_arn: ${{ vars.AWS_ROLE_COMPUTER_APPLY }}
           zone_id: ${{ needs.shared.outputs.zone_id }}
           certificate_arn: ${{ needs.shared.outputs.certificate_arn }}

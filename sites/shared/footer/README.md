@@ -1,25 +1,25 @@
 # Shared footer
 
-Home, Blog and Uses render the same footer at build time. Edit `footer.html` for
+Home, Blog, Uses and Computer render the same footer at build time. Edit `footer.html` for
 its structure, `footer.css` for its appearance, and the site/social link arrays in
 `render.mjs` for navigation. There is no browser JavaScript or image dependency.
 
 ## Integration
 
-`renderFooter('home' | 'blog' | 'uses')` returns a semantic `<footer>` containing
+`renderFooter('home' | 'blog' | 'uses' | 'computer')` returns a semantic `<footer>` containing
 `<mh-site-footer>` with a Declarative Shadow DOM template. The browser creates the
 shadow tree and scopes the CSS while parsing. Identical light-DOM content provides
 a fallback for browsers without Declarative Shadow DOM; only one copy is visible.
 
 The homepage build replaces `<!-- shared-footer -->`. The Uses Markdown build
-calls `renderFooter('uses')`. Jekyll's `shared_footer.rb` invokes the same renderer
+calls `renderFooter('uses')`; Computer calls `renderFooter('computer')`. Jekyll's `shared_footer.rb` invokes the same renderer
 as a CLI, reads its JSON output, and exposes `site.data.shared_footers.blog` to the
 default layout. Every blog layout inherits that footer.
 
 Site links are absolute so they work across domains and from nested articles.
 The visible **For agents** link points to the current site's `llms.txt`, making
 Markdown entry points discoverable even when a reader omits HTTP and HTML metadata.
-Home and Uses use `aria-current="page"`; Blog uses `aria-current="location"` for
+Home and Uses use `aria-current="page"`; Blog and Computer use `aria-current="location"` for
 its entire section. Explore and Elsewhere are separately labelled navigation
 landmarks, links have visible keyboard focus, and the footer is hidden for print.
 
@@ -48,7 +48,7 @@ make check-sites
 make dev
 ```
 
-Footer changes affect all three sites. Preview each at desktop and mobile widths,
+Footer changes affect all four sites. Preview each at desktop and mobile widths,
 in light and dark modes. See [Development](../../../docs/development.md#validation)
-for validation details. All three sites receive the updated footer through the normal
+for validation details. All four sites receive the updated footer through the normal
 [deployment workflow](../../../docs/deployment.md#automatic-apply).

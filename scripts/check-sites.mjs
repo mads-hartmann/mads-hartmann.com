@@ -23,6 +23,7 @@ function checkFooter(html, current) {
     home: 'https://www.mads-hartmann.com/',
     blog: 'https://blog.mads-hartmann.com/',
     uses: 'https://uses.mads-hartmann.com/',
+    computer: 'https://computer.mads-hartmann.com/',
   }[current];
   for (const content of [shadow, fallback.split('</mh-site-footer>')[0]]) {
     assert.equal((content.match(/aria-current=/g) || []).length, 1);
@@ -33,7 +34,7 @@ function checkFooter(html, current) {
     for (const href of ['https://github.com/mads-hartmann', 'https://www.linkedin.com/in/mads-hartmann/', 'https://twitter.com/mads_hartmann', 'mailto:hello@mads-hartmann.com']) {
       assert(content.includes(`href="${href}"`));
     }
-    for (const href of ['https://www.mads-hartmann.com/', 'https://blog.mads-hartmann.com/', 'https://uses.mads-hartmann.com/']) {
+    for (const href of ['https://www.mads-hartmann.com/', 'https://blog.mads-hartmann.com/', 'https://uses.mads-hartmann.com/', 'https://computer.mads-hartmann.com/']) {
       assert(content.includes(`href="${href}"`));
     }
   }
@@ -47,6 +48,20 @@ const uses = await readFile('.build/uses/index.html', 'utf8');
 checkFooter(uses, 'uses');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(uses));
 assert.deepEqual((await readdir('.build/uses')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
+const computer = await readFile('.build/computer/index.html', 'utf8');
+checkFooter(computer, 'computer');
+assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(computer));
+assert(computer.includes('<h1>Computer</h1>'));
+assert(computer.includes('href="https://computer.mads-hartmann.com/"'));
+assert.deepEqual((await readdir('.build/computer')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
+const computerRouting = createContext({});
+runInContext(await readFile('.build/routing/computer.js', 'utf8'), computerRouting);
+for (const uri of ['/unknown', '/v4', '/v1/unknown', '/css/main.css',
+  ...[1, 2, 3].flatMap(version => ['', '/', '.html', '.md'].map(suffix => `/v${version}${suffix}`))]) {
+  for (const accept of ['text/html', 'text/markdown']) {
+    assert.equal(computerRouting.handler({ request: { uri, headers: { accept: { value: accept } } } }).statusCode, 404);
+  }
+}
 for (const content of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'master’s degree in Computer Science', 'University of Copenhagen', 'bachelor’s degree in Computer Science', 'IT University of Copenhagen']) {
   assert(homepage.includes(content), `Homepage is missing About content: ${content}`);
 }
@@ -126,6 +141,6 @@ for (const site of ['uses','blog']) {
 }
 assert(uses.includes('Travel'));
 await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
-console.log(`Sites validated; shared footer on homepage, Uses and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);
+console.log(`Sites validated; shared footer on homepage, Uses, Computer and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);
 await import('./check-markdown.mjs');
 await import('../sites/blog.mads-hartmann.com/check-images.mjs');

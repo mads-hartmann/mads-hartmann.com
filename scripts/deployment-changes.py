@@ -11,11 +11,13 @@ SITES = {
     "homepage": "sites/mads-hartmann.com",
     "blog": "sites/blog.mads-hartmann.com",
     "uses": "sites/uses.mads-hartmann.com",
+    "computer": "sites/computer.mads-hartmann.com",
 }
 SITE_JOB_NAMES = {
     "homepage": "Deploy homepage",
     "blog": "Deploy blog",
     "uses": "Deploy Uses",
+    "computer": "Deploy Computer",
 }
 
 

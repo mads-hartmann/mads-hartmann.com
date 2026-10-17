@@ -1,0 +1,13 @@
+# Computer — Mads Hartmann
+
+> An agent-friendly description of my macOS baseline configuration.
+
+## Content
+
+- [Current Mac setup](https://computer.mads-hartmann.com/index.md): Tools, shell, Git, SSH key management, and macOS keyboard shortcuts. Use this for the current baseline.
+
+## Other sites
+
+- [Home](https://www.mads-hartmann.com/index.md)
+- [Uses](https://uses.mads-hartmann.com/index.md)
+- [Blog](https://blog.mads-hartmann.com/index.md)

@@ -10,4 +10,5 @@ site_buckets = {
   homepage = "mads-hartmann.com"
   blog     = "blog.mads-hartmann.com"
   uses     = "uses.mads-hartmann.com"
+  computer = "computer.mads-hartmann.com"
 }

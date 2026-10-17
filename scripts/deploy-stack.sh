@@ -2,7 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 stack="${1:?stack required}"
-case "$stack" in shared|homepage|blog|uses) ;; *) echo 'Unknown stack' >&2; exit 2;; esac
+case "$stack" in shared|homepage|blog|uses|computer) ;; *) echo 'Unknown stack' >&2; exit 2;; esac
 root="terraform/stacks/$stack"
 terraform -chdir="$root" init -input=false -lockfile=readonly -backend-config=backend.hcl
 test "$(terraform -chdir="$root" workspace show)" = default

@@ -1,14 +1,15 @@
 # mads-hartmann.com
 
-The source and AWS infrastructure for my three sites:
+The source and AWS infrastructure for my four sites:
 
 | Site | Instructions | Build |
 | --- | --- | --- |
 | [Homepage](https://www.mads-hartmann.com/) | [Homepage README](sites/mads-hartmann.com/README.md) | Node: HTML and Markdown |
 | [Blog](https://blog.mads-hartmann.com/) | [Blog README](sites/blog.mads-hartmann.com/README.md) | Jekyll with jekyll-md |
 | [Uses](https://uses.mads-hartmann.com/) | [Uses README](sites/uses.mads-hartmann.com/README.md) | Node: HTML and source Markdown |
+| [Computer](https://computer.mads-hartmann.com/) | [Computer README](sites/computer.mads-hartmann.com/README.md) | Node: macOS baseline in HTML and Markdown |
 
-All three sites use the [shared footer](sites/shared/footer/README.md).
+All four sites use the [shared footer](sites/shared/footer/README.md).
 The [Terraform README](terraform/README.md) covers infrastructure work.
 Each site also publishes Markdown pages and its own editable `llms.txt`; see
 [Markdown and agent discovery](docs/deployment.md#markdown-and-agent-discovery).
