@@ -22,13 +22,12 @@ for (const page of pages) {
   let content;
   if (page.name === 'index') {
     const headings = [...html.matchAll(/<h2 id="([^"]+)">([^<]+)<\/h2>/g)];
-    const intro = html.slice(0, headings[0].index).replace(/<nav[\s\S]*?<\/nav>/, '');
-    const contents = `<nav class="contents" aria-label="On this page">${headings.map(([, id, title]) => `<a href="#${id}">${title}</a>`).join('\n')}</nav>`;
+    const intro = html.slice(0, headings[0].index);
     const sections = headings.map(([heading, id, title], i) => {
       const body = html.slice(headings[i].index + heading.length, headings[i + 1]?.index ?? html.length);
       return `<section id="${id}" aria-labelledby="${id}-title"><h2 id="${id}-title">${title}</h2><div class="section-content">${body}</div></section>`;
     }).join('\n');
-    content = `<header class="intro">${intro}</header>${contents}<div>${sections}</div>`;
+    content = `<header class="intro">${intro}</header><div>${sections}</div>`;
   } else {
     content = html.replace('</h1>', `</h1>${navigation}${archive}`);
   }
@@ -75,11 +74,8 @@ h1 { font-size: 2rem; line-height: 1.2; letter-spacing: -.04em; margin: 0 0 24px
 .intro p { max-width: 650px; }
 .intro p + p { font-size: 14px; color: var(--mh-color-muted); }
 p { margin: 0 0 20px; }
-.contents { display: flex; flex-wrap: wrap; gap: 4px 26px; border-block: 1px solid var(--mh-color-border); padding: 8px 0; margin-bottom: 40px; }
-.contents a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; text-decoration: none; }
-.contents a:hover { text-decoration: underline; }
-section { display: grid; grid-template-columns: 175px minmax(0, 1fr); gap: 25px; padding: 32px 0; border-top: 1px solid var(--mh-color-border); scroll-margin-top: 24px; }
-section:first-child { border-top: 0; padding-top: 0; }
+section { display: grid; grid-template-columns: 175px minmax(0, 1fr); gap: 25px; padding: 32px 0; scroll-margin-top: 24px; }
+section:first-child { padding-top: 0; }
 section:last-child { padding-bottom: 0; }
 h2 { margin: 0; font-size: 1.1rem; }
 .section-content { min-width: 0; overflow-wrap: anywhere; }
@@ -91,17 +87,13 @@ li { padding-left: 4px; margin-bottom: 12px; }
 li:last-child { margin-bottom: 0; }
 li::marker { color: var(--mh-color-muted); font-size: 11px; }
 ul + p { margin-top: 24px; }
-.back-to-top { margin: 36px 0 0; text-align: right; font-size: 13px; }
-.back-to-top a { display: inline-flex; align-items: center; min-height: 44px; }
 @media (max-width: 700px) {
   main { padding-top: 36px; }
-  .contents { gap: 0 20px; margin-bottom: 30px; }
-  .contents a { font-size: 13px; }
   section { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 28px 0; }
 }
 @media (max-width: 480px) { body { font-size: 17px; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-@media print { .skip-link, .contents, .back-to-top { display: none; } main { padding: 0; max-width: none; } }
+@media print { .skip-link { display: none; } main { padding: 0; max-width: none; } }
 
 pre { max-width: 100%; overflow-x: auto; padding: 16px; background: color-mix(in srgb, var(--mh-color-accent) 8%, var(--mh-color-surface)); border-radius: 6px; font-size: .85rem; line-height: 1.6; overflow-wrap: normal; }
 code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .9em; }

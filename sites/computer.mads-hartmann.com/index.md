@@ -2,15 +2,7 @@
 
 An agent-friendly description of my macOS baseline configuration.
 
-<nav aria-label="On this page">
-<a href="#heading-setting-up-a-new-mac">Tools</a> ·
-<a href="#heading-shell">Shell</a> ·
-<a href="#heading-git">Git</a> ·
-<a href="#heading-ssh">SSH</a> ·
-<a href="#heading-keyboard">Keyboard</a>
-</nav>
-
-<h2 id="heading-setting-up-a-new-mac">Tools</h2>
+<h2 id="heading-setting-up-a-new-mac">Command-line tools</h2>
 
 Use Apple's command-line tools for Git and the usual build tools. If `xcode-select -p` fails, install them and wait for the installer to finish:
 
@@ -18,19 +10,41 @@ Use Apple's command-line tools for Git and the usual build tools. If `xcode-sele
 xcode-select --install
 ```
 
+<h2 id="heading-homebrew">Homebrew</h2>
+
 Use [Homebrew](https://brew.sh/) for system-wide command-line tools. If it isn't installed, run its [official installer](https://docs.brew.sh/Installation):
 
 ```sh
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-Follow the installer's next steps to make `brew` available in the current shell, then install:
+Follow the installer's next steps to make `brew` available in the current shell. Other useful tools are `coreutils`, `shellcheck`, and `tldr`; install them when needed.
+
+<h2 id="heading-starship">Starship</h2>
+
+Use [Starship](https://starship.rs/) with its default prompt. Enable it in `~/.zshrc` as shown under Shell.
 
 ```sh
-brew install starship fzf gnu-sed
+brew install starship
 ```
 
-These provide the shell prompt, fuzzy history and file search, and GNU `sed`. Other useful tools are `coreutils`, `shellcheck`, and `tldr`; install them when needed.
+<h2 id="heading-fzf">fzf</h2>
+
+Use [fzf](https://github.com/junegunn/fzf) for fuzzy history and file search. Enable its Zsh integration as shown under Shell.
+
+```sh
+brew install fzf
+```
+
+<h2 id="heading-gnu-sed">GNU sed</h2>
+
+Use GNU `sed` in place of the macOS version. The path configuration under Shell makes it the default.
+
+```sh
+brew install gnu-sed
+```
+
+<h2 id="heading-applications">Applications</h2>
 
 Install desktop apps from their official downloads. I use [Ghostty](https://ghostty.org/) as my terminal. Use [Uses](https://uses.mads-hartmann.com/) for the rest of my apps.
 
