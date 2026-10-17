@@ -6,14 +6,6 @@
 
 - [Current Mac setup](https://computer.mads-hartmann.com/index.md): Tools, shell, Git, SSH key management, and macOS keyboard shortcuts. Use this for the current baseline.
 
-## Historical notes
-
-These are archives, not instructions for the current setup.
-
-- [v3](https://computer.mads-hartmann.com/v3.md)
-- [v2](https://computer.mads-hartmann.com/v2.md)
-- [v1](https://computer.mads-hartmann.com/v1.md)
-
 ## Other sites
 
 - [Home](https://www.mads-hartmann.com/index.md)

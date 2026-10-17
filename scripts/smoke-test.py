@@ -63,9 +63,8 @@ elif stack == 'blog':
 elif stack == 'computer':
     check('/', content='id="heading-setting-up-a-new-mac"')
     for version in ['v1', 'v2', 'v3']:
-        for suffix in ['', '/', '.html']:
-            check('/' + version + suffix, content=f'<h1>Computer — {version}</h1>')
-            check('/' + version + suffix, accept='text/markdown', content_type='text/markdown', content='Canonical page:')
+        for suffix in ['', '/', '.html', '.md']:
+            check('/' + version + suffix, 404)
 if stack in ['homepage', 'blog', 'uses', 'computer']:
     current = 'home' if stack == 'homepage' else stack
     check('/', content=f'<mh-site-footer data-current="{current}">')

@@ -48,39 +48,19 @@ const uses = await readFile('.build/uses/index.html', 'utf8');
 checkFooter(uses, 'uses');
 assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(uses));
 assert.deepEqual((await readdir('.build/uses')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
-assert.deepEqual((await readdir('.build/computer')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml', 'v1.html', 'v1.md', 'v2.html', 'v2.md', 'v3.html', 'v3.md']);
-for (const name of ['index', 'v1', 'v2', 'v3']) {
-  const html = await readFile(`.build/computer/${name}.html`, 'utf8');
-  checkFooter(html, 'computer');
-  assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(html));
-  assert(html.includes('<h1>Computer'));
-  assert(html.includes(`href="https://computer.mads-hartmann.com${name === 'index' ? '/' : `/${name}.html`}"`));
-  assert(!html.includes('DO NOT EDIT'));
-  assert(!html.includes('9c3cf9a818da426f9be44d838395396c'));
-  for (const link of html.matchAll(/href="(\/[^"#]*)(?:#[^"]*)?"/g)) {
-    await stat(`.build/computer${link[1] === '/' ? '/index.html' : link[1]}`);
-  }
-  if (name === 'v3') {
-    for (const id of ['heading-gitpod', 'heading-vscode', 'heading-keybindings', 'heading-raycast', 'heading-setting-up-a-new-mac', 'heading-changelog']) {
-      assert(html.includes(`id="${id}"`), `Missing historical heading: ${id}`);
-    }
-    assert(html.includes('<details>'));
-  }
-}
+const computer = await readFile('.build/computer/index.html', 'utf8');
+checkFooter(computer, 'computer');
+assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(computer));
+assert(computer.includes('<h1>Computer</h1>'));
+assert(computer.includes('href="https://computer.mads-hartmann.com/"'));
+assert.deepEqual((await readdir('.build/computer')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
 const computerRouting = createContext({});
 runInContext(await readFile('.build/routing/computer.js', 'utf8'), computerRouting);
-for (const [uri, target] of Object.entries({
-  '/': '/index.html', '/index.html': '/index.html',
-  '/v1': '/v1.html', '/v1/': '/v1.html', '/v1.html': '/v1.html',
-  '/v2': '/v2.html', '/v2/': '/v2.html', '/v2.html': '/v2.html',
-  '/v3': '/v3.html', '/v3/': '/v3.html', '/v3.html': '/v3.html',
-})) {
-  const result = computerRouting.handler({ request: { uri, querystring: { source: { value: 'archive' } } } });
-  assert.equal(result.uri, target);
-  await stat(`.build/computer${target}`);
-}
-for (const uri of ['/unknown', '/v4', '/v1/unknown', '/css/main.css']) {
-  assert.equal(computerRouting.handler({ request: { uri } }).statusCode, 404);
+for (const uri of ['/unknown', '/v4', '/v1/unknown', '/css/main.css',
+  ...[1, 2, 3].flatMap(version => ['', '/', '.html', '.md'].map(suffix => `/v${version}${suffix}`))]) {
+  for (const accept of ['text/html', 'text/markdown']) {
+    assert.equal(computerRouting.handler({ request: { uri, headers: { accept: { value: accept } } } }).statusCode, 404);
+  }
 }
 for (const content of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'master’s degree in Computer Science', 'University of Copenhagen', 'bachelor’s degree in Computer Science', 'IT University of Copenhagen']) {
   assert(homepage.includes(content), `Homepage is missing About content: ${content}`);

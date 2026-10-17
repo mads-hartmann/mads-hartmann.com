@@ -5,37 +5,21 @@ import { renderFooter } from '../shared/footer/render.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 const destination = process.argv[2] || `${root}dist`;
-const pages = [
-  { name: 'index', label: 'Current (v4)', title: 'Computer', path: '/' },
-  { name: 'v3', label: 'v3', title: 'Computer — v3', path: '/v3.html' },
-  { name: 'v2', label: 'v2', title: 'Computer — v2', path: '/v2.html' },
-  { name: 'v1', label: 'v1', title: 'Computer — v1', path: '/v1.html' },
-];
+const markdown = await readFile(`${root}index.md`, 'utf8');
+const html = marked.parse(markdown, { async: false });
+const headings = [...html.matchAll(/<h2 id="([^"]+)">([^<]+)<\/h2>/g)];
+const intro = html.slice(0, headings[0].index);
+const sections = headings.map(([heading, id, title], i) => {
+  const body = html.slice(headings[i].index + heading.length, headings[i + 1]?.index ?? html.length);
+  return `<section id="${id}" aria-labelledby="${id}-title"><h2 id="${id}-title">${title}</h2><div class="section-content">${body}</div></section>`;
+}).join('\n');
+const content = `<header class="intro">${intro}</header><div>${sections}</div>`;
 await mkdir(destination, { recursive: true });
-for (const page of pages) {
-  const markdown = await readFile(`${root}${page.name}.md`, 'utf8');
-  const html = marked.parse(markdown, { async: false });
-  const navigation = `<nav class="versions" aria-label="Setup versions">${pages.map(({ name, label, path }) =>
-    `<a href="${path}"${name === page.name ? ' aria-current="page"' : ''}>${label}</a>`
-  ).join('')}</nav>`;
-  const archive = page.name === 'index' ? '' : '<p class="archive-note">An earlier version of my setup. See the current version for my latest notes.</p>';
-  let content;
-  if (page.name === 'index') {
-    const headings = [...html.matchAll(/<h2 id="([^"]+)">([^<]+)<\/h2>/g)];
-    const intro = html.slice(0, headings[0].index);
-    const sections = headings.map(([heading, id, title], i) => {
-      const body = html.slice(headings[i].index + heading.length, headings[i + 1]?.index ?? html.length);
-      return `<section id="${id}" aria-labelledby="${id}-title"><h2 id="${id}-title">${title}</h2><div class="section-content">${body}</div></section>`;
-    }).join('\n');
-    content = `<header class="intro">${intro}</header><div>${sections}</div>`;
-  } else {
-    content = html.replace('</h1>', `</h1>${navigation}${archive}`);
-  }
-  await writeFile(`${destination}/${page.name}.html`, `<!doctype html>
+await writeFile(`${destination}/index.html`, `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${page.title} — Mads Hartmann</title><meta name="description" content="${page.name === 'index' ? 'How I set up my Mac: installing tools, configuring my shell and using SSH with 1Password' : `Notes on my computer setup, applications and configuration — ${page.name} archive`}.">
-<link rel="canonical" href="https://computer.mads-hartmann.com${page.path}">
-<link rel="alternate" type="text/markdown" href="https://computer.mads-hartmann.com/${page.name}.md">
+<title>Computer — Mads Hartmann</title><meta name="description" content="How I set up my Mac: installing tools, configuring my shell and using SSH with 1Password.">
+<link rel="canonical" href="https://computer.mads-hartmann.com/">
+<link rel="alternate" type="text/markdown" href="https://computer.mads-hartmann.com/index.md">
 <link rel="describedby" type="text/plain" href="https://computer.mads-hartmann.com/llms.txt">
 <meta name="color-scheme" content="light dark">
 <style>
@@ -103,16 +87,10 @@ th, td { padding: 8px 12px; border: 1px solid var(--mh-color-border); text-align
 details { margin: 16px 0; }
 summary { cursor: pointer; font-weight: 600; }
 summary:focus-visible { outline: 2px solid var(--mh-color-accent); outline-offset: 4px; }
-.versions { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0 0 28px; font-size: .9rem; }
-.versions [aria-current] { font-weight: 650; }
-.archive { overflow-wrap: anywhere; }
-.archive h2 { margin: 32px 0 8px; }
-.archive-note { color: var(--mh-color-muted); font-size: .9rem; }
 hr { border: 0; border-top: 1px solid var(--mh-color-border); margin: 32px 0; }
-</style></head><body><a class="skip-link" href="#main">Skip to content</a><main id="main"${page.name === 'index' ? '' : ' class="archive"'}>${content}</main>${renderFooter('computer')}</body></html>
+</style></head><body><a class="skip-link" href="#main">Skip to content</a><main id="main">${content}</main>${renderFooter('computer')}</body></html>
 `);
-  await writeFile(`${destination}/${page.name}.md`, `${markdown.trimEnd()}\n\n---\n\nCanonical page: https://computer.mads-hartmann.com${page.path}\n`);
-}
+await writeFile(`${destination}/index.md`, `${markdown.trimEnd()}\n\n---\n\nCanonical page: https://computer.mads-hartmann.com/\n`);
 for (const file of ['llms.txt', 'robots.txt', 'sitemap.xml']) {
   await copyFile(`${root}${file}`, `${destination}/${file}`);
 }

@@ -7,7 +7,7 @@ The source and AWS infrastructure for my four sites:
 | [Homepage](https://www.mads-hartmann.com/) | [Homepage README](sites/mads-hartmann.com/README.md) | Node: HTML and Markdown |
 | [Blog](https://blog.mads-hartmann.com/) | [Blog README](sites/blog.mads-hartmann.com/README.md) | Jekyll with jekyll-md |
 | [Uses](https://uses.mads-hartmann.com/) | [Uses README](sites/uses.mads-hartmann.com/README.md) | Node: HTML and source Markdown |
-| [Computer](https://computer.mads-hartmann.com/) | [Computer README](sites/computer.mads-hartmann.com/README.md) | Node: macOS baseline and historical archives |
+| [Computer](https://computer.mads-hartmann.com/) | [Computer README](sites/computer.mads-hartmann.com/README.md) | Node: macOS baseline in HTML and Markdown |
 
 All four sites use the [shared footer](sites/shared/footer/README.md).
 The [Terraform README](terraform/README.md) covers infrastructure work.

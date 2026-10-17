@@ -15,7 +15,7 @@ build:
 
 dev:
 	watchexec --restart --stop-signal SIGINT \
-		--watch index.md --watch v1.md --watch v2.md --watch v3.md --watch llms.txt --watch robots.txt --watch sitemap.xml --watch build.mjs --watch package.json --watch package-lock.json --watch ../shared/footer --watch ../../scripts --watch Makefile \
+		--watch index.md --watch llms.txt --watch robots.txt --watch sitemap.xml --watch build.mjs --watch package.json --watch package-lock.json --watch ../shared/footer --watch ../../scripts --watch Makefile \
 		-- '$(MAKE) build && exec python3 -m http.server "$(COMPUTER_PORT)" --bind 127.0.0.1 --directory ../../.build/computer'
 
 # Shared footer and redirect checks need artifacts from all four sites.

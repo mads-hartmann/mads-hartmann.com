@@ -9,7 +9,7 @@
 | Homepage | `stacks/homepage.tfstate` | Homepage S3/CloudFront, apex and www DNS, URL redirects |
 | Blog | `stacks/blog.tfstate` | Blog S3/CloudFront/DNS, generated posts and assets |
 | Uses | `stacks/uses.tfstate` | Uses S3/CloudFront/DNS, generated HTML |
-| Computer | `stacks/computer.tfstate` | Computer S3/CloudFront/DNS, macOS baseline and archives |
+| Computer | `stacks/computer.tfstate` | Computer S3/CloudFront/DNS, macOS baseline |
 
 All states use the `terraform-state-cloud-mads-hartmann-com` bucket in
 `eu-central-1`, with native S3 lock files. Versioning protects previous states.
@@ -149,10 +149,9 @@ cannot create these identities itself. The existing wildcard certificate covers
 `computer.mads-hartmann.com`. The required PR plan needs the new plan role too.
 
 After that prerequisite, the normal Sites workflow creates the private bucket,
-CloudFront distribution and DNS aliases and uploads the current setup guide and
-v1/v2/v3 archives. Existing `.html`, extensionless and trailing-slash archive links
-resolve, including Markdown negotiation. The former GitHub Pages and Notion-sync
-workflows remain retired; edit the restored Markdown files in Git.
+CloudFront distribution and DNS aliases and uploads the current setup guide
+in HTML and Markdown. Older version URLs return 404. The former GitHub Pages
+and Notion-sync workflows remain retired; edit the setup page in Git.
 
 ## Updating the kernel
 
@@ -195,7 +194,7 @@ installs site-local dependencies and invokes those builds:
 - Uses' `sites/uses.mads-hartmann.com/build.mjs` renders HTML and publishes its
   existing Markdown source, adding the canonical URL and copying `llms.txt`.
 - Computer's `sites/computer.mads-hartmann.com/build.mjs` does the same for its
-  current setup page and three historical archives.
+  current setup page.
 - The blog uses the released [jekyll-md](https://github.com/dblock/jekyll-md) gem,
   pinned in its Gemfile/lockfile and enabled in `src/_config.yml`. It converts
   rendered `.site` content, generates Markdown files, and injects discovery links
