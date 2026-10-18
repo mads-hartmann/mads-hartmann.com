@@ -84,19 +84,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REQUESTED_STACK: ${{ inputs.stack }}
         run: python3 scripts/deployment-changes.py
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: '24'
-      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
-        with:
-          ruby-version: '3.3'
-          bundler: '4.0.16'
-          bundler-cache: true
-          working-directory: sites/blog.mads-hartmann.com
+      - uses: ./.github/actions/setup-build
       - run: scripts/build.sh
-      - run: node scripts/check-sites.mjs
-      - run: scripts/check-workflows.sh
-      - run: tar -czf sites.tar.gz .build/homepage .build/blog .build/uses .build/computer .build/routing
+      - run: bazel test //...
+      - run: tar -czf sites.tar.gz .build/homepage .build/blog .build/uses .build/computer .build/routing .build/manifests
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sites

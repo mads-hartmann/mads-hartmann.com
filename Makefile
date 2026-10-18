@@ -9,24 +9,20 @@ help:
 	@echo 'Infrastructure commands: make -C terraform fmt|lint|check'
 
 setup:
-	$(MAKE) -C sites/mads-hartmann.com setup
-	$(MAKE) -C sites/blog.mads-hartmann.com setup
-	$(MAKE) -C sites/uses.mads-hartmann.com setup
-	$(MAKE) -C sites/computer.mads-hartmann.com setup
+	bazel fetch //:sites
 
 build:
-	$(MAKE) -C sites/blog.mads-hartmann.com setup
 	./scripts/build.sh
 
 build-routing:
 	node scripts/build-routing.mjs
 
-check: check-sites check-terraform check-workflows
+check: check-sites check-terraform
 
 lint: check
 
-check-sites: build
-	node scripts/check-sites.mjs
+check-sites:
+	bazel test //...
 
 check-terraform: build
 	./scripts/check-terraform.sh

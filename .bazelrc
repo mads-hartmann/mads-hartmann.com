@@ -1,0 +1,8 @@
+build --nostamp
+build --incompatible_strict_action_env
+test --test_output=errors
+# Nix packages execute from /nix/store on the build host. Remote caching is
+# supported; remote execution requires workers with the same Nix closures.
+build --jobs=4
+common --enable_workspace=false
+try-import %workspace%/.bazelrc.local

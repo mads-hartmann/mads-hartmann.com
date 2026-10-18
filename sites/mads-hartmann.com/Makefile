@@ -8,7 +8,7 @@ help:
 	@echo 'Targets: setup, build, dev, check (or lint); HOMEPAGE_PORT=8080'
 
 setup:
-	npm ci --ignore-scripts --no-audit --no-fund
+	cd ../.. && bazel fetch //:homepage_manifest
 
 build:
 	../../scripts/build.sh homepage
@@ -19,7 +19,7 @@ dev:
 		--watch ../shared/footer --watch ../../routing --watch ../../scripts --watch Makefile \
 		-- '$(MAKE) build && exec python3 -m http.server "$(HOMEPAGE_PORT)" --bind 127.0.0.1 --directory ../../.build/homepage'
 
-# Shared footer and redirect checks need artifacts from all three sites.
+# Shared footer and redirect checks need artifacts from all four sites.
 check:
 	$(MAKE) -C ../.. check-sites
 

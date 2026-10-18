@@ -1,14 +1,18 @@
 import { execFileSync } from 'node:child_process';
-execFileSync('python3', ['scripts/test_upload_immutable_assets.py'], { stdio: 'inherit' });
-execFileSync(process.execPath, ['--test', 'scripts/fingerprint-assets.test.mjs'], { stdio: 'inherit' });
+if ((process.argv[2] || 'all') === 'all') execFileSync('python3', ['scripts/test_upload_immutable_assets.py'], { stdio: 'inherit' });
+if ((process.argv[2] || 'all') === 'all') execFileSync(process.execPath, ['--test', 'scripts/fingerprint-assets.test.mjs'], { stdio: 'inherit' });
 import assert from 'node:assert/strict';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { createContext, runInContext } from 'node:vm';
-const homepage = await readFile('.build/homepage/index.html', 'utf8');
-assert(!/<script|<link[^>]+stylesheet|src=["']https?:|theme-picker/i.test(homepage));
-assert(homepage.includes('https://blog.mads-hartmann.com/'));
-assert(homepage.includes('https://uses.mads-hartmann.com/'));
-assert.deepEqual((await readdir('.build/homepage')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
+const selected = process.argv[2] || 'all';
+const includes = site => selected === 'all' || selected === site;
+const homepage = includes('homepage') ? await readFile('.build/homepage/index.html', 'utf8') : '';
+if (includes('homepage')) {
+  assert(!/<script|<link[^>]+stylesheet|src=["']https?:|theme-picker/i.test(homepage));
+  assert(homepage.includes('https://blog.mads-hartmann.com/'));
+  assert(homepage.includes('https://uses.mads-hartmann.com/'));
+  assert.deepEqual((await readdir('.build/homepage')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
+}
 
 function checkFooter(html, current) {
   assert.equal((html.match(/<mh-site-footer /g) || []).length, 1);
@@ -40,81 +44,95 @@ function checkFooter(html, current) {
   }
 }
 
-checkFooter(homepage, 'home');
-assert(!homepage.includes('aria-labelledby="elsewhere"'));
-assert(homepage.includes('>Read my blog</a>'));
-assert(homepage.includes('>What I use</a>'));
-const uses = await readFile('.build/uses/index.html', 'utf8');
-checkFooter(uses, 'uses');
-assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(uses));
-assert.deepEqual((await readdir('.build/uses')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
-const computer = await readFile('.build/computer/index.html', 'utf8');
-checkFooter(computer, 'computer');
-assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(computer));
-assert(computer.includes('<h1>Computer</h1>'));
-assert(computer.includes('href="https://computer.mads-hartmann.com/"'));
-assert.deepEqual((await readdir('.build/computer')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
-const computerRouting = createContext({});
-runInContext(await readFile('.build/routing/computer.js', 'utf8'), computerRouting);
-for (const uri of ['/unknown', '/v4', '/v1/unknown', '/css/main.css',
-  ...[1, 2, 3].flatMap(version => ['', '/', '.html', '.md'].map(suffix => `/v${version}${suffix}`))]) {
-  for (const accept of ['text/html', 'text/markdown']) {
-    assert.equal(computerRouting.handler({ request: { uri, headers: { accept: { value: accept } } } }).statusCode, 404);
+if (includes('homepage')) {
+  checkFooter(homepage, 'home');
+  assert(!homepage.includes('aria-labelledby="elsewhere"'));
+  assert(homepage.includes('>Read my blog</a>'));
+  assert(homepage.includes('>What I use</a>'));
+}
+const uses = includes('uses') ? await readFile('.build/uses/index.html', 'utf8') : '';
+if (includes('uses')) {
+  checkFooter(uses, 'uses');
+  assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(uses));
+  assert.deepEqual((await readdir('.build/uses')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
+}
+if (includes('computer')) {
+  const computer = await readFile('.build/computer/index.html', 'utf8');
+  checkFooter(computer, 'computer');
+  assert(!/<script|<link[^>]+stylesheet|src=["']https?:/i.test(computer));
+  assert(computer.includes('<h1>Computer</h1>'));
+  assert(computer.includes('href="https://computer.mads-hartmann.com/"'));
+  assert.deepEqual((await readdir('.build/computer')).sort(), ['index.html', 'index.md', 'llms.txt', 'robots.txt', 'sitemap.xml']);
+  const computerRouting = createContext({});
+  runInContext(await readFile('.build/routing/computer.js', 'utf8'), computerRouting);
+  for (const uri of ['/unknown', '/v4', '/v1/unknown', '/css/main.css',
+    ...[1, 2, 3].flatMap(version => ['', '/', '.html', '.md'].map(suffix => `/v${version}${suffix}`))]) {
+    for (const accept of ['text/html', 'text/markdown']) {
+      assert.equal(computerRouting.handler({ request: { uri, headers: { accept: { value: accept } } } }).statusCode, 404);
+    }
   }
 }
-for (const content of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'master’s degree in Computer Science', 'University of Copenhagen', 'bachelor’s degree in Computer Science', 'IT University of Copenhagen']) {
-  assert(homepage.includes(content), `Homepage is missing About content: ${content}`);
+if (includes('homepage')) {
+  for (const content of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'master’s degree in Computer Science', 'University of Copenhagen', 'bachelor’s degree in Computer Science', 'IT University of Copenhagen']) {
+    assert(homepage.includes(content), `Homepage is missing About content: ${content}`);
+  }
 }
-await assert.rejects(stat('.build/blog/about/index.html'), { code: 'ENOENT' });
-// Check every rendered blog page so layouts and collection pages cannot silently
-// lose the shared footer; CSS, feeds and other static files are left alone.
 let blogPages = 0;
-for (const file of await readdir('.build/blog', { recursive: true })) {
-  if (!file.endsWith('.html')) continue;
-  const html = await readFile(`.build/blog/${file}`, 'utf8');
-  if (!html.includes('<html')) continue;
-  checkFooter(html, 'blog');
-  if (file === 'index.html') {
-    assert(/<h1 class="blog-title">Blog<\/h1>\s*<div class="featured posts">/.test(html), 'Blog title must lead directly into Highlights');
-    assert(!html.includes('class="back-to-blog"'));
-  } else {
-    assert(html.includes('<a class="back-to-blog" href="https://blog.mads-hartmann.com/">'), 'Nested blog pages must link to the blog root');
+if (includes('blog')) {
+  await assert.rejects(stat('.build/blog/about/index.html'), { code: 'ENOENT' });
+  // Check every rendered blog page so layouts and collection pages cannot silently
+  // lose the shared footer; CSS, feeds and other static files are left alone.
+  for (const file of await readdir('.build/blog', { recursive: true })) {
+    if (!file.endsWith('.html')) continue;
+    const html = await readFile(`.build/blog/${file}`, 'utf8');
+    if (!html.includes('<html')) continue;
+    checkFooter(html, 'blog');
+    if (file === 'index.html') {
+      assert(/<h1 class="blog-title">Blog<\/h1>\s*<div class="featured posts">/.test(html), 'Blog title must lead directly into Highlights');
+      assert(!html.includes('class="back-to-blog"'));
+    } else {
+      assert(html.includes('<a class="back-to-blog" href="https://blog.mads-hartmann.com/">'), 'Nested blog pages must link to the blog root');
+    }
+    blogPages++;
   }
-  blogPages++;
+  assert(blogPages > 0);
 }
-assert(blogPages > 0);
 const redirects = JSON.parse(await readFile('routing/redirects.json', 'utf8'));
 const routes = redirects.homepage;
-const context = createContext({});
-runInContext(await readFile('.build/routing/homepage.js', 'utf8'), context);
-function request(uri, host='www.mads-hartmann.com', querystring={}) {
-  return context.handler({ request: { uri, headers: { host: { value: host } }, querystring } });
-}
-assert.equal(request('/').uri, '/index.html');
-assert.equal(request('/', 'mads-hartmann.com').headers.location.value, 'https://www.mads-hartmann.com/');
-for (const [from,to] of Object.entries(routes)) {
-  for (const suffix of ['', '/']) {
-    const result = request(from + suffix, 'mads-hartmann.com');
-    assert.equal(result.statusCode,301); assert.equal(result.headers.location.value,to);
-  }
-  await stat('.build/blog' + new URL(to).pathname);
-}
-assert.equal(request('/uses/').headers.location.value,'https://uses.mads-hartmann.com/');
-assert.equal(request('/blog/feed.xml').headers.location.value,'https://blog.mads-hartmann.com/feed.xml');
-assert.equal(request('/blog/images/a.png').headers.location.value,'https://blog.mads-hartmann.com/images/a.png');
 const query = { source: { value: 'old%20about' }, tag: { multiValue: [{ value: 'a%26b' }, { value: 'c' }] }, empty: { value: '' } };
-for (const uri of [...Object.keys(routes), '/blog', '/writings', '/blog/feed.xml', '/blog/images/a.png', '/blog/uploads/a.png', '/uses', '/']) {
-  const host = uri === '/' ? 'mads-hartmann.com' : 'www.mads-hartmann.com';
-  const target = request(uri, host).headers.location.value;
-  assert.equal(request(uri, host, query).headers.location.value, target);
-}
-assert.equal(request('/tools/ascii-art').statusCode,410);
-assert.equal(request('/photography').statusCode,410);
-assert.equal(request('/unknown').statusCode,404);
 const immutablePath = '/_assets/' + 'a'.repeat(64) + '/css/site.css';
-assert.equal(request(immutablePath).uri, immutablePath);
-assert.equal(request('/_assets/not-a-hash/site.css').statusCode, 404);
-for (const site of ['uses','blog']) {
+if (includes('homepage')) {
+  const context = createContext({});
+  runInContext(await readFile('.build/routing/homepage.js', 'utf8'), context);
+  function request(uri, host='www.mads-hartmann.com', querystring={}) {
+    return context.handler({ request: { uri, headers: { host: { value: host } }, querystring } });
+  }
+  assert.equal(request('/').uri, '/index.html');
+  assert.equal(request('/', 'mads-hartmann.com').headers.location.value, 'https://www.mads-hartmann.com/');
+  for (const [from,to] of Object.entries(routes)) {
+    for (const suffix of ['', '/']) {
+      const result = request(from + suffix, 'mads-hartmann.com');
+      assert.equal(result.statusCode,301); assert.equal(result.headers.location.value,to);
+    }
+    if (selected === 'all') await stat('.build/blog' + new URL(to).pathname);
+  }
+  assert.equal(request('/uses/').headers.location.value,'https://uses.mads-hartmann.com/');
+  assert.equal(request('/blog/feed.xml').headers.location.value,'https://blog.mads-hartmann.com/feed.xml');
+  assert.equal(request('/blog/images/a.png').headers.location.value,'https://blog.mads-hartmann.com/images/a.png');
+
+  for (const uri of [...Object.keys(routes), '/blog', '/writings', '/blog/feed.xml', '/blog/images/a.png', '/blog/uploads/a.png', '/uses', '/']) {
+    const host = uri === '/' ? 'mads-hartmann.com' : 'www.mads-hartmann.com';
+    const target = request(uri, host).headers.location.value;
+    assert.equal(request(uri, host, query).headers.location.value, target);
+  }
+  assert.equal(request('/tools/ascii-art').statusCode,410);
+  assert.equal(request('/photography').statusCode,410);
+  assert.equal(request('/unknown').statusCode,404);
+
+  assert.equal(request(immutablePath).uri, immutablePath);
+  assert.equal(request('/_assets/not-a-hash/site.css').statusCode, 404);
+}
+for (const site of ['uses','blog'].filter(includes)) {
   const ctx = createContext({});
   runInContext(await readFile(`.build/routing/${site}.js`, 'utf8'),ctx);
   assert.equal(ctx.handler({ request:{uri:'/'} }).uri,'/index.html');
@@ -139,8 +157,8 @@ for (const site of ['uses','blog']) {
     }
   }
 }
-assert(uses.includes('Travel'));
-await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html');
-console.log(`Sites validated; shared footer on homepage, Uses, Computer and ${blogPages} blog pages; About redirects to Home; ${Object.keys(routes).length} homepage post redirects and ${Object.keys(redirects.blog).length} blog redirects passed.`);
+if (includes('uses')) assert(uses.includes('Travel'));
+if (includes('blog')) { await stat('.build/blog/feed.xml'); await stat('.build/blog/404.html'); }
+console.log(`Site checks passed: ${selected}${includes('blog') ? ` (${blogPages} blog pages)` : ''}; footer, content and routing validated.`);
 await import('./check-markdown.mjs');
-await import('../sites/blog.mads-hartmann.com/check-images.mjs');
+if (includes('blog')) await import('../sites/blog.mads-hartmann.com/check-images.mjs');

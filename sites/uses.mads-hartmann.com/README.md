@@ -45,6 +45,6 @@ and copies `llms.txt`, `robots.txt`, and `sitemap.xml` unchanged into `.build/us
 at the repository root.
 For a standalone build into local `dist/`, run `npm ci && npm run build`.
 
-`make check` builds and checks all three sites. See
+`make check` builds and checks all four sites. See
 [validation](../../docs/development.md#validation) for check scope and
 [deployment](../../docs/deployment.md) for production routing and Markdown negotiation.

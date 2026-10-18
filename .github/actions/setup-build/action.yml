@@ -1,0 +1,23 @@
+name: Set up Nix and Bazel
+description: Install build tools from the same Nix expressions used locally
+runs:
+  using: composite
+  steps:
+    - uses: cachix/install-nix-action@448cde739abec1eaf0646249e3d25bb8d9bc7702 # v31
+    - name: Realize pinned build tools
+      shell: bash
+      run: |
+        nix build --extra-experimental-features 'nix-command flakes' \
+          --impure --no-link --print-out-paths --file dev/bazel/tools.nix bazel python |
+          while IFS= read -r package; do
+            echo "$package/bin" >> "$GITHUB_PATH"
+          done
+    - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      with:
+        path: ~/.cache/bazel-disk
+        key: bazel-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
+        restore-keys: |
+          bazel-${{ runner.os }}-${{ runner.arch }}-
+    - name: Configure Bazel disk cache
+      shell: bash
+      run: echo "build --disk_cache=$HOME/.cache/bazel-disk" > .bazelrc.local

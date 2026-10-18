@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { createContext, runInContext } from 'node:vm';
 
+const selected = process.argv[2] || 'all';
+const includes = site => selected === 'all' || selected === site;
 const origins = {
   homepage: 'https://www.mads-hartmann.com',
   blog: 'https://blog.mads-hartmann.com',
@@ -9,7 +11,7 @@ const origins = {
   computer: 'https://computer.mads-hartmann.com',
 };
 let count = 0;
-for (const [site, origin] of Object.entries(origins)) {
+for (const [site, origin] of Object.entries(origins).filter(([site]) => includes(site))) {
   const context = createContext({});
   const source = await readFile(`.build/routing/${site}.js`, 'utf8');
   assert(Buffer.byteLength(source) <= 10240, `${site} exceeds the CloudFront function size limit`);
@@ -88,7 +90,7 @@ for (const [site, origin] of Object.entries(origins)) {
     const url = new URL(target);
     const targetSite = Object.keys(origins).find(key => origins[key] === url.origin);
     assert(targetSite, `Unexpected llms.txt target: ${target}`);
-    await stat(`.build/${targetSite}${url.pathname}`);
+    if (includes(targetSite)) await stat(`.build/${targetSite}${url.pathname}`);
   }
   if (site === 'blog') {
     for (const path of ['/series/observability', '/series/observability/']) assert.equal(request(path, 'text/markdown').uri, '/series/observability.md');
@@ -110,29 +112,35 @@ for (const [site, origin] of Object.entries(origins)) {
   }
 }
 
-assert.equal(await readFile('.build/uses/index.md', 'utf8'), `${(await readFile('sites/uses.mads-hartmann.com/index.md', 'utf8')).trimEnd()}\n\n---\n\nCanonical page: https://uses.mads-hartmann.com/\n`);
+if (includes('uses')) assert.equal(await readFile('.build/uses/index.md', 'utf8'), `${(await readFile('sites/uses.mads-hartmann.com/index.md', 'utf8')).trimEnd()}\n\n---\n\nCanonical page: https://uses.mads-hartmann.com/\n`);
 
-const article = await readFile('.build/blog/2026/01/27/using-ai-to-do-your-best-work.md', 'utf8');
-assert(article.includes('# Using AI to do your best work'));
-assert(article.includes('27 Jan 2026'));
-assert(article.includes('## A worthy bug'));
-assert(article.includes('jsonl'));
-assert(article.includes('[^1]'));
-assert(article.includes('\n[^1]: This prompt'));
-assert(!article.includes('#fn:') && !article.includes('#fnref:'));
-const archive = await readFile('.build/blog/index.md', 'utf8');
-assert(archive.includes('](https://blog.mads-hartmann.com/2026/01/27/using-ai-to-do-your-best-work.md) — 27 Jan 2026'));
-assert(archive.includes('](https://blog.mads-hartmann.com/series/observability.md) — 2019 - 2020'));
-const awk = await readFile('.build/blog/2018/09/29/enough-awk-to-get-by.md', 'utf8');
-assert(awk.includes('[^3]'));
-assert(awk.includes('\n[^3]: [The A-Z of Programming Languages: AWK]'));
-assert(awk.includes('https://blog.mads-hartmann.com/2018/09/29/enough-awk-to-get-by.html#explaining-the-example'));
-assert(awk.includes("grep -R TRIGGER . | awk '{gsub(/:.*/,\" \")}1'"));
-const usesSource = await readFile('sites/uses.mads-hartmann.com/index.md', 'utf8');
-const contentUpdated = usesSource.match(/^Content updated: (\d{4}-\d{2}-\d{2})\.$/m);
-assert(contentUpdated, 'Uses must carry an explicit content update date');
-assert((await readFile('.build/uses/index.html', 'utf8')).includes(contentUpdated[0]));
-assert((await readFile('.build/blog/sre/2020/05/07/feelings-during-incident-response.md', 'utf8')).includes('https://blog.mads-hartmann.com/uploads/feelings-during-incident-response.mp3'));
-const homepage = await readFile('.build/homepage/index.md', 'utf8');
-for (const value of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'University of Copenhagen', 'IT University of Copenhagen']) assert(homepage.includes(value));
-console.log(`Markdown validated: ${count} pages, four llms.txt indexes, discovery links, content preservation, and negotiated routes.`);
+if (includes('blog')) {
+  const article = await readFile('.build/blog/2026/01/27/using-ai-to-do-your-best-work.md', 'utf8');
+  assert(article.includes('# Using AI to do your best work'));
+  assert(article.includes('27 Jan 2026'));
+  assert(article.includes('## A worthy bug'));
+  assert(article.includes('jsonl'));
+  assert(article.includes('[^1]'));
+  assert(article.includes('\n[^1]: This prompt'));
+  assert(!article.includes('#fn:') && !article.includes('#fnref:'));
+  const archive = await readFile('.build/blog/index.md', 'utf8');
+  assert(archive.includes('](https://blog.mads-hartmann.com/2026/01/27/using-ai-to-do-your-best-work.md) — 27 Jan 2026'));
+  assert(archive.includes('](https://blog.mads-hartmann.com/series/observability.md) — 2019 - 2020'));
+  const awk = await readFile('.build/blog/2018/09/29/enough-awk-to-get-by.md', 'utf8');
+  assert(awk.includes('[^3]'));
+  assert(awk.includes('\n[^3]: [The A-Z of Programming Languages: AWK]'));
+  assert(awk.includes('https://blog.mads-hartmann.com/2018/09/29/enough-awk-to-get-by.html#explaining-the-example'));
+  assert(awk.includes("grep -R TRIGGER . | awk '{gsub(/:.*/,\" \")}1'"));
+}
+if (includes('uses')) {
+  const usesSource = await readFile('sites/uses.mads-hartmann.com/index.md', 'utf8');
+  const contentUpdated = usesSource.match(/^Content updated: (\d{4}-\d{2}-\d{2})\.$/m);
+  assert(contentUpdated, 'Uses must carry an explicit content update date');
+  assert((await readFile('.build/uses/index.html', 'utf8')).includes(contentUpdated[0]));
+}
+if (includes('blog')) assert((await readFile('.build/blog/sre/2020/05/07/feelings-during-incident-response.md', 'utf8')).includes('https://blog.mads-hartmann.com/uploads/feelings-during-incident-response.mp3'));
+if (includes('homepage')) {
+  const homepage = await readFile('.build/homepage/index.md', 'utf8');
+  for (const value of ['OpenAI', 'Ona', 'Glitch', 'Famly', 'Issuu', 'University of Copenhagen', 'IT University of Copenhagen']) assert(homepage.includes(value));
+}
+console.log(`Markdown validated for ${selected}: ${count} pages, llms.txt, discovery links, content preservation, and negotiated routes.`);

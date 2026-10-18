@@ -79,6 +79,12 @@ class SelectionTests(unittest.TestCase):
             "scripts/smoke-test.py": all_sites,
             ".github/workflows/sites.yml": all_sites,
             ".github/actions/apply-stack/action.yml": all_sites,
+            "BUILD.bazel": all_sites,
+            "MODULE.bazel.lock": all_sites,
+            ".bazelrc": all_sites,
+            "dev/bazel/tools.nix": all_sites,
+            "dev/shared/versions.nix": all_sites,
+            "devenv.yaml": all_sites,
             "docs/deployment.md": set(),
             "terraform/kernel/main.tf": set(),
         }

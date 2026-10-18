@@ -1,9 +1,10 @@
 # Development
 
 A single root [devenv](https://devenv.sh/) configuration supplies all tools, wherever
-in the repository you work. Makefiles handle dependency setup, builds, checks,
-and development servers. Supported platforms are Apple Silicon macOS and x86-64
-Linux. CI keeps its independent installation steps and existing script entry points.
+in the repository you work. Nix owns the tools and locked dependencies; Bazel
+tracks builds and tests. Makefiles provide entry points and development servers.
+The environment supports Apple Silicon macOS and x86-64 Linux; the Bazel integration
+has been exercised on Linux. CI uses the same Nix expressions and Bazel targets.
 
 ## First-time setup
 
@@ -24,11 +25,11 @@ updates these three tools without adding duplicate entries. Nix normally puts
 this profile on `PATH`. If your shell does not yet see the tools, open a new
 terminal. The first environment activation can take several minutes.
 
-The environment provides Node 24, Ruby 3.3.11, Terraform 1.16.5, native gem build
+The environment provides Bazel 8, Node 24, Ruby 3.3.11, Terraform 1.16.5, native gem build
 tools, Make, watchexec, actionlint, Bash, Git, GitHub CLI, AWS CLI, curl, Python,
 jq, gawk, direnv, kubectl, kubectx, and stern. Ruby uses devenv's built-in version
-selector with the pinned `nixpkgs-ruby` input. Bundler's version comes from the
-blog's `Gemfile.lock` (4.0.16). Terraform 1.16.5 is the only
+selector with the pinned `nixpkgs-ruby` input. Nix builds the blog's gem environment
+from `Gemfile.lock` and the generated `gemset.nix`. Terraform 1.16.5 is the only
 supported version, used in development, CI and deployment.
 
 Determinate manages `/etc/nix/nix.conf`; any personal Nix settings belong in
@@ -37,8 +38,9 @@ Determinate manages `/etc/nix/nix.conf`; any personal Nix settings belong in
 ## Activate once
 
 Run `devenv shell` from the repository root, then change to any project directory
-inside that shell. All tools remain available. Entering the shell does not install
-application dependencies, build sites, or start servers.
+inside that shell. All tools remain available. Nix realizes the pinned Jekyll gem
+environment when entering the shell; site builds realize their locked npm dependencies.
+Entering the shell does not build sites or start servers.
 
 For automatic activation, add the appropriate direnv hook to your shell:
 
@@ -74,8 +76,10 @@ make -C terraform check
 ```
 
 Each site's own build produces its Markdown alternatives and publishes its
-committed `llms.txt`. `scripts/build.sh` installs site-local dependencies and
-invokes those builds; there is no root npm package or shared Markdown generator.
+committed `llms.txt`. `scripts/build.sh` invokes Bazel and exports its artifacts to
+`.build` for Terraform and previews. Bazel uses immutable Nix dependencies, including
+the shared asset fingerprinting packages. There is no npm install during a build action.
+See [Bazel builds](builds.md) for individual targets and cache verification.
 
 `make dev` uses watchexec to rebuild and restart a foreground server when source, `llms.txt`,
 build scripts, or the shared footer change. Jekyll includes drafts and disables
@@ -102,10 +106,10 @@ Inside the root devenv shell, choose the check for your change:
 | GitHub Actions workflows | `make check-workflows` |
 | Full repository | `make check` |
 
-Site checks install locked dependencies, build all four sites, and check generated
-pages, Markdown output and routing. A site's `make check` (or `make lint`) runs
-these same checks because footer and redirect assertions span all four artifacts.
-Building only one site is not sufficient before running `scripts/check-sites.mjs`.
+Site checks run `bazel test //...`, which builds declared artifacts and checks generated
+pages, Markdown, images, routing, workflows, manifests and deployment logic. A site's
+`make check` (or `make lint`) runs these same checks, including cross-site assertions.
+For a focused check, use `bazel test //:uses_test` (or homepage, blog, computer).
 Preview changed pages at desktop and mobile widths, including light and dark modes.
 
 Terraform checks build the sites, check formatting, validate configuration and run
@@ -120,9 +124,10 @@ repository. Site builds and screenshots are unnecessary unless rendered pages ch
 ## Configuration and updates
 
 `devenv.nix`, `devenv.yaml`, and the committed `devenv.lock` at the root are the
-only environment configuration. The YAML uses JSON syntax so the bootstrap can
-read pins directly with Nix. Devenv declares tools and cache settings; runnable
-commands live in Makefiles and repository scripts.
+environment entry points. The YAML uses JSON syntax so the bootstrap and Bazel
+can read the same pins. `dev/shared/versions.nix` selects runtime versions, and
+`dev/bazel/tools.nix` constructs the shared build tools and dependency environments.
+Runnable commands live in Makefiles and repository scripts.
 
 To update tools, edit root input revisions and language versions, bootstrap again
 when activation tools change, then run from the root:
@@ -132,18 +137,17 @@ scripts/lock-dev-env.sh
 make check
 ```
 
-Review and commit the resulting root lockfile. CI version pins remain a separate
-deliberate change. Kubernetes utilities are included in the normal environment.
+Review and commit the resulting root lockfile. After changing blog gem locks, run
+`bundix` in the blog directory and commit `gemset.nix` too. CI uses the same build
+tool pins; Terraform installation remains explicit in its workflow jobs. Kubernetes utilities are included in the normal environment.
 
 ## Local state and cloud workspaces
 
-`.devenv`, `.direnv`, `.devenv-state`, generated output, and dependencies are
-ignored. `make setup` installs frozen blog gems and Home, Uses and Computer npm dependencies; builds
-and development servers also prepare their dependencies. Gem caches include the
-platform and Ruby derivation identity. The locked protobuf gem needs a build flag
-that keeps format warnings from being fatal; it applies only while compiling
-that gem. Delete `.devenv-state` and the Home, Uses and Computer `node_modules` directories to reinstall
-dependencies. Setup does not change application lockfiles.
+`.devenv`, `.direnv`, `.devenv-state`, Bazel outputs, generated output and dependencies
+are ignored. `make setup` fetches Bazel's Nix tool repositories. Nix owns immutable npm
+and gem environments; deleting local `node_modules` does not clear those caches.
+Blog preview setup links its ignored `node_modules` to the same Nix dependency tree.
+Setup does not change application lockfiles.
 
 Cloud startup uses the same bootstrap and root `make setup`. A host without
 native Nix can use the pinned workspace-local nix-portable launcher described

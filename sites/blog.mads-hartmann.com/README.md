@@ -26,7 +26,7 @@ cd sites/blog.mads-hartmann.com
 make dev
 ```
 
-Open http://localhost:4000. The server installs locked gems as needed, includes
+Open http://localhost:4000. The server uses Nix-provided gems and npm packages, includes
 drafts, and restarts when source files, `llms.txt` or the shared footer change.
 Preview output goes to `.build/blog-preview` at the repository root. Stop it with Ctrl-C.
 
@@ -40,7 +40,7 @@ make check
 ```
 
 Production output goes to `.build/blog` at the repository root and excludes drafts.
-`make check` builds and checks all three sites. See
+`make check` builds and checks all four sites. See
 [validation](../../docs/development.md#validation) for check scope and
 [routing](../../docs/deployment.md#routing) for production redirects.
 
@@ -115,7 +115,7 @@ Browsers choose how far ahead to fetch lazy images; it is not an exact fold cuto
 Use `link=true` to link a screenshot to its original full-resolution file.
 Original images and existing links to them remain unchanged. Generated images live
 in ignored `.build/blog-images` and are copied by Jekyll into the site artifact.
-`make setup` and production builds install the locked Node dependency as well as
-the gems. Run `make setup` before invoking Jekyll directly. Development watches the
+`make setup` links the Nix-provided Node dependency for preview; production
+builds use the same dependency and gem environment through Bazel. Run `make setup` before invoking Jekyll directly. Development watches the
 image builder and Node manifests too. `make check` validates the generated image
 files, dimension descriptors, aspect ratios, and first-image loading policy.

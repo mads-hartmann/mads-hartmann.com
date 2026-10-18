@@ -1,0 +1,205 @@
+load("//dev/bazel:rules.bzl", "site_build", "site_manifest", "site_routing", "site_test")
+
+exports_files([
+    "devenv.yaml",
+    "dev/shared/versions.nix",
+    "scripts/package.json",
+    "scripts/package-lock.json",
+    "sites/blog.mads-hartmann.com/Gemfile",
+    "sites/blog.mads-hartmann.com/Gemfile.lock",
+    "sites/blog.mads-hartmann.com/gemset.nix",
+] + ["sites/" + directory + "/" + f for directory in [
+    "mads-hartmann.com",
+    "uses.mads-hartmann.com",
+    "computer.mads-hartmann.com",
+    "blog.mads-hartmann.com",
+] for f in [
+    "package.json",
+    "package-lock.json",
+]])
+
+filegroup(
+    name = "footer",
+    srcs = glob([
+        "sites/shared/footer/*.mjs",
+        "sites/shared/footer/*.html",
+        "sites/shared/footer/*.css",
+    ]),
+)
+
+[site_build(
+    name = site,
+    srcs = [
+        "scripts/fingerprint-assets.mjs",
+        ":footer",
+    ] + glob(
+        [
+            "sites/" + directory + "/src/**",
+            "sites/" + directory + "/build.mjs",
+            "sites/" + directory + "/index.md",
+            "sites/" + directory + "/llms.txt",
+            "sites/" + directory + "/robots.txt",
+            "sites/" + directory + "/sitemap.xml",
+        ],
+        allow_empty = True,
+    ),
+    runtime = "@nix_" + site + "//:tool.json",
+    site = site,
+) for site, directory in {
+    "homepage": "mads-hartmann.com",
+    "uses": "uses.mads-hartmann.com",
+    "computer": "computer.mads-hartmann.com",
+}.items()]
+
+site_build(
+    name = "blog",
+    srcs = [
+        "scripts/fingerprint-assets.mjs",
+        "sites/blog.mads-hartmann.com/build-images.mjs",
+        "sites/blog.mads-hartmann.com/llms.txt",
+        ":footer",
+    ] + glob(
+        ["sites/blog.mads-hartmann.com/src/**"],
+        exclude = [
+            "sites/blog.mads-hartmann.com/src/_drafts/**",
+            "sites/blog.mads-hartmann.com/src/.jekyll-cache/**",
+        ],
+    ),
+    runtime = "@nix_blog//:tool.json",
+    site = "blog",
+)
+
+[site_routing(
+    name = site + "_routing",
+    srcs = [
+        "routing/" + site + ".js",
+        "routing/markdown.js",
+        "routing/redirects.json",
+    ],
+    site = site,
+) for site in [
+    "homepage",
+    "blog",
+    "uses",
+    "computer",
+]]
+
+[site_manifest(
+    name = site + "_manifest",
+    content = ":" + site,
+    infrastructure = glob([
+        "terraform/stacks/" + site + "/*.tf",
+        "terraform/stacks/" + site + "/*.tfvars",
+        "terraform/stacks/" + site + "/*.hcl",
+        "terraform/stacks/" + site + "/.terraform.lock.hcl",
+        "terraform/modules/static-site/*.tf",
+    ]),
+    routing = ":" + site + "_routing",
+    site = site,
+) for site in [
+    "homepage",
+    "blog",
+    "uses",
+    "computer",
+]]
+
+filegroup(
+    name = "sites",
+    srcs = [":" + site + "_manifest" for site in [
+               "homepage",
+               "blog",
+               "uses",
+               "computer",
+           ]] +
+           [":" + site + suffix for site in [
+               "homepage",
+               "blog",
+               "uses",
+               "computer",
+           ] for suffix in [
+               "",
+               "_routing",
+           ]],
+)
+
+[site_test(
+    name = site + "_test",
+    data = [
+        ":" + site,
+        ":" + site + "_routing",
+        "routing/redirects.json",
+        "scripts/check-markdown.mjs",
+        "scripts/check-sites.mjs",
+        "sites/" + directory + "/llms.txt",
+    ] + glob(
+        ["sites/" + directory + "/index.md"],
+        allow_empty = True,
+    ) + ([
+        "sites/blog.mads-hartmann.com/check-images.mjs",
+        "@nix_blog//:tool.json",
+    ] if site == "blog" else []),
+    mode = site,
+    runtime = "@nix_checks//:tool.json",
+    tags = ["no-remote-exec"],
+) for site, directory in {
+    "homepage": "mads-hartmann.com",
+    "blog": "blog.mads-hartmann.com",
+    "uses": "uses.mads-hartmann.com",
+    "computer": "computer.mads-hartmann.com",
+}.items()]
+
+site_test(
+    name = "sites_test",
+    data = [
+        "routing/redirects.json",
+        "scripts/check-markdown.mjs",
+        "scripts/check-sites.mjs",
+        "scripts/fingerprint-assets.mjs",
+        "scripts/fingerprint-assets.test.mjs",
+        "scripts/test_upload_immutable_assets.py",
+        "scripts/upload-immutable-assets.py",
+        "sites/blog.mads-hartmann.com/check-images.mjs",
+        ":sites",
+        "@nix_blog//:tool.json",
+    ] + glob([
+        "sites/*/llms.txt",
+        "sites/uses.mads-hartmann.com/index.md",
+    ]),
+    mode = "all",
+    runtime = "@nix_checks//:tool.json",
+    tags = ["no-remote-exec"],
+)
+
+site_test(
+    name = "workflows_test",
+    data = glob([
+        ".github/workflows/*.yml",
+        ".github/actions/**/action.yml",
+    ]),
+    mode = "workflows",
+    runtime = "@nix_actionlint//:bin/actionlint",
+    tags = ["no-remote-exec"],
+)
+
+site_test(
+    name = "deployments_test",
+    data = glob(["scripts/tests/test_*.py"]) + [
+        "scripts/check-ci-results.sh",
+        "scripts/deploy-stack.sh",
+        "scripts/deployment-changes.py",
+    ],
+    mode = "deployments",
+    runtime = "@nix_checks//:tool.json",
+    tags = ["no-remote-exec"],
+)
+
+site_test(
+    name = "manifest_test",
+    data = [
+        "scripts/site-manifest.py",
+        "scripts/test-site-manifest.py",
+    ],
+    mode = "manifest",
+    runtime = "@nix_python//:bin/python3",
+    tags = ["no-remote-exec"],
+)

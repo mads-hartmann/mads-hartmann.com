@@ -8,7 +8,7 @@ help:
 	@echo 'Targets: setup, build, dev, check (or lint); COMPUTER_PORT=8082'
 
 setup:
-	npm ci --ignore-scripts --no-audit --no-fund
+	cd ../.. && bazel fetch //:computer_manifest
 
 build:
 	../../scripts/build.sh computer

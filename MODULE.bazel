@@ -1,0 +1,6 @@
+module(name = "mads_hartmann_sites")
+
+bazel_dep(name = "rules_nixpkgs_core", version = "0.14.0")
+
+nix = use_extension("//dev/bazel:extensions.bzl", "tools")
+use_repo(nix, "nix_actionlint", "nix_blog", "nix_checks", "nix_computer", "nix_homepage", "nix_node", "nix_python", "nix_uses")

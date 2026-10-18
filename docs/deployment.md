@@ -93,7 +93,8 @@ covers a partial deployment followed by a revert whose net source diff is empty.
 Each site's source directory (including dependencies and build configuration),
 routing function and Terraform stack select that site. Shared footer files,
 Markdown routing, redirects, Terraform modules/shared stack, scripts, workflows
-and local action changes select all sites. Unrelated documentation and manual kernel changes do not
+and local action changes select all sites. Bazel graph/configuration files and
+shared Nix build tool definitions also select all sites. Unrelated documentation and manual kernel changes do not
 select site deployments. Build and required checks still run; site jobs alone are
 skipped. Manual runs remain available to reconcile infrastructure drift even when
 source files have not changed. On automatic runs, actual changes applied to shared
@@ -127,6 +128,17 @@ The homepage has no external styles, fonts, scripts or image requests. Uses and 
 one pinned Markdown dependency. Markdown is trusted author-controlled source and
 can include HTML; it is not an untrusted-input renderer. The blog keeps Jekyll,
 posts, book reviews, drafts, media, feed and existing permalink behavior.
+
+## Build manifests
+
+The build artifact includes `.build/manifests/<site>.json` alongside content and
+routing. These deterministic Bazel outputs identify rendered content, routing and
+declared Terraform inputs. They do not include Git revisions or timestamps, so an
+unrelated commit does not change a site's content version. See [Bazel builds](builds.md).
+
+Deployment selection still uses the source-based gate above. Comparing manifests
+against successful S3 deployment records is a separate follow-up; a record can
+include the deploying commit without adding it to cached build inputs.
 
 ## Routing
 

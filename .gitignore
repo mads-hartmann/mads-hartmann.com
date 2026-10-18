@@ -22,3 +22,5 @@ __pycache__/
 devenv.local.nix
 devenv.local.yaml
 devenv.user.yaml
+/bazel-*
+.bazelrc.local
