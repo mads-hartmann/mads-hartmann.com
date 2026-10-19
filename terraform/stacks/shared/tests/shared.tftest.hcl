@@ -12,6 +12,26 @@ mock_provider "aws" {
     defaults = { certificate_arn = "arn:aws:acm:us-east-1:790804032123:certificate/new-dns-certificate" }
   }
 }
+# Import blocks need explicit resource overrides with a mock provider.
+override_resource {
+  target          = aws_route53_record.mail_mx
+  override_during = plan
+}
+override_resource {
+  target          = aws_route53_record.mail_spf
+  override_during = plan
+}
+override_resource {
+  target          = aws_route53_record.mail_dkim
+  override_during = plan
+}
+
+# Production already has a hosted zone before these records are imported.
+run "existing_zone" {
+  command = apply
+  plan_options { target = [aws_route53_zone.primary] }
+}
+
 run "dns_certificate" {
   command = apply
   assert {

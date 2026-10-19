@@ -113,7 +113,21 @@ resource "aws_iam_role_policy" "shared_apply" {
     } },
     # RequestCertificate also authorizes AddTagsToCertificate for its initial tags.
     { Effect = "Allow", Action = "acm:AddTagsToCertificate", Resource = "arn:aws:acm:us-east-1:${var.account_id}:certificate/*", Condition = { StringEquals = { "aws:RequestTag/Stack" = "shared", "aws:RequestTag/Project" = "mads-hartmann.com" } } },
-    { Effect = "Allow", Action = ["acm:AddTagsToCertificate", "acm:RemoveTagsFromCertificate"], Resource = "arn:aws:acm:us-east-1:${var.account_id}:certificate/*", Condition = { StringEquals = { "aws:ResourceTag/Stack" = "shared", "aws:ResourceTag/Project" = "mads-hartmann.com" } } }
+    { Effect = "Allow", Action = ["acm:AddTagsToCertificate", "acm:RemoveTagsFromCertificate"], Resource = "arn:aws:acm:us-east-1:${var.account_id}:certificate/*", Condition = { StringEquals = { "aws:ResourceTag/Stack" = "shared", "aws:ResourceTag/Project" = "mads-hartmann.com" } } },
+    # Keep mail record types paired with their exact names; these permissions do
+    # not allow shared CI to change site aliases or arbitrary mail subdomains.
+    { Effect = "Allow", Action = "route53:ChangeResourceRecordSets", Resource = "arn:aws:route53:::hostedzone/${var.zone_id}", Condition = { "ForAllValues:StringEquals" = {
+      "route53:ChangeResourceRecordSetsNormalizedRecordNames" = ["mads-hartmann.com"]
+      "route53:ChangeResourceRecordSetsRecordTypes"           = ["MX"]
+    } } },
+    { Effect = "Allow", Action = "route53:ChangeResourceRecordSets", Resource = "arn:aws:route53:::hostedzone/${var.zone_id}", Condition = { "ForAllValues:StringEquals" = {
+      "route53:ChangeResourceRecordSetsNormalizedRecordNames" = ["mads-hartmann.com", "_dmarc.mads-hartmann.com"]
+      "route53:ChangeResourceRecordSetsRecordTypes"           = ["TXT"]
+    } } },
+    { Effect = "Allow", Action = "route53:ChangeResourceRecordSets", Resource = "arn:aws:route53:::hostedzone/${var.zone_id}", Condition = { "ForAllValues:StringEquals" = {
+      "route53:ChangeResourceRecordSetsNormalizedRecordNames" = ["fm1._domainkey.mads-hartmann.com", "fm2._domainkey.mads-hartmann.com", "fm3._domainkey.mads-hartmann.com"]
+      "route53:ChangeResourceRecordSetsRecordTypes"           = ["CNAME"]
+    } } }
   ] })
 }
 resource "github_branch_default" "main" {

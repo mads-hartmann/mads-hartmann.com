@@ -88,4 +88,36 @@ run "kernel_boundaries" {
     ]]))
     error_message = "Existing function mutations must stay restricted to the site's named and Stack-tagged function."
   }
+  assert {
+    condition = alltrue([for grant in [
+      { type = "MX", names = ["mads-hartmann.com"] },
+      { type = "TXT", names = ["mads-hartmann.com", "_dmarc.mads-hartmann.com"] },
+      { type = "CNAME", names = ["fm1._domainkey.mads-hartmann.com", "fm2._domainkey.mads-hartmann.com", "fm3._domainkey.mads-hartmann.com"] }
+      ] : anytrue([for statement in jsondecode(aws_iam_role_policy.shared_apply.policy).Statement :
+        statement.Effect == "Allow" &&
+        contains(flatten([statement.Action]), "route53:ChangeResourceRecordSets") &&
+        statement.Resource == "arn:aws:route53:::hostedzone/${var.zone_id}" &&
+        try(toset(statement.Condition["ForAllValues:StringEquals"]["route53:ChangeResourceRecordSetsRecordTypes"]) == toset([grant.type]), false) &&
+        try(toset(statement.Condition["ForAllValues:StringEquals"]["route53:ChangeResourceRecordSetsNormalizedRecordNames"]) == toset(grant.names), false)
+    ])])
+    error_message = "Shared CI must manage mail using separate exact-name/type grants in its own hosted zone."
+  }
+  assert {
+    condition = alltrue([for statement in jsondecode(aws_iam_role_policy.shared_apply.policy).Statement :
+      (
+        statement.Resource == "arn:aws:route53:::hostedzone/${var.zone_id}" &&
+        alltrue([for record_type in statement.Condition["ForAllValues:StringEquals"]["route53:ChangeResourceRecordSetsRecordTypes"] :
+          contains(["MX", "TXT", "CNAME"], record_type)
+        ]) &&
+        alltrue([for name in try(statement.Condition["ForAllValues:StringEquals"]["route53:ChangeResourceRecordSetsNormalizedRecordNames"], []) :
+          contains(
+            statement.Condition["ForAllValues:StringEquals"]["route53:ChangeResourceRecordSetsRecordTypes"] == ["MX"] ? ["mads-hartmann.com"] :
+            statement.Condition["ForAllValues:StringEquals"]["route53:ChangeResourceRecordSetsRecordTypes"] == ["TXT"] ? ["mads-hartmann.com", "_dmarc.mads-hartmann.com"] :
+            ["fm1._domainkey.mads-hartmann.com", "fm2._domainkey.mads-hartmann.com", "fm3._domainkey.mads-hartmann.com"], name
+          )
+        ])
+      ) if contains(flatten([statement.Action]), "route53:ChangeResourceRecordSets")
+    ])
+    error_message = "Mail permissions must not grant site alias changes, unrelated names, or cross-type mail changes."
+  }
 }
