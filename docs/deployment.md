@@ -5,7 +5,7 @@
 | Root | State key | Responsibility |
 | --- | --- | --- |
 | Manual kernel | `kernel/terraform.tfstate` | Backend storage, OIDC, IAM roles/policies, GitHub controls |
-| Shared | `stacks/shared.tfstate` | Route 53 zone, DNS certificate and validation CNAME |
+| Shared | `stacks/shared.tfstate` | Route 53 zone, DNS certificate/validation CNAME, Fastmail MX/SPF/DKIM and DMARC |
 | Homepage | `stacks/homepage.tfstate` | Homepage S3/CloudFront, apex and www DNS, URL redirects |
 | Blog | `stacks/blog.tfstate` | Blog S3/CloudFront/DNS, generated posts and assets |
 | Uses | `stacks/uses.tfstate` | Uses S3/CloudFront/DNS, generated HTML |
@@ -165,13 +165,9 @@ Keep the validation CNAME for automatic renewal. ACM certificate deletion is a
 human operation: apply a reviewed removal plan before merging it so Actions
 never needs certificate deletion permissions.
 
-```sh
-export GITHUB_TOKEN="$(gh auth token)"
-terraform -chdir=terraform/kernel init -backend-config=backend.hcl
-terraform -chdir=terraform/kernel plan -out=kernel.tfplan
-terraform -chdir=terraform/kernel apply kernel.tfplan
-unset GITHUB_TOKEN
-```
+Follow the [kernel README](../terraform/kernel/README.md) for local tools,
+authentication with individual AWS credential environment variables, account
+verification, and the plan/apply commands.
 
 Review IAM, trust and GitHub-control changes here manually. A merge that changes
 the kernel validates it but does not apply it. When adjusting component permissions,
@@ -265,6 +261,49 @@ curl -i https://www.mads-hartmann.com/ -H 'Accept: text/markdown'
 curl -i https://blog.mads-hartmann.com/index.md
 curl -i https://uses.mads-hartmann.com/llms.txt
 ```
+
+## Email DNS
+
+The shared stack owns email DNS in `email.tf`. Fastmail is the only authorized
+sender: the apex SPF record ends in `-all`, and DMARC requests rejection of
+messages that fail both aligned SPF and aligned DKIM, including on subdomains
+(`p=reject; sp=reject`). The two Fastmail MX hosts retain their existing priorities.
+Keep all three `fm1`, `fm2` and `fm3` DKIM CNAMEs: Fastmail manages the target keys
+and may intentionally leave rotation slots empty.
+
+This deliberately tightens [Fastmail's documented compatibility defaults](https://www.fastmail.help/hc/en-us/articles/1500000280261-Setting-up-your-domain-MX-only),
+which use SPF `?all` and DMARC `p=none`. Fastmail [explains](https://www.fastmail.com/blog/email-authentication/)
+that neutral SPF accommodates other sending systems. Our `-all` policy instead
+requires every legitimate sending service to be authorized in SPF. DMARC
+enforcement is a separate choice: `p=reject` requires an aligned SPF or DKIM pass
+and can work even with neutral SPF. The strict policy here is intentional;
+account for any new sender before enabling it.
+
+The initial adoption uses `imports.tf` to import the existing MX, apex TXT and
+three DKIM CNAME record sets. DMARC is new. Imports run with the normal shared
+plan/apply and are skipped once the records are in state; no overwrite flag or
+manual state editing is needed. The apex TXT resource owns the entire TXT record
+set, so preserve any additional verification values if adding them later.
+
+Roll out in this order:
+
+1. Apply the kernel using the authenticated human session described above **before
+   merging**. The added shared-role permissions allow only apex MX, apex/DMARC TXT
+   and the three named DKIM CNAMEs in this hosted zone. Site roles remain limited
+   to A/AAAA aliases; existing ACM validation permissions are retained.
+2. Check that all legitimate senders use Fastmail or have their own aligned DKIM
+   configuration, and confirm a recent outgoing Fastmail message has passing,
+   aligned authentication. Other sending services must be accounted for before
+   enforcement. No DMARC report mailbox is assumed or provisioned by Terraform.
+3. Review a fresh shared plan: on first adoption expect **five imports, one SPF
+   update and one DMARC creation**, with no MX/DKIM changes or deletions. A different
+   result requires checking live DNS/state before applying. In particular, do not
+   remove unrelated apex TXT values. Merge to deploy through the existing shared
+   workflow, or apply the reviewed shared plan using a human AWS session.
+4. After DNS propagation, check the apex SPF and `_dmarc` TXT records, both MX hosts,
+   and all three DKIM CNAMEs. Send a message to an independent receiving service
+   and inspect its `Authentication-Results` header for aligned `dkim=pass` and
+   `dmarc=pass`. DNS configuration alone cannot verify actual outgoing signing.
 
 ## Recovery
 
