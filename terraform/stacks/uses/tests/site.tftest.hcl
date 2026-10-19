@@ -1,5 +1,14 @@
 mock_provider "aws" {
   override_during = plan
+  mock_resource "aws_cloudfront_distribution" {
+    defaults = { arn = "arn:aws:cloudfront::790804032123:distribution/TEST" }
+  }
+  mock_resource "aws_cloudwatch_log_group" {
+    defaults = { arn = "arn:aws:logs:us-east-1:790804032123:log-group:mads-sites-test-access" }
+  }
+  mock_resource "aws_cloudwatch_log_delivery_destination" {
+    defaults = { arn = "arn:aws:logs:us-east-1:790804032123:delivery-destination:mads-sites-test" }
+  }
   mock_resource "aws_cloudfront_function" {
     defaults = { arn = "arn:aws:cloudfront::790804032123:function/mads-sites-test" }
   }

@@ -1,5 +1,11 @@
 mock_provider "aws" {
   override_during = plan
+  mock_resource "aws_cloudwatch_log_group" {
+    defaults = { arn = "arn:aws:logs:us-east-1:790804032123:log-group:mads-sites-test-access" }
+  }
+  mock_resource "aws_cloudwatch_log_delivery_destination" {
+    defaults = { arn = "arn:aws:logs:us-east-1:790804032123:delivery-destination:mads-sites-test" }
+  }
   mock_resource "aws_s3_bucket" {
     override_during = plan
     defaults = {
@@ -96,6 +102,34 @@ run "cache_contract" {
   assert {
     condition     = length(terraform_data.immutable_assets.input.files) > 0 && alltrue([for key, digest in terraform_data.immutable_assets.input.files : startswith(key, "_assets/${digest}/")]) && terraform_data.immutable_assets.input.cache_control == "public,max-age=31536000,immutable"
     error_message = "Only byte-verified fingerprinted assets can be published as immutable."
+  }
+}
+run "traffic_logging" {
+  command = plan
+  assert {
+    condition = (
+      aws_cloudwatch_log_group.traffic.retention_in_days == 30 &&
+      aws_cloudwatch_log_group.traffic.region == "us-east-1" &&
+      aws_cloudwatch_log_group.traffic.log_group_class == "STANDARD" &&
+      aws_cloudwatch_log_delivery_source.traffic.region == "us-east-1" &&
+      aws_cloudwatch_log_delivery_destination.traffic.region == "us-east-1" &&
+      aws_cloudwatch_log_delivery.traffic.region == "us-east-1" &&
+      aws_cloudwatch_log_delivery_source.traffic.resource_arn == aws_cloudfront_distribution.distribution.arn &&
+      aws_cloudwatch_log_delivery_source.traffic.log_type == "ACCESS_LOGS" &&
+      aws_cloudwatch_log_delivery.traffic.delivery_source_name == aws_cloudwatch_log_delivery_source.traffic.name &&
+      aws_cloudwatch_log_delivery.traffic.delivery_destination_arn == aws_cloudwatch_log_delivery_destination.traffic.arn &&
+      aws_cloudwatch_log_delivery_destination.traffic.delivery_destination_configuration[0].destination_resource_arn == aws_cloudwatch_log_group.traffic.arn &&
+      aws_cloudwatch_log_delivery_destination.traffic.output_format == "json"
+    )
+    error_message = "Every site must deliver JSON CloudFront access logs to its own 30-day Standard log group through us-east-1."
+  }
+  assert {
+    condition = (
+      length(setintersection(toset(aws_cloudwatch_log_delivery.traffic.record_fields), toset(["c-ip", "cs(Cookie)", "cs-uri-query", "cs(Referer)", "x-forwarded-for"]))) == 0 &&
+      alltrue([for field in ["cs-method", "cs-uri-stem", "cs(User-Agent)", "sc-status", "sc-content-type", "x-host-header"] : contains(aws_cloudwatch_log_delivery.traffic.record_fields, field)]) &&
+      aws_cloudwatch_log_delivery.traffic.tags.Stack == var.stack
+    )
+    error_message = "Traffic logs must support the dashboard without collecting IPs, cookies, query strings or referrers, and deliveries must carry their IAM isolation tag."
   }
 }
 run "reject_missing_build" {

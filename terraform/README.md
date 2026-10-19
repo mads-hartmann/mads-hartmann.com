@@ -9,6 +9,11 @@ manual kernel updates and recovery. The `static-site` module serves each site
 from a private S3 bucket through CloudFront with signed origin requests and
 Route 53 aliases.
 
+The shared stack also owns the `mads-sites-traffic` CloudWatch dashboard. Each
+site delivers CloudFront access logs for traffic, user-agent and popular-page
+breakdowns. See [traffic analytics](../docs/traffic-analytics.md) for deployment,
+costs, retention and how to interpret the charts.
+
 ## Format and check
 
 Complete [first-time setup](../docs/development.md#first-time-setup), then run

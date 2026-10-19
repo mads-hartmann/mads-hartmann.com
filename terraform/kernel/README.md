@@ -1,8 +1,8 @@
 # Infrastructure kernel
 
 The kernel manages Terraform state storage, GitHub OIDC/IAM roles and policies,
-and GitHub repository controls. It is applied manually using your own AWS
-credentials and GitHub token; GitHub Actions validates it but does not apply it.
+the CloudFront log-delivery resource policy, and GitHub repository controls. It is
+applied manually using your own AWS credentials and GitHub token; GitHub Actions validates it but does not apply it.
 
 Check out the branch containing the reviewed kernel change. Apply permission
 changes **before merging** any stack changes that depend on them. Run the commands
@@ -68,10 +68,15 @@ terraform -chdir=terraform/kernel plan -out=kernel.tfplan
 The backend uses `terraform-state-cloud-mads-hartmann-com` in `eu-central-1`,
 with state key `kernel/terraform.tfstate` and native S3 locking.
 
-Review the plan's resource changes before running the next command. For the email
-DNS hardening change, expect one in-place update to
+Review the plan's resource changes before running the next command. For an email-only
+DNS hardening rollout, expect one in-place update to
 `aws_iam_role_policy.shared_apply` adding the scoped mail DNS permissions, with
 no resource creation or destruction. Investigate any additional changes.
+
+For the [traffic analytics rollout](../../docs/traffic-analytics.md), expect new
+traffic inspection/deployment policies on the existing CI roles and a CloudWatch
+Logs resource policy. Apply these before the PR's authenticated component plans
+or merge; the dashboard and log groups are created by the component stacks.
 
 Apply exactly the reviewed plan:
 
