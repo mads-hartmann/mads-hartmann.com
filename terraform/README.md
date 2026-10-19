@@ -28,6 +28,7 @@ for first-time activation and tool updates.
 
 ## Plan and deploy
 
-Follow [Deployment](../docs/deployment.md) for authentication and procedures.
-Manual plans/applies use a human AWS session. The kernel also needs `GITHUB_TOKEN`;
+Follow the [kernel README](kernel/README.md) to apply the kernel locally using
+individual AWS credential environment variables and a GitHub token.
+See [Deployment](../docs/deployment.md) for stack procedures and rollout order.
 Actions obtains short-lived AWS credentials through OIDC.

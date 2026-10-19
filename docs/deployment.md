@@ -165,13 +165,9 @@ Keep the validation CNAME for automatic renewal. ACM certificate deletion is a
 human operation: apply a reviewed removal plan before merging it so Actions
 never needs certificate deletion permissions.
 
-```sh
-export GITHUB_TOKEN="$(gh auth token)"
-terraform -chdir=terraform/kernel init -backend-config=backend.hcl
-terraform -chdir=terraform/kernel plan -out=kernel.tfplan
-terraform -chdir=terraform/kernel apply kernel.tfplan
-unset GITHUB_TOKEN
-```
+Follow the [kernel README](../terraform/kernel/README.md) for local tools,
+authentication with individual AWS credential environment variables, account
+verification, and the plan/apply commands.
 
 Review IAM, trust and GitHub-control changes here manually. A merge that changes
 the kernel validates it but does not apply it. When adjusting component permissions,
