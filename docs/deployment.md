@@ -4,8 +4,8 @@
 
 | Root | State key | Responsibility |
 | --- | --- | --- |
-| Manual kernel | `kernel/terraform.tfstate` | Backend storage, OIDC, IAM roles/policies, GitHub controls |
-| Shared | `stacks/shared.tfstate` | Route 53 zone, DNS certificate/validation CNAME, Fastmail MX/SPF/DKIM and DMARC |
+| Manual kernel | `kernel/terraform.tfstate` | Backend storage, OIDC, IAM roles/policies, log-delivery resource policy, GitHub controls |
+| Shared | `stacks/shared.tfstate` | Route 53 zone, DNS certificate/validation CNAME, Fastmail MX/SPF/DKIM and DMARC, traffic dashboard |
 | Homepage | `stacks/homepage.tfstate` | Homepage S3/CloudFront, apex and www DNS, URL redirects |
 | Blog | `stacks/blog.tfstate` | Blog S3/CloudFront/DNS, generated posts and assets |
 | Uses | `stacks/uses.tfstate` | Uses S3/CloudFront/DNS, generated HTML |
@@ -15,6 +15,10 @@ All states use the `terraform-state-cloud-mads-hartmann-com` bucket in
 `eu-central-1`, with native S3 lock files. Versioning protects previous states.
 Only the default Terraform workspace is supported. Homepage and uses buckets are
 in `eu-central-1`; the blog bucket is in `us-east-1`.
+
+All four sites' CloudFront access log groups and delivery resources are in
+`us-east-1`, with 30-day retention. See [traffic analytics](traffic-analytics.md)
+for the dashboard and its first-deployment requirements.
 
 Terraform Core 1.16.5 is the only supported version. Development, CI validation
 and automatic cloud plans/applies all use 1.16.5. Provider versions and their
