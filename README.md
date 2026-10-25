@@ -40,3 +40,9 @@ Terraform when deployment is enabled. The infrastructure kernel is applied manua
 See the [Sites workflow](https://github.com/mads-hartmann/mads-hartmann.com/actions/workflows/sites.yml)
 and [Deployment](docs/deployment.md) for CI checks, state ownership, manual kernel
 updates, deployment controls and recovery.
+
+## Security
+
+See [Security policy](SECURITY.md) for review scope and security objectives, and
+[Threat model](docs/threat-model.md) for architecture, trust boundaries and known
+verification gaps.
